@@ -486,9 +486,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#collecting-data-using-the-pmu_pub-plugin" class="md-nav__link">
+  <a href="#collecting-data-using-the-dummy-examon_pub-plugin" class="md-nav__link">
     <span class="md-ellipsis">
-      Collecting data using the "pmu_pub" plugin
+      Collecting data using the dummy "examon_pub" plugin
     </span>
   </a>
   
@@ -1114,9 +1114,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#collecting-data-using-the-pmu_pub-plugin" class="md-nav__link">
+  <a href="#collecting-data-using-the-dummy-examon_pub-plugin" class="md-nav__link">
     <span class="md-ellipsis">
-      Collecting data using the "pmu_pub" plugin
+      Collecting data using the dummy "examon_pub" plugin
     </span>
   </a>
   
@@ -1167,9 +1167,7 @@
 <h2 id="setup">Setup</h2>
 <h3 id="clone-the-git-repository">Clone the Git repository</h3>
 <p>First you will need to clone the Git repository:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/EEESlab/examon
-git<span class="w"> </span>checkout<span class="w"> </span>develop
-<span class="nb">cd</span><span class="w"> </span>examon/docker/
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ExamonHPC/examon.git
 </code></pre></div>
 <h3 id="create-docker-services">Create Docker Services</h3>
 <p>Once you have the above setup, you need to create the Docker services:</p>
@@ -1186,14 +1184,15 @@ git<span class="w"> </span>checkout<span class="w"> </span>develop
 <li>Type: <code>KairosDB</code>  </li>
 <li>Name: <code>kairosdb</code> </li>
 <li>Url: http://kairosdb:8083 </li>
-<li>Access: <code>Proxy</code></li>
+<li>Access: <code>Server</code></li>
 </ul>
 <h2 id="usage-examples">Usage Examples</h2>
-<h3 id="collecting-data-using-the-pmu_pub-plugin">Collecting data using the "pmu_pub" plugin</h3>
-<p>Once all Docker services are running (can be started either by <code>docker compose up -d</code> or <code>docker compose start</code>) the MQTT broker is available at <code>TEST_SERVER</code> port <code>1883</code> where <code>TEST_SERVER</code> is the address of the server where the services run.</p>
-<p>To test the installation, we can use the <code>pmu_pub</code> plugin available in the <code>publishers/pmu_pub</code> folder of  this project.</p>
+<h3 id="collecting-data-using-the-dummy-examon_pub-plugin">Collecting data using the dummy "examon_pub" plugin</h3>
+<p>Once all Docker services are running (can be started either by <code>docker-compose up -d</code> or <code>docker-compose start</code>), the MQTT broker is available at <code>TEST_SERVER</code> port <code>1883</code> where <code>TEST_SERVER</code> is the address of the server where the services run.</p>
+<p>To test the installation we can use the <code>examon_pub.py</code> plugin available in the <code>publishers/examon_pub</code> folder of  this project.</p>
+<p>It is highly recommended to follow the tutorial described in the Jupyter notebook <code>README-notebook.ipynb</code> to understand how an Examon plugin works.</p>
 <p>After having installed and configured it on one or more test nodes we can start the data collection running for example:</p>
-<p><div class="highlight"><pre><span></span><code><span class="o">[</span>root@testnode00<span class="o">]</span>$<span class="w"> </span>./pmu_pub<span class="w"> </span>-b<span class="w"> </span>TEST_SERVER<span class="w"> </span>-p<span class="w"> </span><span class="m">1883</span><span class="w"> </span>-t<span class="w"> </span>org/myorg<span class="w"> </span>-s<span class="w"> </span><span class="m">1</span><span class="w"> </span>run
+<p><div class="highlight"><pre><span></span><code><span class="o">[</span>root@testnode00<span class="o">]</span>$<span class="w"> </span>python<span class="w"> </span>./examon_pub.py<span class="w"> </span>-b<span class="w"> </span>TEST_SERVER<span class="w"> </span>-p<span class="w"> </span><span class="m">1883</span><span class="w"> </span>-s<span class="w"> </span><span class="m">1</span><span class="w"> </span>run
 </code></pre></div>
 If everything went well, the data are available both through the Grafana interface and using the <a href="../../Users/Demo_ExamonQL/">examon-client</a>. </p>
 
