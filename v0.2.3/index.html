@@ -1,0 +1,1606 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Gain deeper insights into your data with advanced monitoring, analytics and visualization tools.">
+      
+      
+      
+        <link rel="canonical" href="https://fbeneventi.github.io/v0.2.3/">
+      
+      
+      
+        <link rel="next" href="Introduction/">
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.44">
+    
+    
+      
+        <title>Home - ExaMon</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.0253249f.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="stylesheets/extra.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+    
+      
+
+    
+  
+    <!-- Track external links -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        document.body.addEventListener("click", function(ev) {
+          if (ev.target instanceof HTMLElement) {
+            var el = ev.target.closest("a[href^=http]")
+            if (el)
+              ga("send", "event", "outbound", "click", el.href)
+          }
+        })
+      })
+    </script>
+  
+    
+    
+  
+    <!-- Determine title -->
+    
+    
+  
+    <!-- The image needs to have an absolute URL -->
+    
+  
+    <!-- Open graph meta tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ExaMon" />
+    <meta property="og:description" content="Gain deeper insights into your data with advanced monitoring, analytics and visualization tools." />
+    <meta property="og:url" content="https://fbeneventi.github.io/v0.2.3/" />
+    <meta property="og:image" content="https://fbeneventi.github.io/v0.2.3assets/images/banner.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1080" />
+    <meta property="og:image:height" content="568" />
+  
+    <!-- Twitter meta tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@examon_hpc" />
+    <meta name="twitter:creator" content="@Ben__Fra" />
+    <meta name="twitter:title" content="ExaMon" />
+    <meta name="twitter:description" content="Gain deeper insights into your data with advanced monitoring, analytics and visualization tools." />
+    <meta name="twitter:image" content="https://fbeneventi.github.io/v0.2.3assets/images/banner.png" />
+  
+    <!-- Extra stylesheets  -->
+    <!-- <link
+      rel="stylesheet"
+      href="assets/stylesheets/overrides.css"
+    /> 
+     -->
+
+    
+  
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="ExaMon" class="md-header__button md-logo" aria-label="ExaMon" data-md-component="logo">
+      
+  <img src="assets/images/favicon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ExaMon
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Home
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ExamonHPC/examon" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ExamonHPC/examon
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+    
+        
+          
+        
+      
+  
+    <!-- Additional styles for landing page -->
+    <style>
+      /* Version selector styling */
+      .md-version__link {
+          color:var(--md-default-fg-color);
+      }
+      .md-version__list {
+          color:var(--md-default-fg-color);
+          background-color:var(--md-default-bg-color);
+      }
+      .md-version__item a {
+          color:var(--md-default-fg-color);
+      }
+      ul[class*="md-version__list"] {
+          justify-content: flex-start !important;
+      }      
+       .md-typeset .tx-insiders{
+          color:#e91e63
+      }
+      .md-typeset .tx-switch button{
+          cursor:pointer;
+          transition:opacity 250ms
+      }
+      .md-typeset .tx-switch button:hover{
+          opacity:.75
+      }
+      .md-typeset .tx-switch button>code{
+          display:block;
+          color:var(--md-primary-bg-color);
+          background-color:var(--md-primary-fg-color)
+      }
+      .md-typeset .tx-columns{
+          -moz-columns:2;
+          columns:2
+      }
+      .md-typeset .tx-columns>*{
+          -moz-column-break-inside:avoid;
+          break-inside:avoid
+      }
+      @media screen and (max-width: 29.9375em){
+          .md-typeset .tx-columns{
+              -moz-columns:initial;
+              columns:initial
+          }
+      }
+      .md-announce a,.md-announce a:focus,.md-announce a:hover{
+          color:currentColor
+      }
+      .md-announce strong{
+          white-space:nowrap
+      }
+      .md-announce .twitter{
+          margin-left:.2em;
+          color:#00acee
+      }
+      .tx-container{
+          padding-top:1rem;
+          /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(0, 0%, 100%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
+          */
+          margin: 0 0px;
+          background-color: var(--md-primary-bg-color) 99%;
+          background-image: url('assets/images/home_bg-fs8.png');
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+      [data-md-color-scheme=slate] .tx-container{
+          /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(232, 15%, 21%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
+          */
+          margin: 0 0px;
+          background-color: var(--md-primary-bg-color) 99%;
+          background-image: url('assets/images/home_bg-fs8.png');
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+      @-webkit-keyframes tx-heart{
+          0%,40%,80%,100%{
+              transform:scale(1)
+          }
+          20%,60%{
+              transform:scale(1.15)
+          }
+      }
+      @keyframes tx-heart{
+          0%,40%,80%,100%{
+              transform:scale(1)
+          }
+          20%,60%{
+              transform:scale(1.15)
+          }
+      }
+      .tx-content__footer{
+          margin-top:1rem;
+          text-align:center
+      }
+      .tx-content__footer a{
+          display:inline-block;
+          color:#e91e63;
+          transition:transform 250ms cubic-bezier(0.1, 0.7, 0.1, 1),color 125ms
+      }
+      .tx-content__footer a:focus,.tx-content__footer a:hover{
+          transform:scale(1.2)
+      }
+      .tx-content__footer hr{
+          display:inline-block;
+          width:2rem;
+          margin:1em;
+          vertical-align:middle;
+          background-color:currentColor;
+          border:none
+      }
+      .tx-heart{
+          -webkit-animation:tx-heart 1000ms infinite;
+          animation:tx-heart 1000ms infinite
+      }
+      .tx-hero{
+          margin:0 .8rem;
+          color:var(--md-primary-bg-color)
+      }
+      .tx-hero h1{
+          margin-bottom:1rem;
+          color:currentColor;
+          font-weight:700
+      }
+      @media screen and (max-width: 29.9375em){
+          .tx-hero h1{
+              font-size:1.4rem
+          }
+
+      }
+      .tx-hero__content{
+          padding-bottom:6rem
+      }
+      @media screen and (min-width: 60em){
+          .tx-hero{
+              display:flex;
+              align-items:stretch
+          }
+          .tx-hero__content{
+              max-width:19rem;
+              margin-top:3.5rem;
+              padding-bottom:14vw
+          }
+          .tx-hero__image{
+              order:1;
+              width:38rem;
+              transform:translateX(4rem)
+          }
+      }
+      @media screen and (min-width: 76.25em){
+          .tx-hero__image{
+              transform:translateX(8rem)
+          }
+
+          .top-hr {
+              width: 100%;
+              display: flex;
+              max-width: 61rem;
+              margin-right: auto;
+              margin-left: auto;
+              padding: 0 .2rem;
+          }
+
+          .bottom-hr {
+              margin-top: 10px;
+              width: 100%;
+              display: flex;
+              max-width: 61rem;
+              margin-right: auto;
+              margin-left: auto;
+              padding: 0 .2rem;
+          }
+
+          .feature-item {
+              flex: 1;
+              min-width: 0;
+          }
+
+          .feature-item:hover {
+              /* background-color: #526cfe47; */
+              border-radius: 3px;
+          }
+
+
+      }
+
+      .hr {
+          border-bottom: 1px solid #eee;
+          width: 100%;
+          margin: 20px 0;
+      }
+
+
+      .tx-hero .md-button{
+          margin-top:.5rem;
+          margin-right:.5rem;
+          color:var(--md-primary-bg-color)
+      }
+      .tx-hero .md-button:hover,.tx-hero .md-button:focus{
+          color:var(--md-default-bg-color);
+          background-color:var(--md-accent-fg-color);
+          border-color:var(--md-accent-fg-color)
+      }
+      .tx-hero .md-button--primary{
+          color:#894da8;
+          background-color:var(--md-primary-bg-color);
+          border-color:var(--md-primary-bg-color)
+      }
+      /* Application header should be static for the landing page */
+      .md-header {
+        position: initial;
+      }
+  
+      /* Remove spacing, as we cannot hide it completely */
+      .md-main__inner {
+        margin: 0;
+      }
+  
+      /* Hide main content for now */
+      .md-content {
+        display: none;
+      }
+
+      /* Hide hero image for now */
+      .tx-hero__image {
+        display: none;
+      }
+  
+      /* Hide table of contents */
+      @media screen and (min-width: 60em) {
+        .md-sidebar--secondary {
+          display: none;
+        }
+      }
+  
+      /* Hide navigation */
+      @media screen and (min-width: 76.25em) {
+        .md-sidebar--primary {
+          display: none;
+        }
+
+      }
+
+
+    /* custom styles  */
+    .feature-item h2 svg {
+        height: 30px;
+        float: left;
+        margin-right: 10px;
+        transform: translateY(10%);
+    }
+
+    .top-hr {
+        margin-top: 52px;
+    }
+
+    .feature-item {
+        font-family: 'Lato', sans-serif;
+        font-weight: 300;
+        box-sizing: border-box;
+        padding: 0 15px;
+        word-break: break-word
+    }
+
+    .feature-item h2 {
+        color: #333;
+        font-weight: 300;
+        font-size: 25px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: normal;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-family: inherit;
+    }
+
+    .feature-item p {
+        font-size: 16px;
+        line-height: 1.8em;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        color: #111;
+        margin: 0 0 10px;
+        display: block;
+    }
+
+    .feature-item .md-button{
+          margin-top:.5rem;
+          margin-right:.5rem;
+          color:var(--md-primary-fg-color);
+          margin: 0 auto; 
+          text-align: center; 
+          font-size: 24px; 
+          padding: 10px 32px;
+          border: 0.1rem solid;
+          border-radius: 0.1rem
+      }
+    .feature-item .md-button:hover,.feature-item .md-button:focus{
+          color:var(--md-default-bg-color);
+          background-color:var(--md-accent-fg-color);
+          border-color:var(--md-accent-fg-color)
+      }
+    .feature-item .md-button--primary{
+          color:#894da8;
+          background-color:var(--md-primary-bg-color);
+          border-color:var(--md-primary-fg-color)
+      }
+
+
+    .logo-grid {
+        flex-wrap: wrap; /* Allow flex items to wrap to the next row */
+        justify-content: center; /* Center items horizontally within the container */
+      }
+
+    .logo-grid a {
+        flex: 1; /* Distribute available space equally among items */
+        text-align: center; /* Center the text within each item */
+        margin: 10px; /* Add some spacing between items */
+      }
+
+      /* Add media query using em units for max-width */
+      @media screen and (max-width: 76.25em) {
+
+        .top-hr {
+          display: grid;
+        }
+        /* Change the order of flex items within .second-row */
+        .second-row .feature-item:nth-child(1) {
+          order: 2; /* Change order for the first .feature-item in the second-row */
+        }
+
+        .second-row .feature-item:nth-child(2) {
+          order: 1; /* Change order for the second .feature-item in the second-row */
+        }
+
+        /* Disable Menu drawer: broken in hompage */
+        .md-header__button:not([hidden]) {
+          display: none;
+        }
+
+        .md-sidebar {
+          display: none;
+        }
+      }
+
+
+    /* footer  */
+
+    footer {
+      background-color: #000000de;
+      color: #fff;
+      padding: 20px 0;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .logo-section img {
+      max-height: 50px;
+      margin-right: 20px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap; /* Allow flex items to wrap to the next row */
+    }
+
+    nav li {
+      margin: 0 10px;
+    }
+
+    nav a {
+      color: var(--md-footer-fg-color--lighter);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: all 0.3s ease-in-out;
+    }
+
+    nav a:hover {
+      color: #0088cc;
+    }
+
+    .social-media {
+      display: flex;
+    }
+
+    .social-icon {
+      color: #fff;
+      font-size: 1.5rem;
+      margin-right: 10px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .social-icon:hover {
+      color: #0088cc;
+    }
+
+
+    </style>
+  
+    <!-- Hero for landing page -->
+    <section class="tx-container">
+      <div class="md-grid md-typeset">
+        <div class="tx-hero">
+  
+          <!-- Hero image -->
+          <div class="tx-hero__image">
+            <img
+              src="assets/images/home_bg-fs8.png"
+              alt=""
+              width="1920"
+              height="600"
+              draggable="false"
+            >
+          </div>
+  
+          <!-- Hero content -->
+          <div class="tx-hero__content">
+            <h1>A holistic solution for monitoring HPC resources</h1>
+            <p>Gain deeper insights into your data with advanced monitoring, analytics and visualization tools.</p>
+            <a
+              href="getting_started/"
+              title="Quick start"
+              class="md-button md-button--primary"
+            >
+              Quick start
+            </a>
+            <a
+              href="https://github.com/EEESlab/examon"
+              title="GitHub repository"
+              class="md-button"
+            >
+              Go to GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+   <div class="top-hr">
+      <div class="feature-item">
+        <!-- <h2>Collect and Store</h2> -->
+        <h2>
+          <svg id="eVjnPUTkQfc1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1424 1240" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"><g transform="matrix(.924202 0 0 0.905762-1351.461191-648.966991)"><path d="M2231.5,1315.5v636.19" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="135.208" stroke-linecap="round" stroke-miterlimit="8"/><path d="M2417.37,1499.66l-188.14-187.81-184.57,184.89" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="135.208" stroke-linecap="round" stroke-miterlimit="8"/><path d="M239.93,480C107.106,479.686,-0.31393,371.98,0.000731,239.432s108.245269-239.745181,241.069269-239.431174c2.816.006657,5.631.062657,8.445.167974" transform="matrix(1 0 0-1 1548 1718)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M111.782,415.703C6.7954,356.144,-30.9692,221.066,27.4322,113.998C38.2839,94.1033,52.0738,76.0308,68.3174,60.415" transform="matrix(.609716 0.79262 0.79262-.609716 1701.04 1222.92)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M464.978,634.069c-167.416,73.787-362.983-2.037-436.8113-169.357-73.8285-167.32,2.0386-362.775,169.4543-436.5615c19.929-8.7837,40.677-15.5817,61.941-20.29533" transform="matrix(-.051606 0.998668 0.998668 0.051606 2103.8 801.952)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M188.641,421.552C84.1815,421.244,-0.275518,326.627,0.000829,210.219C0.277176,93.8105,85.1823,-0.3074,189.642,0.000557c5.213.015369,10.423.270896,15.617.765926" transform="matrix(-.993962-.109728-.109728 0.993962 2917.39 1322.36)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M0,0l314.047.000361" transform="matrix(-1 0 0 1 2684.05 1721)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M1798,1718h293.17" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/></g></svg>
+          Collect
+        </h2>
+        <p>Collect and store data from any source using a flexible data model and scalable data store.</p>
+      </div>
+      <div class="feature-item">
+        <!-- <h2>Visualize and Analyze</h2> -->
+        <h2>
+          <svg id="emhAjFWwaGo1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"><g transform="translate(1.719059 0)"><g transform="matrix(1.209748 0 0 1.209747-1.718966 1.85185)"><path d="M266.666667,128C331.468077,128,384,180.531923,384,245.333333c0,24.693186-7.627964,47.604765-20.656081,66.506928l59.884556,59.884992-30.169889,30.169889-59.884992-59.884557c-18.902163,13.028118-41.813742,20.656082-66.506927,20.656082-64.801411,0-117.333334-52.531923-117.333334-117.333334s52.531923-117.333333,117.333334-117.333333Zm0,42.666667C225.429405,170.666667,192,204.096072,192,245.333333s33.429405,74.666667,74.666667,74.666667s74.666666-33.429405,74.666666-74.666667-33.429405-74.666666-74.666666-74.666666ZM128.404239,234.665576c-.26786,3.5208-.404239,7.078352-.404239,10.667757c0,11.014287,1.284152,21.728643,3.710904,32.001518L0,277.333333v-42.666666l128.404239-.001091ZM85.333333,0v213.333333h-64L21.333333,0h64Zm85.333334,85.333333l-.00272,59.94015c-18.930213,18.167331-32.715709,41.654591-38.953043,68.058332l-25.044237.001518v-128h64ZM256,42.666667l-.000404,64.404187c-23.445281,1.783582-45.260868,9.397436-64.000144,21.394945L192,42.666667h64ZM341.333333,64l.00065,64.465865c-18.739115-11.99743-40.554496-19.611277-63.999559-21.394959L277.333333,64h64Z" fill-rule="evenodd"/></g></g></svg>
+          Analyze
+        </h2>
+        <p>Use data immediately: From zero-code dashboards to advanced BI tools using ANSI-SQL or even Python in a popular Jupyter notebook.</p>
+      </div>
+      <div class="feature-item">
+        <!-- <h2>Collaborate and Improve</h2> -->
+        <h2>
+          <svg id="eFZzaCDtdpH1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"><g transform="translate(.000504 0)"><polygon points="154.219,205.188 166.219,335.031 110.922,405.563 96.406,296.563"/><polygon points="357.781,205.188 345.766,335.031 401.063,405.563 415.594,296.563"/><path d="M323.813,62.219C305.125,23.328,275.656,0,256,0s-49.125,23.344-67.813,62.219h135.626Z"/><path d="M331.328,80.469h-150.656c-6.641,19.156-10.594,41.094-10.047,65.188c1.609,69.063,18.047,190.984,18.047,190.984l122.641-.016l12,.016c0,0,16.453-121.938,18.031-190.984.578-24.094-3.375-46.048-10.016-65.188ZM256,231.031c-23.578,0-42.688-19.094-42.688-42.672s19.125-42.672,42.688-42.672s42.672,19.094,42.656,42.672c.016,23.579-19.093,42.672-42.656,42.672Z"/><path d="M429.516,512c-6.109-17.594-22.859-30.219-42.531-30.219-6.297,0-12.297,1.281-17.766,3.625-1.875-20.578-19.188-36.688-40.25-36.688-3.047,0-6,.328-8.844.969.031-.563.031-1.125.031-1.688c0-15.531-12.594-28.125-28.125-28.125-4.031,0-7.875.844-11.344,2.375-9.734-17.219-12.563-62.156-12.563-62.156h-25.5c0,0-3.266,49.344-14.813,65.688-2.688-1.094-5.656-1.688-8.75-1.688-13.016,0-23.563,10.547-23.563,23.563c0,.984.063,1.953.188,2.906-3.719-1.203-3.281-1.844-7.406-1.844-16.484,0-30.531,10.406-35.938,25-6.047-2.516-12.672-3.906-19.625-3.906-25.156,0-46.063,18.219-50.234,42.188h347.033Z"/></g></svg>
+          Improve
+        </h2>
+        <p>Enable teams with different areas of expertise to work together, maximizing the extraction of valuable insights.</p>
+      </div>
+    </div>
+    
+
+
+    
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h2>Breaking Down Data Silos</h2>
+        <p>ExaMon provides a centralized repository that breaks down data silos, consolidates information, and offers downstream users a single place to look for all data sources. This accelerates knowledge discovery and results in faster decision-making and improved performance.</p>
+      </div>
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <img src="assets/images/silost.png" alt="sp1" style="width: 100%;">
+        <p></p>
+      </div>
+    </div>
+
+
+    <div class="top-hr second-row">
+        <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <img src="assets/images/loopt.png" alt="sp1" style="width: 100%;">
+          <p></p>
+        </div>
+        <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <h2>Empowering Technology Transfer</h2>
+        <p>Enables smooth technology transfer between academia and industry, encompassing data collection, analysis, collaboration, and continuous improvement, fostering innovation and real-world impact.</p>
+      </div>
+    </div>
+
+
+    <div class="top-hr">
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h2>Fueling Digital Twins</h2>
+        <p>With a unified interface that smoothly integrates different data sources, creating and operating a digital twin becomes easier. ExaMon streamlines the process of gathering, analyzing, and presenting various data on a 3D digital representation of the assets, which allows for thorough insights, quick collaboration, and effective overall optimization.</p>
+      </div>
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center;justify-content: center;">
+        <img src="assets/images/digitatwint-fs8.png" alt="sp1" style="width: 100%;">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+
+    
+    <div class="top-hr">
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <a
+          href="Introduction/"
+          title="Introduction"
+          class="md-button md-button--primary"
+        >
+        Quick start
+      </a>
+      </div>
+    </div>
+    
+
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="feature-item">
+        <h2> </h2>
+        <p>ExaMon is a project by DEI - Department of Electrical, Electronic, and Information Engineering "Guglielmo Marconi" of the University of Bologna.</p>
+      </div>
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <a href="https://dei.unibo.it/en/index.html" target="_blank"><img src="https://www.unibo.it/en/++theme++unibotheme.portale/img/header/sigillo1x_xl.png" alt="sp1" style="width: 100%;"></a>
+        <p></p>
+      </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+
+    <div class="top-hr">
+      <div class="feature-item">
+        <h2 style="text-align: center; margin-bottom: 40px;">Partners</h2>
+        <div class="logo-grid" style="display: flex; justify-content: center;">
+            <a href="https://www.cineca.it/en" target="_blank"><img src="assets/images/cineca_logo.png" alt="Logo 1" style="padding: 40px; max-height: 180px; width: auto"></a>
+            <a href="https://www.e4company.com/en/" target="_blank"><img src="assets/images/e4_logo.png" alt="Logo 2" style="padding: 40px; max-height: 180px; width: auto"></a>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="feature-item">
+        <h2 style="text-align: center; margin-bottom: 40px;">European Projects</h2>
+        <div class="logo-grid" style="display: flex; justify-content: center;">
+          <!-- <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;"> -->
+            <a href="https://cordis.europa.eu/project/id/291125" target="_blank"><img src="assets/images/multitherman_logo.png" alt="Logo 0" style="padding: 30px; height: 130px; width: auto;"></a>
+            <a href="https://antarex.fe.up.pt/" target="_blank"><img src="assets/images/antarex_logo.png" alt="Logo 1" style="padding: 30px; height: 100px; width: auto;"></a>
+            <a href="https://www.iotwins.eu/" target="_blank"><img src="assets/images/iotwins_logo.png" alt="Logo 2" style="padding: 30px; height: 100px; width: auto;"></a>
+          <!-- </div>  -->
+          <!--  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;"> -->
+            <a href="https://regale-project.eu/" target="_blank"><img src="assets/images/regale_logo.png" alt="Logo 3" style="padding: 30px; height: 100px; width: auto;"></a>
+            <a href="https://graph-massivizer.eu/" target="_blank"><img src="assets/images/graphmass_logo.png" alt="Logo 4" style="padding: 30px; height: 100px; width: auto;"></a>
+           <!-- </div> -->
+        </div>
+      </div>
+    </div>
+
+  
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="ExaMon" class="md-nav__button md-logo" aria-label="ExaMon" data-md-component="logo">
+      
+  <img src="assets/images/favicon.png" alt="logo">
+
+    </a>
+    ExaMon
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ExamonHPC/examon" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ExamonHPC/examon
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Administrators
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Administrators
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Administrators/Getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Users
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Users
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Users/Getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Clusters
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Clusters
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Marconi100/Metrics_reference/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Marconi 100
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    MonteCimone
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            MonteCimone
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="MonteCimone/MonteCimone/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2_2" id="__nav_6_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Notebooks
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Notebooks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="MonteCimone/Examon_Monte_Cimone/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="About/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="credits/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Credits
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contactus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contact Us
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Blog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="blog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_10_2" id="__nav_10_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Archive
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="blog/archive/2023/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2023
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_10_3" id="__nav_10_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Categories
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="blog/category/test/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+     <footer class>
+      <div class="footer-content">
+        <div class="logo-section">
+          <img src="https://github.com/fbeneventi/panels/raw/main/logo4_trasp.png" alt="ExaMon" style="padding: 5px">
+<!--           <div class="md-copyright__highlight">
+            Copyright &copy; 2023 Francesco Beneventi
+          </div> -->
+        </div>
+        <nav>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="getting_started/">Docs</a></li>
+            <li><a href="About/">About</a></li>
+            <li><a href="credits/">Credits</a></li>
+            <li><a href="contactus/">Contact us</a></li>
+          </ul>
+        </nav>
+        <div class="social-media">
+          <a href="https://github.com/ExamonHPC/examon" class="md-social__link">
+          <p> 
+            <span class="twemoji">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg> 
+            </span>
+            </p>
+          </a>
+          <a href="https://twitter.com/examon_hpc" class="md-social__link">
+          <p> 
+            <span class="twemoji">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253"/></svg> 
+            </span>
+            </p>
+          </a>
+          <a href="https://hub.docker.com/r/examonhpc/examon" class="md-social__link">
+          <p> 
+            <span class="twemoji">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg> 
+            </span>
+            </p>
+          </a>
+          <a href="https://github.com/orgs/ExamonHPC/discussions" class="md-social__link">
+          <p> 
+            <span class="twemoji">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M208 352c114.9 0 208-78.8 208-176S322.9 0 208 0 0 78.8 0 176c0 38.6 14.7 74.3 39.6 103.4-3.5 9.4-8.7 17.7-14.2 24.7-4.8 6.2-9.7 11-13.3 14.3-1.8 1.6-3.3 2.9-4.3 3.7-.5.4-.9.7-1.1.8l-.2.2C1 327.2-1.4 334.4.8 340.9S9.1 352 16 352c21.8 0 43.8-5.6 62.1-12.5 9.2-3.5 17.8-7.4 25.2-11.4C134.1 343.3 169.8 352 208 352m240-176c0 112.3-99.1 196.9-216.5 207 24.3 74.4 104.9 129 200.5 129 38.2 0 73.9-8.7 104.7-23.9 7.5 4 16 7.9 25.2 11.4 18.3 6.9 40.3 12.5 62.1 12.5 6.9 0 13.1-4.5 15.2-11.1s-.2-13.8-5.8-17.9l-.2-.2c-.2-.2-.6-.4-1.1-.8-1-.8-2.5-2-4.3-3.7-3.6-3.3-8.5-8.1-13.3-14.3-5.5-7-10.7-15.4-14.2-24.7 24.9-29 39.6-64.7 39.6-103.4 0-92.8-84.9-168.9-192.6-175.5.4 5.1.6 10.3.6 15.5z"/></svg> 
+            </span>
+            </p>
+          </a>
+        </div>
+      </div>
+    </footer>
+  
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": ".", "features": ["toc.follow", "search.suggest", "search.highlight", "search.share", "navigation.footer", "announce.dismiss"], "search": "assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+    
+    
+      <script src="assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+    
+  </body>
+</html>
