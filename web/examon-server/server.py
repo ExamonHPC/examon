@@ -108,7 +108,7 @@ def qb_get_where(query):
         for k,v in query['tags'].iteritems():
             for i in v:
                 _where += ' AND '
-                if k.lower() in ['user_id','exit_status']:
+                if k.lower() in ['user_id','job_id']:
                     _where += "{} = {}".format(str(k),str(i))
                 elif k == 'node':
                     _where += "cpus_alloc_layout CONTAINS KEY '{}'".format(str(i))
@@ -149,13 +149,11 @@ def query_builder(query):
     if qb_get_tstart(query):
         tstart = qb_get_tstart(query)
         cass_query += ' WHERE '
-        #cass_query += '(start_time, end_time) >= ' + "({},{})".format(tstart, tstart)
-        cass_query += '(stime, mtime) >= ' + "({},{})".format(tstart, tstart)
+        cass_query += '(start_time, end_time) >= ' + "({},{})".format(tstart, tstart)
     if qb_get_tstop(query):
         tstop = qb_get_tstop(query)
         cass_query += ' AND '
-        #cass_query += '(start_time, end_time) <= ' + "({},{})".format(tstop, tstop)
-        cass_query += '(stime, mtime) <= ' + "({},{})".format(tstop, tstop)
+        cass_query += '(start_time, end_time) <= ' + "({},{})".format(tstop, tstop)
     if qb_get_where(query):
         cass_query += qb_get_where(query)
     if qb_get_limit(query):
