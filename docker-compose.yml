@@ -19,8 +19,8 @@ services:
         source: ./web/examon-server
         target: /etc/examon_deploy/examon/web/examon-server
       - type: bind
-        source: ./publishers/examon_pub
-        target: /etc/examon_deploy/examon/publishers/examon_pub
+        source: ./publishers/random_pub
+        target: /etc/examon_deploy/examon/publishers/random_pub
     logging:
       driver: json-file
       options:
