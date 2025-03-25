@@ -11,9 +11,6 @@ RUN touch /etc/apt/sources.list
 # Debian strech moved to archived
 RUN echo "deb https://debian.mirror.garr.it/debian-archive/ stretch main" > /etc/apt/sources.list
 
-# Update repositories
-RUN apt-get -y update
-
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     apt-transport-https \
@@ -25,6 +22,7 @@ RUN apt-get update && apt-get install -y \
 	&& rm -rf /var/lib/apt/lists/*
 
 # copy app
+ADD ./publishers/random_pub ${EXAMON_HOME}/publishers/random_pub
 ADD ./lib/examon-common $EXAMON_HOME/lib/examon-common
 ADD ./docker/examon/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
 ADD ./scripts/examon.conf $EXAMON_HOME/scripts/examon.conf
@@ -37,6 +35,9 @@ ENV PIP $EXAMON_HOME/scripts/ve/bin/pip
 WORKDIR $EXAMON_HOME/lib/examon-common
 RUN $PIP install .
 RUN pip install .
+
+WORKDIR $EXAMON_HOME/publishers/random_pub
+RUN $PIP install -r requirements.txt
 
 WORKDIR $EXAMON_HOME/web
 RUN virtualenv flask
