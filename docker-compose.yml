@@ -1,4 +1,3 @@
-version: "3.8"
 name: "examon"
 
 networks:
@@ -11,7 +10,7 @@ services:
   examon:
     build:
       context: .
-    image: examonhpc/examon:0.2.1
+    image: examonhpc/examon:0.3.1
     volumes:  
       - type: bind
         source: ./lib/examon-common
@@ -36,7 +35,8 @@ services:
     environment:
       - EX_KAIROSDB_HOST=kairosdb
     depends_on:
-      - kairosdb
+      cassandra:
+        condition: service_healthy
 
   grafana:
     build:
@@ -55,6 +55,7 @@ services:
     networks:
       - examon_net
     environment:
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
       - GF_SECURITY_ADMIN_PASSWORD=Password
       - GF_INSTALL_PLUGINS=ae3e-plotly-panel 0.4.0,grafana-piechart-panel,yesoreyeram-infinity-datasource 0.8.8,marcusolsson-gantt-panel 0.7.5,flant-statusmap-panel 0.5.1,gapit-htmlgraphics-panel 1.3.3
     depends_on:
@@ -78,6 +79,12 @@ services:
       - CASSANDRA_HOST_LIST=cassandra:9042
     depends_on:
       - cassandra
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/v1/health/check"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 120s
 
   cassandra:
     build:
@@ -100,6 +107,12 @@ services:
       - CASSANDRA_BROADCAST_ADDRESS=cassandra
       - CASSANDRA_START_RPC=true
       - CASSANDRA_LISTEN_ADDRESS=auto
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status | grep UN"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 120s
 
 volumes:
   cassandra_volume:
