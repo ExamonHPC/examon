@@ -14,9 +14,9 @@ This setup will install all server-side components of the ExaMon framework:
 
  This Examon installation includes the following plugins:
 
-- `examon_pub`
+- `random_pub`
 
-Please note: the `examon_pub` plugin is used to test the system and it will publish random metrics.
+Please note: the `random_pub` plugin is used to test the system and it will publish random metrics.
 It can be disabled as described in the [Enable/disable the plugins](#enable-disable-the-plugins) section.
 
 ## Prerequisites
@@ -90,7 +90,7 @@ following folders:
 
 | Plugin          | Path                        |
 |-----------------|-----------------------------|
-| examon_pub      | `/publishers/examon_pub`    |
+| random_pub      | `/publishers/random_pub`    |
 
 Please refer to the respective plugin readme file (*Configuration* section) for further details.
 
@@ -127,7 +127,7 @@ docker exec -it <examon-container-name> supervisorctl start <plugin-name>
 Example:
 
 ```bash
-docker exec -it examon supervisorctl start plugins:examon_pub
+docker exec -it examon supervisorctl start plugins:random_pub
 ```
 
 Or, if you want to start all the plugins, you can use the following command:
