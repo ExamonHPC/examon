@@ -1,0 +1,658 @@
+{#-
+    This file was automatically generated - do not edit
+  -#}
+  {% extends "main.html" %}
+
+  <!-- Render hero under tabs -->
+  {% block tabs %}
+    {{ super() }}
+  
+    <!-- Additional styles for landing page -->
+    <style>
+      /* Version selector styling */
+      .md-version__link {
+          color:var(--md-default-fg-color);
+      }
+      .md-version__list {
+          color:var(--md-default-fg-color);
+          background-color:var(--md-default-bg-color);
+      }
+      .md-version__item a {
+          color:var(--md-default-fg-color);
+      }
+      ul[class*="md-version__list"] {
+          justify-content: flex-start !important;
+      }      
+       .md-typeset .tx-insiders{
+          color:#e91e63
+      }
+      .md-typeset .tx-switch button{
+          cursor:pointer;
+          transition:opacity 250ms
+      }
+      .md-typeset .tx-switch button:hover{
+          opacity:.75
+      }
+      .md-typeset .tx-switch button>code{
+          display:block;
+          color:var(--md-primary-bg-color);
+          background-color:var(--md-primary-fg-color)
+      }
+      .md-typeset .tx-columns{
+          -moz-columns:2;
+          columns:2
+      }
+      .md-typeset .tx-columns>*{
+          -moz-column-break-inside:avoid;
+          break-inside:avoid
+      }
+      @media screen and (max-width: 29.9375em){
+          .md-typeset .tx-columns{
+              -moz-columns:initial;
+              columns:initial
+          }
+      }
+      .md-announce a,.md-announce a:focus,.md-announce a:hover{
+          color:currentColor
+      }
+      .md-announce strong{
+          white-space:nowrap
+      }
+      .md-announce .twitter{
+          margin-left:.2em;
+          color:#00acee
+      }
+      .tx-container{
+          padding-top:1rem;
+          /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(0, 0%, 100%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
+          */
+          margin: 0 0px;
+          background-color: var(--md-primary-bg-color) 99%;
+          background-image: url('assets/images/home_bg-fs8.png');
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+      [data-md-color-scheme=slate] .tx-container{
+          /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(232, 15%, 21%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
+          */
+          margin: 0 0px;
+          background-color: var(--md-primary-bg-color) 99%;
+          background-image: url('assets/images/home_bg-fs8.png');
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+      @-webkit-keyframes tx-heart{
+          0%,40%,80%,100%{
+              transform:scale(1)
+          }
+          20%,60%{
+              transform:scale(1.15)
+          }
+      }
+      @keyframes tx-heart{
+          0%,40%,80%,100%{
+              transform:scale(1)
+          }
+          20%,60%{
+              transform:scale(1.15)
+          }
+      }
+      .tx-content__footer{
+          margin-top:1rem;
+          text-align:center
+      }
+      .tx-content__footer a{
+          display:inline-block;
+          color:#e91e63;
+          transition:transform 250ms cubic-bezier(0.1, 0.7, 0.1, 1),color 125ms
+      }
+      .tx-content__footer a:focus,.tx-content__footer a:hover{
+          transform:scale(1.2)
+      }
+      .tx-content__footer hr{
+          display:inline-block;
+          width:2rem;
+          margin:1em;
+          vertical-align:middle;
+          background-color:currentColor;
+          border:none
+      }
+      .tx-heart{
+          -webkit-animation:tx-heart 1000ms infinite;
+          animation:tx-heart 1000ms infinite
+      }
+      .tx-hero{
+          margin:0 .8rem;
+          color:var(--md-primary-bg-color)
+      }
+      .tx-hero h1{
+          margin-bottom:1rem;
+          color:currentColor;
+          font-weight:700
+      }
+      @media screen and (max-width: 29.9375em){
+          .tx-hero h1{
+              font-size:1.4rem
+          }
+
+      }
+      .tx-hero__content{
+          padding-bottom:6rem
+      }
+      @media screen and (min-width: 60em){
+          .tx-hero{
+              display:flex;
+              align-items:stretch
+          }
+          .tx-hero__content{
+              max-width:19rem;
+              margin-top:3.5rem;
+              padding-bottom:14vw
+          }
+          .tx-hero__image{
+              order:1;
+              width:38rem;
+              transform:translateX(4rem)
+          }
+      }
+      @media screen and (min-width: 76.25em){
+          .tx-hero__image{
+              transform:translateX(8rem)
+          }
+
+          .top-hr {
+              width: 100%;
+              display: flex;
+              max-width: 61rem;
+              margin-right: auto;
+              margin-left: auto;
+              padding: 0 .2rem;
+          }
+
+          .bottom-hr {
+              margin-top: 10px;
+              width: 100%;
+              display: flex;
+              max-width: 61rem;
+              margin-right: auto;
+              margin-left: auto;
+              padding: 0 .2rem;
+          }
+
+          .feature-item {
+              flex: 1;
+              min-width: 0;
+          }
+
+          .feature-item:hover {
+              /* background-color: #526cfe47; */
+              border-radius: 3px;
+          }
+
+
+      }
+
+      .hr {
+          border-bottom: 1px solid #eee;
+          width: 100%;
+          margin: 20px 0;
+      }
+
+
+      .tx-hero .md-button{
+          margin-top:.5rem;
+          margin-right:.5rem;
+          color:var(--md-primary-bg-color)
+      }
+      .tx-hero .md-button:hover,.tx-hero .md-button:focus{
+          color:var(--md-default-bg-color);
+          background-color:var(--md-accent-fg-color);
+          border-color:var(--md-accent-fg-color)
+      }
+      .tx-hero .md-button--primary{
+          color:#894da8;
+          background-color:var(--md-primary-bg-color);
+          border-color:var(--md-primary-bg-color)
+      }
+      /* Application header should be static for the landing page */
+      .md-header {
+        position: initial;
+      }
+  
+      /* Remove spacing, as we cannot hide it completely */
+      .md-main__inner {
+        margin: 0;
+      }
+  
+      /* Hide main content for now */
+      .md-content {
+        display: none;
+      }
+
+      /* Hide hero image for now */
+      .tx-hero__image {
+        display: none;
+      }
+  
+      /* Hide table of contents */
+      @media screen and (min-width: 60em) {
+        .md-sidebar--secondary {
+          display: none;
+        }
+      }
+  
+      /* Hide navigation */
+      @media screen and (min-width: 76.25em) {
+        .md-sidebar--primary {
+          display: none;
+        }
+
+      }
+
+
+    /* custom styles  */
+    .feature-item h2 svg {
+        height: 30px;
+        float: left;
+        margin-right: 10px;
+        transform: translateY(10%);
+    }
+
+    .top-hr {
+        margin-top: 52px;
+    }
+
+    .feature-item {
+        font-family: 'Lato', sans-serif;
+        font-weight: 300;
+        box-sizing: border-box;
+        padding: 0 15px;
+        word-break: break-word
+    }
+
+    .feature-item h2 {
+        color: #333;
+        font-weight: 300;
+        font-size: 25px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: normal;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-family: inherit;
+    }
+
+    .feature-item p {
+        font-size: 16px;
+        line-height: 1.8em;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        color: #111;
+        margin: 0 0 10px;
+        display: block;
+    }
+
+    .feature-item .md-button{
+          margin-top:.5rem;
+          margin-right:.5rem;
+          color:var(--md-primary-fg-color);
+          margin: 0 auto; 
+          text-align: center; 
+          font-size: 24px; 
+          padding: 10px 32px;
+          border: 0.1rem solid;
+          border-radius: 0.1rem
+      }
+    .feature-item .md-button:hover,.feature-item .md-button:focus{
+          color:var(--md-default-bg-color);
+          background-color:var(--md-accent-fg-color);
+          border-color:var(--md-accent-fg-color)
+      }
+    .feature-item .md-button--primary{
+          color:#894da8;
+          background-color:var(--md-primary-bg-color);
+          border-color:var(--md-primary-fg-color)
+      }
+
+
+    .logo-grid {
+        flex-wrap: wrap; /* Allow flex items to wrap to the next row */
+        justify-content: center; /* Center items horizontally within the container */
+      }
+
+    .logo-grid a {
+        flex: 1; /* Distribute available space equally among items */
+        text-align: center; /* Center the text within each item */
+        margin: 10px; /* Add some spacing between items */
+      }
+
+      /* Add media query using em units for max-width */
+      @media screen and (max-width: 76.25em) {
+
+        .top-hr {
+          display: grid;
+        }
+        /* Change the order of flex items within .second-row */
+        .second-row .feature-item:nth-child(1) {
+          order: 2; /* Change order for the first .feature-item in the second-row */
+        }
+
+        .second-row .feature-item:nth-child(2) {
+          order: 1; /* Change order for the second .feature-item in the second-row */
+        }
+
+        /* Disable Menu drawer: broken in hompage */
+        .md-header__button:not([hidden]) {
+          display: none;
+        }
+
+        .md-sidebar {
+          display: none;
+        }
+      }
+
+
+    /* footer  */
+
+    footer {
+      background-color: #000000de;
+      color: #fff;
+      padding: 20px 0;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .logo-section img {
+      max-height: 50px;
+      margin-right: 20px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap; /* Allow flex items to wrap to the next row */
+    }
+
+    nav li {
+      margin: 0 10px;
+    }
+
+    nav a {
+      color: var(--md-footer-fg-color--lighter);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: all 0.3s ease-in-out;
+    }
+
+    nav a:hover {
+      color: #0088cc;
+    }
+
+    .social-media {
+      display: flex;
+    }
+
+    .social-icon {
+      color: #fff;
+      font-size: 1.5rem;
+      margin-right: 10px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .social-icon:hover {
+      color: #0088cc;
+    }
+
+
+    </style>
+  
+    <!-- Hero for landing page -->
+    <section class="tx-container">
+      <div class="md-grid md-typeset">
+        <div class="tx-hero">
+  
+          <!-- Hero image -->
+          <div class="tx-hero__image">
+            <img
+              src="assets/images/home_bg-fs8.png"
+              alt=""
+              width="1920"
+              height="600"
+              draggable="false"
+            >
+          </div>
+  
+          <!-- Hero content -->
+          <div class="tx-hero__content">
+            <h1>A holistic solution for monitoring HPC resources</h1>
+            <p>{{ config.site_description }}</p>
+            <a
+              href="getting_started/"
+              title="Quick start"
+              class="md-button md-button--primary"
+            >
+              Quick start
+            </a>
+            <a
+              href="https://github.com/EEESlab/examon"
+              title="GitHub repository"
+              class="md-button"
+            >
+              Go to GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+   <div class="top-hr">
+      <div class="feature-item">
+        <!-- <h2>Collect and Store</h2> -->
+        <h2>
+          <svg id="eVjnPUTkQfc1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1424 1240" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"><g transform="matrix(.924202 0 0 0.905762-1351.461191-648.966991)"><path d="M2231.5,1315.5v636.19" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="135.208" stroke-linecap="round" stroke-miterlimit="8"/><path d="M2417.37,1499.66l-188.14-187.81-184.57,184.89" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="135.208" stroke-linecap="round" stroke-miterlimit="8"/><path d="M239.93,480C107.106,479.686,-0.31393,371.98,0.000731,239.432s108.245269-239.745181,241.069269-239.431174c2.816.006657,5.631.062657,8.445.167974" transform="matrix(1 0 0-1 1548 1718)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M111.782,415.703C6.7954,356.144,-30.9692,221.066,27.4322,113.998C38.2839,94.1033,52.0738,76.0308,68.3174,60.415" transform="matrix(.609716 0.79262 0.79262-.609716 1701.04 1222.92)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M464.978,634.069c-167.416,73.787-362.983-2.037-436.8113-169.357-73.8285-167.32,2.0386-362.775,169.4543-436.5615c19.929-8.7837,40.677-15.5817,61.941-20.29533" transform="matrix(-.051606 0.998668 0.998668 0.051606 2103.8 801.952)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M188.641,421.552C84.1815,421.244,-0.275518,326.627,0.000829,210.219C0.277176,93.8105,85.1823,-0.3074,189.642,0.000557c5.213.015369,10.423.270896,15.617.765926" transform="matrix(-.993962-.109728-.109728 0.993962 2917.39 1322.36)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M0,0l314.047.000361" transform="matrix(-1 0 0 1 2684.05 1721)" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/><path d="M1798,1718h293.17" fill="none" fill-rule="evenodd" stroke="#000" stroke-width="75.625" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/></g></svg>
+          Collect
+        </h2>
+        <p>Collect and store data from any source using a flexible data model and scalable data store.</p>
+      </div>
+      <div class="feature-item">
+        <!-- <h2>Visualize and Analyze</h2> -->
+        <h2>
+          <svg id="emhAjFWwaGo1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"><g transform="translate(1.719059 0)"><g transform="matrix(1.209748 0 0 1.209747-1.718966 1.85185)"><path d="M266.666667,128C331.468077,128,384,180.531923,384,245.333333c0,24.693186-7.627964,47.604765-20.656081,66.506928l59.884556,59.884992-30.169889,30.169889-59.884992-59.884557c-18.902163,13.028118-41.813742,20.656082-66.506927,20.656082-64.801411,0-117.333334-52.531923-117.333334-117.333334s52.531923-117.333333,117.333334-117.333333Zm0,42.666667C225.429405,170.666667,192,204.096072,192,245.333333s33.429405,74.666667,74.666667,74.666667s74.666666-33.429405,74.666666-74.666667-33.429405-74.666666-74.666666-74.666666ZM128.404239,234.665576c-.26786,3.5208-.404239,7.078352-.404239,10.667757c0,11.014287,1.284152,21.728643,3.710904,32.001518L0,277.333333v-42.666666l128.404239-.001091ZM85.333333,0v213.333333h-64L21.333333,0h64Zm85.333334,85.333333l-.00272,59.94015c-18.930213,18.167331-32.715709,41.654591-38.953043,68.058332l-25.044237.001518v-128h64ZM256,42.666667l-.000404,64.404187c-23.445281,1.783582-45.260868,9.397436-64.000144,21.394945L192,42.666667h64ZM341.333333,64l.00065,64.465865c-18.739115-11.99743-40.554496-19.611277-63.999559-21.394959L277.333333,64h64Z" fill-rule="evenodd"/></g></g></svg>
+          Analyze
+        </h2>
+        <p>Use data immediately: From zero-code dashboards to advanced BI tools using ANSI-SQL or even Python in a popular Jupyter notebook.</p>
+      </div>
+      <div class="feature-item">
+        <!-- <h2>Collaborate and Improve</h2> -->
+        <h2>
+          <svg id="eFZzaCDtdpH1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"><g transform="translate(.000504 0)"><polygon points="154.219,205.188 166.219,335.031 110.922,405.563 96.406,296.563"/><polygon points="357.781,205.188 345.766,335.031 401.063,405.563 415.594,296.563"/><path d="M323.813,62.219C305.125,23.328,275.656,0,256,0s-49.125,23.344-67.813,62.219h135.626Z"/><path d="M331.328,80.469h-150.656c-6.641,19.156-10.594,41.094-10.047,65.188c1.609,69.063,18.047,190.984,18.047,190.984l122.641-.016l12,.016c0,0,16.453-121.938,18.031-190.984.578-24.094-3.375-46.048-10.016-65.188ZM256,231.031c-23.578,0-42.688-19.094-42.688-42.672s19.125-42.672,42.688-42.672s42.672,19.094,42.656,42.672c.016,23.579-19.093,42.672-42.656,42.672Z"/><path d="M429.516,512c-6.109-17.594-22.859-30.219-42.531-30.219-6.297,0-12.297,1.281-17.766,3.625-1.875-20.578-19.188-36.688-40.25-36.688-3.047,0-6,.328-8.844.969.031-.563.031-1.125.031-1.688c0-15.531-12.594-28.125-28.125-28.125-4.031,0-7.875.844-11.344,2.375-9.734-17.219-12.563-62.156-12.563-62.156h-25.5c0,0-3.266,49.344-14.813,65.688-2.688-1.094-5.656-1.688-8.75-1.688-13.016,0-23.563,10.547-23.563,23.563c0,.984.063,1.953.188,2.906-3.719-1.203-3.281-1.844-7.406-1.844-16.484,0-30.531,10.406-35.938,25-6.047-2.516-12.672-3.906-19.625-3.906-25.156,0-46.063,18.219-50.234,42.188h347.033Z"/></g></svg>
+          Improve
+        </h2>
+        <p>Enable teams with different areas of expertise to work together, maximizing the extraction of valuable insights.</p>
+      </div>
+    </div>
+    
+
+
+    
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h2>Breaking Down Data Silos</h2>
+        <p>ExaMon provides a centralized repository that breaks down data silos, consolidates information, and offers downstream users a single place to look for all data sources. This accelerates knowledge discovery and results in faster decision-making and improved performance.</p>
+      </div>
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <img src="assets/images/silost.png" alt="sp1" style="width: 100%;">
+        <p></p>
+      </div>
+    </div>
+
+
+    <div class="top-hr second-row">
+        <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <img src="assets/images/loopt.png" alt="sp1" style="width: 100%;">
+          <p></p>
+        </div>
+        <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <h2>Empowering Technology Transfer</h2>
+        <p>Enables smooth technology transfer between academia and industry, encompassing data collection, analysis, collaboration, and continuous improvement, fostering innovation and real-world impact.</p>
+      </div>
+    </div>
+
+
+    <div class="top-hr">
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h2>Fueling Digital Twins</h2>
+        <p>With a unified interface that smoothly integrates different data sources, creating and operating a digital twin becomes easier. ExaMon streamlines the process of gathering, analyzing, and presenting various data on a 3D digital representation of the assets, which allows for thorough insights, quick collaboration, and effective overall optimization.</p>
+      </div>
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center;justify-content: center;">
+        <img src="assets/images/digitatwint-fs8.png" alt="sp1" style="width: 100%;">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+
+    
+    <div class="top-hr">
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <a
+          href="getting_started/"
+          title="Quick start"
+          class="md-button md-button--primary"
+        >
+        Quick start
+      </a>
+      </div>
+    </div>
+    
+
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="feature-item">
+        <h2> </h2>
+        <p>ExaMon is a project by DEI - Department of Electrical, Electronic, and Information Engineering "Guglielmo Marconi" of the University of Bologna.</p>
+      </div>
+      <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <a href="https://dei.unibo.it/en/index.html" target="_blank"><img src="https://www.unibo.it/en/++theme++unibotheme.portale/img/header/sigillo1x_xl.png" alt="sp1" style="width: 100%;"></a>
+        <p></p>
+      </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+
+    <div class="top-hr">
+      <div class="feature-item">
+        <h2 style="text-align: center; margin-bottom: 40px;">Partners</h2>
+        <div class="logo-grid" style="display: flex; justify-content: center;">
+            <a href="https://www.cineca.it/en" target="_blank"><img src="assets/images/cineca_logo.png" alt="Logo 1" style="padding: 40px; max-height: 180px; width: auto"></a>
+            <a href="https://www.e4company.com/en/" target="_blank"><img src="assets/images/e4_logo.png" alt="Logo 2" style="padding: 40px; max-height: 180px; width: auto"></a>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="top-hr">
+      <div class="hr">
+        </div>
+    </div>
+
+    <div class="top-hr">
+      <div class="feature-item">
+        <h2 style="text-align: center; margin-bottom: 40px;">European Projects</h2>
+        <div class="logo-grid" style="display: flex; justify-content: center;">
+          <!-- <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;"> -->
+            <a href="https://cordis.europa.eu/project/id/291125" target="_blank"><img src="assets/images/multitherman_logo.png" alt="Logo 0" style="padding: 30px; height: 130px; width: auto;"></a>
+            <a href="https://antarex.fe.up.pt/" target="_blank"><img src="assets/images/antarex_logo.png" alt="Logo 1" style="padding: 30px; height: 100px; width: auto;"></a>
+            <a href="https://www.iotwins.eu/" target="_blank"><img src="assets/images/iotwins_logo.png" alt="Logo 2" style="padding: 30px; height: 100px; width: auto;"></a>
+          <!-- </div>  -->
+          <!--  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;"> -->
+            <a href="https://regale-project.eu/" target="_blank"><img src="assets/images/regale_logo.png" alt="Logo 3" style="padding: 30px; height: 100px; width: auto;"></a>
+            <a href="https://graph-massivizer.eu/" target="_blank"><img src="assets/images/graphmass_logo.png" alt="Logo 4" style="padding: 30px; height: 100px; width: auto;"></a>
+           <!-- </div> -->
+        </div>
+      </div>
+    </div>
+
+  {% endblock %}
+  
+  <!-- Content -->
+  {% block content %}{% endblock %}
+  
+  <!-- Application footer -->
+  {% block footer %}
+     <footer class>
+      <div class="footer-content">
+        <div class="logo-section">
+          <img src="https://github.com/fbeneventi/panels/raw/main/logo4_trasp.png" alt="ExaMon" style="padding: 5px">
+<!--           <div class="md-copyright__highlight">
+            Copyright &copy; 2023 Francesco Beneventi
+          </div> -->
+        </div>
+        <nav>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="getting_started/">Docs</a></li>
+            <li><a href="About/">About</a></li>
+            <li><a href="credits/">Credits</a></li>
+            <li><a href="contactus/">Contact us</a></li>
+          </ul>
+        </nav>
+        <div class="social-media">
+          <a href="https://github.com/ExamonHPC/examon" class="md-social__link">
+          <p> 
+            <span class="twemoji">
+              {% include ".icons/fontawesome/brands/github.svg" %} 
+            </span>
+            </p>
+          </a>
+          <a href="https://x.com/examon_hpc" class="md-social__link">
+          <p> 
+            <span class="twemoji">
+              {% include ".icons/fontawesome/brands/x-twitter.svg" %} 
+            </span>
+            </p>
+          </a>
+          <a href="https://hub.docker.com/r/examonhpc/examon" class="md-social__link">
+          <p> 
+            <span class="twemoji">
+              {% include ".icons/fontawesome/brands/docker.svg" %} 
+            </span>
+            </p>
+          </a>
+          <a href="https://github.com/orgs/ExamonHPC/discussions" class="md-social__link">
+          <p> 
+            <span class="twemoji">
+              {% include ".icons/fontawesome/solid/comments.svg" %} 
+            </span>
+            </p>
+          </a>
+        </div>
+      </div>
+    </footer>
+  {% endblock %}
