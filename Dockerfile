@@ -3,13 +3,13 @@ FROM examonhpc/examon:0.2.0
 ENV EXAMON_HOME /etc/examon_deploy/examon
 
 # Create a backup of the existing sources.list
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup
+#RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup
 
 # Create a new sources.list file
-RUN touch /etc/apt/sources.list
+#RUN touch /etc/apt/sources.list
 
 # Debian strech moved to archived
-RUN echo "deb https://debian.mirror.garr.it/debian-archive/ stretch main" > /etc/apt/sources.list
+#RUN echo "deb https://debian.mirror.garr.it/debian-archive/ stretch main" > /etc/apt/sources.list
 
 
 # Install dependencies
