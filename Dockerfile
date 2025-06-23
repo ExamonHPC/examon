@@ -1,4 +1,4 @@
-FROM examonhpc/examon:0.3.0
+FROM examonhpc/examon:0.3.1
 
 ENV EXAMON_HOME /etc/examon_deploy/examon
 
