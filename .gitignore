@@ -2,7 +2,6 @@
 *.log.*
 *.pyc
 .ipynb_* 
-examon-cache/
-examon-cache/*
+examon-cache
 build
 site
