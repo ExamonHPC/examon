@@ -10,7 +10,7 @@ services:
   examon:
     build:
       context: .
-    image: examonhpc/examon:0.3.1
+    image: examonhpc/examon:latest
     volumes:  
       - type: bind
         source: ./web/examon-server

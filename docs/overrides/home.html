@@ -317,101 +317,359 @@
 
 
     .logo-grid {
-        flex-wrap: wrap; /* Allow flex items to wrap to the next row */
-        justify-content: center; /* Center items horizontally within the container */
-      }
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
 
     .logo-grid a {
-        flex: 1; /* Distribute available space equally among items */
-        text-align: center; /* Center the text within each item */
-        margin: 10px; /* Add some spacing between items */
-      }
+        flex: 1;
+        text-align: center;
+        margin: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-      /* Add media query using em units for max-width */
-      @media screen and (max-width: 76.25em) {
+    .logo-grid img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
 
-        .top-hr {
-          display: grid;
-        }
-        /* Change the order of flex items within .second-row */
-        .second-row .feature-item:nth-child(1) {
-          order: 2; /* Change order for the first .feature-item in the second-row */
-        }
+    /* Modern Footer Styles - Material Theme Compatible */
+    .modern-footer {
+      background-color: var(--md-footer-bg-color);
+      color: var(--md-footer-fg-color);
+      margin-top: 4rem;
+      border-top: 1px solid var(--md-default-fg-color--lightest);
+    }
 
-        .second-row .feature-item:nth-child(2) {
-          order: 1; /* Change order for the second .feature-item in the second-row */
-        }
-
-        /* Disable Menu drawer: broken in hompage */
-        .md-header__button:not([hidden]) {
-          display: none;
-        }
-
-        .md-sidebar {
-          display: none;
-        }
-      }
-
-
-    /* footer  */
-
-    footer {
-      background-color: #000000de;
-      color: #fff;
-      padding: 20px 0;
+    .footer-main {
+      padding: 3rem 0 2rem;
     }
 
     .footer-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .footer-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .footer-brand {
+      max-width: 300px;
+    }
+
+    .footer-logo {
+      max-height: 60px;
+      width: auto;
+      margin-bottom: 1rem;
+      filter: brightness(0.9);
+      object-fit: contain;
+      max-width: 100%;
+    }
+
+    /* Dark mode logo adjustment */
+    [data-md-color-scheme="slate"] .footer-logo {
+      filter: brightness(1.2);
+    }
+
+    .footer-description {
+      color: var(--md-footer-fg-color--light);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .footer-title {
+      color: var(--md-footer-fg-color);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      position: relative;
+      text-align: left;
+    }
+
+    .footer-title::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 0;
+      width: 2rem;
+      height: 2px;
+      background: var(--md-primary-fg-color);
+      border-radius: 1px;
+    }
+
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.7rem;
+    }
+
+    .footer-links a {
+      color: var(--md-footer-fg-color--light);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .footer-links a:hover {
+      color: var(--md-footer-fg-color);
+      padding-left: 0;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      /* background: var(--md-default-fg-color--lightest); */
+      background: var(--md-footer-fg-color--light);
+      border-radius: 50%;
+      color: var(--md-footer-fg-color--lighter);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .social-link .twemoji {
+      width: 1.2rem;
+      height: 1.2rem;
+      color: var(--md-footer-fg-color--lighter);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .social-link .twemoji svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .social-link:hover {
+      background: var(--md-primary-fg-color);
+      color: var(--md-primary-bg-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--md-shadow-z2);
+    }
+
+    .social-link:hover .twemoji {
+      color: var(--md-primary-bg-color);
+    }
+
+    .footer-bottom {
+      background: var(--md-default-bg-color--lighter);
+      border-top: 1px solid var(--md-default-fg-color--lightest);
+      padding: 1.5rem 0;
+    }
+
+    /* Dark mode footer bottom adjustment */
+    [data-md-color-scheme="slate"] .footer-bottom {
+      background: var(--md-default-bg-color--light);
+    }
+
+    .footer-bottom-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
       max-width: 1200px;
       margin: 0 auto;
+      padding: 0 1rem;
     }
 
-    .logo-section img {
-      max-height: 50px;
-      margin-right: 20px;
+    .footer-copyright p {
+      margin: 0.2rem 0;
+      color: var(--md-footer-fg-color--lighter);
+      font-size: 0.85rem;
     }
 
-    nav ul {
-      list-style: none;
+    .footer-copyright a {
+      color: var(--md-footer-fg-color--light);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-copyright a:hover {
+      color: var(--md-footer-fg-color);
+    }
+
+    .footer-legal {
       display: flex;
-      justify-content: center;
-      flex-wrap: wrap; /* Allow flex items to wrap to the next row */
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    nav li {
-      margin: 0 10px;
-    }
-
-    nav a {
+    .footer-legal a {
       color: var(--md-footer-fg-color--lighter);
       text-decoration: none;
-      font-size: 0.8rem;
-      transition: all 0.3s ease-in-out;
+      font-size: 0.85rem;
+      transition: color 0.3s ease;
     }
 
-    nav a:hover {
-      color: #0088cc;
+    .footer-legal a:hover {
+      color: var(--md-footer-fg-color);
     }
 
-    .social-media {
-      display: flex;
+    .separator {
+      color: var(--md-footer-fg-color--lightest);
+      font-size: 0.85rem;
     }
 
-    .social-icon {
-      color: #fff;
-      font-size: 1.5rem;
-      margin-right: 10px;
-      transition: all 0.3s ease-in-out;
+    /* --- Responsive Design --- */
+    @media screen and (max-width: 1024px) {
+      /* -- Tablet and Mobile -- */
+      
+      /* Hide navigation */
+      .md-sidebar--primary {
+        display: none;
+      }
+      
+      .top-hr {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+          margin-right: auto;
+          margin-left: auto;
+          padding: 0 .2rem;
+          max-width: 61rem;
+      }
+
+      .second-row .feature-item:nth-child(1) { order: 2; }
+      .second-row .feature-item:nth-child(2) { order: 1; }
+      
+      .top-hr .feature-item {
+          margin-bottom: 1.5rem;
+          text-align: center;
+      }
+      
+      .feature-item img {
+          max-width: 100%;
+          height: auto;
+          object-fit: contain;
+          max-height: 400px;
+      }
+
+      .logo-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+          width: 100%;
+      }
+      
+      .logo-grid a {
+          flex: none;
+          margin: 0;
+          width: 60%;
+          max-width: 250px;
+      }
+      
+      .logo-grid img {
+          width: 100%;
+          max-height: 160px;
+          height: auto;
+      }
+      
+      .footer-content {
+          grid-template-columns: 1fr 1fr;
+      }
+      
+      .footer-brand {
+          grid-column: 1 / -1;
+          max-width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+
+      .footer-brand .footer-title {
+        text-align: center;
+      }
+      
+      .footer-brand .footer-title::after {
+          left: 50%;
+          transform: translateX(-50%);
+      }
     }
 
-    .social-icon:hover {
-      color: #0088cc;
+    @media screen and (max-width: 768px) {
+      /* -- Mobile Only -- */
+
+      .top-hr {
+        display: grid;
+      }
+      
+      .footer-content {
+          grid-template-columns: 1fr;
+      }
+
+      .footer-section {
+          text-align: center;
+      }
+
+      .footer-title {
+          text-align: center;
+      }
+      
+      .footer-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .footer-brand {
+          text-align: center;
+      }
+
+      .footer-logo {
+          max-height: 50px;
+      }
+      
+      .footer-bottom-content {
+          flex-direction: column;
+          gap: 1rem;
+          text-align: center;
+      }
+      
+      .footer-social {
+          justify-content: center;
+          flex-wrap: wrap;
+      }
+      
+      .logo-grid a {
+          width: 80%;
+          max-width: 300px;
+      }
+
+      .md-header__button:not([hidden]) {
+          display: none;
+      }
+
+      .md-sidebar {
+          display: none;
+      }
     }
-
-
     </style>
   
     <!-- Hero for landing page -->
@@ -578,11 +836,6 @@
 
 
     <div class="top-hr">
-      <div class="hr">
-        </div>
-    </div>
-
-    <div class="top-hr">
       <div class="feature-item">
         <h2 style="text-align: center; margin-bottom: 40px;">European Projects</h2>
         <div class="logo-grid" style="display: flex; justify-content: center;">
@@ -606,53 +859,77 @@
   
   <!-- Application footer -->
   {% block footer %}
-     <footer class>
-      <div class="footer-content">
-        <div class="logo-section">
-          <img src="https://github.com/fbeneventi/panels/raw/main/logo4_trasp.png" alt="ExaMon" style="padding: 5px">
-<!--           <div class="md-copyright__highlight">
-            Copyright &copy; 2023 Francesco Beneventi
-          </div> -->
-        </div>
-        <nav>
-          <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="getting_started/">Docs</a></li>
-            <li><a href="About/">About</a></li>
-            <li><a href="credits/">Credits</a></li>
-            <li><a href="contactus/">Contact us</a></li>
-          </ul>
-        </nav>
-        <div class="social-media">
-          <a href="https://github.com/ExamonHPC/examon" class="md-social__link">
-          <p> 
-            <span class="twemoji">
-              {% include ".icons/fontawesome/brands/github.svg" %} 
-            </span>
-            </p>
+<footer class="modern-footer">
+  <div class="footer-main">
+    <div class="footer-content">
+      <!-- Company/Project Section -->
+      <div class="footer-section footer-brand">
+        <img src="https://github.com/fbeneventi/panels/raw/main/logo4_trasp.png" alt="ExaMon" class="footer-logo">
+        <p class="footer-description">A holistic solution for monitoring HPC resources, enabling data collection, analysis, and collaboration.</p>
+        <div class="footer-social">
+          <a href="https://github.com/ExamonHPC/examon" class="social-link" aria-label="GitHub">
+            <span class="twemoji">{% include ".icons/fontawesome/brands/github.svg" %}</span>
           </a>
-          <a href="https://x.com/examon_hpc" class="md-social__link">
-          <p> 
-            <span class="twemoji">
-              {% include ".icons/fontawesome/brands/x-twitter.svg" %} 
-            </span>
-            </p>
+          <a href="https://x.com/examon_hpc" class="social-link" aria-label="Twitter/X">
+            <span class="twemoji">{% include ".icons/fontawesome/brands/x-twitter.svg" %}</span>
           </a>
-          <a href="https://hub.docker.com/r/examonhpc/examon" class="md-social__link">
-          <p> 
-            <span class="twemoji">
-              {% include ".icons/fontawesome/brands/docker.svg" %} 
-            </span>
-            </p>
+          <a href="https://hub.docker.com/r/examonhpc/examon" class="social-link" aria-label="Docker Hub">
+            <span class="twemoji">{% include ".icons/fontawesome/brands/docker.svg" %}</span>
           </a>
-          <a href="https://github.com/orgs/ExamonHPC/discussions" class="md-social__link">
-          <p> 
-            <span class="twemoji">
-              {% include ".icons/fontawesome/solid/comments.svg" %} 
-            </span>
-            </p>
+          <a href="https://github.com/orgs/ExamonHPC/discussions" class="social-link" aria-label="Discussions">
+            <span class="twemoji">{% include ".icons/fontawesome/solid/comments.svg" %}</span>
           </a>
         </div>
       </div>
-    </footer>
-  {% endblock %}
+
+      <!-- Quick Links -->
+      <div class="footer-section">
+        <h3 class="footer-title">Quick Links</h3>
+        <ul class="footer-links">
+          <li><a href="#">Home</a></li>
+          <li><a href="getting_started/">Getting Started</a></li>
+          <li><a href="About/">About</a></li>
+          <li><a href="credits/">Credits</a></li>
+        </ul>
+      </div>
+
+      <!-- Documentation -->
+      <div class="footer-section">
+        <h3 class="footer-title">Documentation</h3>
+        <ul class="footer-links">
+          <li><a href="Administrators/Getting_started/">Administrator Guide</a></li>
+          <li><a href="Users/Getting_started/">User Guide</a></li>
+          <li><a href="Plugins/examon_pub">Plugin Development</a></li>
+          <li><a href="Users/Demo_ExamonQL">Query Examples</a></li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div class="footer-section">
+        <h3 class="footer-title">Support</h3>
+        <ul class="footer-links">
+          <li><a href="contactus/">Contact Us</a></li>
+          <li><a href="https://github.com/orgs/ExamonHPC/discussions">Community</a></li>
+          <li><a href="https://github.com/ExamonHPC/examon/issues">Report Issues</a></li>
+          <li><a href="CONTRIBUTING.md">Contributing</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Bottom -->
+  <div class="footer-bottom">
+    <div class="footer-bottom-content">
+      <div class="footer-copyright">
+        <p>&copy; 2024 ExaMon Project. Licensed under <a href="https://github.com/ExamonHPC/examon/blob/main/LICENSE" target="_blank">MIT License</a>.</p>
+        <p>Developed by <a href="https://dei.unibo.it/en/index.html" target="_blank">DEI - University of Bologna</a></p>
+      </div>
+      <!-- <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <span class="separator">|</span>
+        <a href="#">Terms of Service</a>
+      </div> -->
+    </div>
+  </div>
+</footer>
+{% endblock %}
