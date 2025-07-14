@@ -1,8 +1,9 @@
 #!flask/bin/python
 from flask import Flask, jsonify, request, abort, Response
 
-from cassandra.cluster import Cluster
+from cassandra.cluster import Cluster, OperationTimedOut, NoHostAvailable
 from cassandra.auth import PlainTextAuthProvider
+from cassandra.policies import ExponentialReconnectionPolicy
 from cassandra.query import dict_factory
 from cassandra.util import OrderedMapSerializedKey
 
@@ -23,6 +24,8 @@ from logging.handlers import RotatingFileHandler
 
 import configparser
 from flask_caching import Cache
+
+import time
 
 
 LOGFILE_SIZE_B = 5 * 1024 * 1024
@@ -77,15 +80,37 @@ def pandas_factory(colnames, rows):
     return [df]
 
 
-def get_jobs(stmt, fetch_size=20000):  # Set a default fetch size
+def get_jobs(stmt, fetch_size=20000, max_retries=3):  # Set a default fetch size
+    """Execute query with automatic retry on connection failures."""
+    
     df = pd.DataFrame()
-    # Set the fetch size for the query
-    statement = session.execute(stmt, timeout=120.0)
-    statement.fetch_size = fetch_size
-    for page in statement:
-        df = pd.concat([df, pd.DataFrame(page)], ignore_index=True)
-    logger.info('QUERYBUILDER: Number of records: %s', str(len(df)))
-    return df
+    last_exception = None
+    
+    for attempt in range(max_retries):
+        try:
+            # Set the fetch size for the query
+            statement = session.execute(stmt, timeout=120.0)
+            statement.fetch_size = fetch_size
+            for page in statement:
+                df = pd.concat([df, pd.DataFrame(page)], ignore_index=True)
+            logger.info('QUERYBUILDER: Number of records: %s', str(len(df)))
+            return df
+            
+        except (OperationTimedOut, NoHostAvailable) as e:
+            last_exception = e
+            logger.warning(f'Connection issue during query execution (attempt {attempt + 1}/{max_retries}): {e}')
+            
+            if attempt < max_retries - 1:
+                # Short delay before retry to allow driver reconnection
+                time.sleep(1)
+                continue
+            else:
+                logger.error(f'Query failed after {max_retries} attempts due to connection issues')
+                raise
+        except Exception as e:
+            # For non-connection related errors, don't retry
+            logger.error(f'Query failed with non-connection error: {e}')
+            raise
 
 
 def qb_get_tables(query):
@@ -249,16 +274,24 @@ def get_jobs_test():
     try:
         stmt = query_builder(query)
         logger.info('QUERYBUILDER: %s', stmt)
-        df_json = get_jobs(stmt).to_json(date_format='iso', orient='records')
+        df_json = get_jobs(stmt, max_retries=5).to_json(date_format='iso', orient='records')
     except Exception as e:
         logger.error('QUERY: %s', stmt)
         import traceback
         print(traceback.format_exc())
+        
+        # Check if it's a connection-related error
+        if isinstance(e, (OperationTimedOut, NoHostAvailable)):
+            logger.error('CASSANDRA CONNECTION: %s', str(e))
+            return jsonify({'error': 'Database temporarily unavailable, please try again later'}), 503
+        
+        # Handle other errors
         if hasattr(e, 'message'):
             logger.error('CASSANDRA: %s', e.message)
-            return jsonify(e.message), 400
-            logger.error('QUERY: response: 400')
-        abort(400)
+            return jsonify({'error': e.message}), 400
+        else:
+            logger.error('QUERY: Unexpected error: %s', str(e))
+            return jsonify({'error': 'Query execution failed'}), 400
     logger.info('QUERY: response: 200')
     return jsonify(df_json), 200
 
@@ -282,14 +315,57 @@ def get_jobs_test_v2():
         logger.error('QUERY: %s', stmt)
         import traceback
         print(traceback.format_exc())
+        
+        # Check if it's a connection-related error
+        if isinstance(e, (OperationTimedOut, NoHostAvailable)):
+            logger.error('CASSANDRA CONNECTION: %s', str(e))
+            return jsonify({'error': 'Database temporarily unavailable, please try again later'}), 503
+        
+        # Handle other errors
         if hasattr(e, 'message'):
             logger.error('CASSANDRA: %s', e.message)
-            return jsonify(e.message), 400
-        abort(400)
+            return jsonify({'error': e.message}), 400
+        else:
+            logger.error('QUERY: Unexpected error: %s', str(e))
+            return jsonify({'error': 'Query execution failed'}), 400
     logger.info('QUERY: response: 200')
     logger.debug('QUERY: response: %s', json.dumps(df_json, indent=4))
     #return jsonify(json.loads(df_json)), 200
     return Response(df_json, mimetype='application/json')
+
+
+def connect_to_cassandra_with_retry(cassandra_ip, cassandra_user, cassandra_passw, cassandra_keyspace, max_retries=30, initial_delay=1, max_delay=60):
+    """Connect to Cassandra with retry logic and exponential backoff.
+
+    """
+    delay = initial_delay
+    last_exception = None
+    
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"Attempting to connect to Cassandra (attempt {attempt + 1}/{max_retries})...")
+            
+            c_auth = PlainTextAuthProvider(username=cassandra_user, password=cassandra_passw)
+            cluster = Cluster(contact_points=(cassandra_ip,), auth_provider=c_auth, reconnection_policy=ExponentialReconnectionPolicy(base_delay=1, max_delay=60))
+            session = cluster.connect(cassandra_keyspace)
+            
+            logger.info("Successfully connected to Cassandra")
+            return cluster, session
+            
+        except Exception as e:
+            last_exception = e
+            logger.warning(f"Failed to connect to Cassandra (attempt {attempt + 1}/{max_retries}): {e}")
+            
+            if attempt < max_retries - 1:  # Don't sleep on the last attempt
+                logger.info(f"Retrying in {delay} seconds...")
+                time.sleep(delay)
+                
+                # Exponential backoff with max limit
+                delay = min(delay * 2, max_delay)
+    
+    # If we get here, all retries failed
+    logger.error(f"Failed to connect to Cassandra after {max_retries} attempts")
+    raise last_exception
 
 
 if __name__ == '__main__':
@@ -334,9 +410,13 @@ if __name__ == '__main__':
     SCHEDULER_TYPE = str(config.get('Server', 'SCHEDULER_TYPE', fallback='SLURM'))
     logger.info("Starting examon server with scheduler type: %s", SCHEDULER_TYPE)
 
-    c_auth = PlainTextAuthProvider(username=CASSANDRA_USER, password=CASSANDRA_PASSW)
-    cluster = Cluster(contact_points=(CASSANDRA_IP,), auth_provider=c_auth)
-    session = cluster.connect(CASSANDRA_KEY_SPACE)
+    # Connect to Cassandra with retry logic
+    cluster, session = connect_to_cassandra_with_retry(
+        cassandra_ip=CASSANDRA_IP,
+        cassandra_user=CASSANDRA_USER,
+        cassandra_passw=CASSANDRA_PASSW,
+        cassandra_keyspace=CASSANDRA_KEY_SPACE
+    )
     queries = {}
 
     # setup cassandra row factory
