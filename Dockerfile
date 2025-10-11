@@ -1,4 +1,4 @@
-FROM examonhpc/examon:0.3.1
+FROM examonhpc/examon:0.3.2
 
 ENV EXAMON_HOME /etc/examon_deploy/examon
 
@@ -10,7 +10,7 @@ ADD ./web $EXAMON_HOME/web
 
 # Venvs
 WORKDIR $EXAMON_HOME/scripts
-RUN virtualenv py3_env
+RUN virtualenv -p $(which python) py3_env
 
 ENV PIP $EXAMON_HOME/scripts/ve/bin/pip
 ENV S_PIP $EXAMON_HOME/scripts/py3_env/bin/pip
@@ -25,7 +25,7 @@ RUN $PIP install -r requirements.txt
 
 # Web
 WORKDIR $EXAMON_HOME/web
-RUN virtualenv flask
+RUN virtualenv -p $(which python) flask
 RUN CASS_DRIVER_BUILD_CONCURRENCY=8 flask/bin/pip install -r ./examon-server/requirements.txt
 
 WORKDIR $EXAMON_HOME/scripts
