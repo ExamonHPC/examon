@@ -64,9 +64,7 @@
       }
       .tx-container{
           padding-top:1rem;
-          /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(0, 0%, 100%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
-          */
-          margin: 0 0px;
+          margin: 0;
           background-color: var(--md-primary-bg-color);
           background-image: url('assets/images/home_bg-fs8.png');
           background-repeat: no-repeat;
@@ -212,16 +210,11 @@
           background-color:var(--md-primary-bg-color);
           border-color:var(--md-primary-bg-color)
       }
-      /* Application header should be static for the landing page */
-      .md-header {
-        position: initial;
-      }
-  
       /* Remove spacing, as we cannot hide it completely */
       .md-main__inner {
         margin: 0;
       }
-  
+
       /* Hide main content for now */
       .md-content {
         display: none;
@@ -230,20 +223,17 @@
       .tx-hero__image {
         display: none;
       }
-  
-      /* Hide table of contents */
-      @media screen and (min-width: 60em) {
-        .md-sidebar--secondary {
-          display: none;
-        }
+
+      /* Hide the ToC sidebar at all sizes */
+      .md-sidebar--secondary {
+        display: none;
       }
-  
-      /* Hide navigation */
-      @media screen and (min-width: 76.25em) {
+
+      /* Hide the nav sidebar on tablet/desktop (keep drawer working on mobile < 60em) */
+      @media screen and (min-width: 60em) {
         .md-sidebar--primary {
           display: none;
         }
-
       }
 
 
@@ -504,33 +494,26 @@
       color: var(--md-footer-fg-color);
     }
 
-    /* --- Responsive Design --- */
-    @media screen and (max-width: 1024px) {
-      /* -- Tablet and Mobile -- */
-      
-      /* Hide navigation */
-      .md-sidebar--primary {
-        display: none;
-      }
-      
+    /* --- Responsive: Tablet (< 76.25em / ~1220px) --- */
+    @media screen and (max-width: 76.1875em) {
       .top-hr {
           display: flex;
           flex-direction: column;
           gap: 2rem;
           margin-right: auto;
           margin-left: auto;
-          padding: 0 .2rem;
+          padding: 0 1rem;
           max-width: 61rem;
       }
 
       .second-row .feature-item:nth-child(1) { order: 2; }
       .second-row .feature-item:nth-child(2) { order: 1; }
-      
+
       .top-hr .feature-item {
           margin-bottom: 1.5rem;
           text-align: center;
       }
-      
+
       .feature-item img {
           max-width: 100%;
           height: auto;
@@ -544,24 +527,24 @@
           gap: 2rem;
           width: 100%;
       }
-      
+
       .logo-grid a {
           flex: none;
           margin: 0;
           width: 60%;
           max-width: 250px;
       }
-      
+
       .logo-grid img {
           width: 100%;
           max-height: 160px;
           height: auto;
       }
-      
+
       .footer-content {
           grid-template-columns: 1fr 1fr;
       }
-      
+
       .footer-brand {
           grid-column: 1 / -1;
           max-width: 100%;
@@ -585,13 +568,16 @@
       }
     }
 
-    @media screen and (max-width: 768px) {
-      /* -- Mobile Only -- */
-
+    /* --- Responsive: Mobile (< 48em / ~768px) --- */
+    @media screen and (max-width: 48em) {
       .top-hr {
         display: grid;
       }
-      
+
+      .feature-item h2 {
+        white-space: normal;
+      }
+
       .footer-content {
           grid-template-columns: 1fr;
           gap: 2rem;
@@ -616,18 +602,10 @@
           justify-content: center;
           flex-wrap: wrap;
       }
-      
+
       .logo-grid a {
           width: 80%;
           max-width: 300px;
-      }
-
-      .md-header__button:not([hidden]) {
-          display: none;
-      }
-
-      .md-sidebar {
-          display: none;
       }
     }
     </style>
