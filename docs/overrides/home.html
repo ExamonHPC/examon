@@ -181,7 +181,6 @@
           }
 
           .feature-item:hover {
-              background-color: var(--md-default-fg-color--lightest);
               border-radius: 3px;
           }
 
@@ -236,6 +235,26 @@
         }
       }
 
+
+    /* Dark mode: recolor SVG icons */
+    [data-md-color-scheme="slate"] .feature-item h2 svg {
+        fill: var(--md-default-fg-color);
+    }
+
+    [data-md-color-scheme="slate"] .feature-item h2 svg path[fill="none"],
+    [data-md-color-scheme="slate"] .feature-item h2 svg polygon[fill="none"] {
+        fill: none;
+        stroke: var(--md-default-fg-color);
+    }
+
+    [data-md-color-scheme="slate"] .feature-item h2 svg path:not([fill="none"]),
+    [data-md-color-scheme="slate"] .feature-item h2 svg polygon:not([fill="none"]) {
+        fill: var(--md-default-fg-color);
+    }
+
+    [data-md-color-scheme="slate"] .logo-grid img {
+        filter: brightness(0) invert(1);
+    }
 
     /* custom styles  */
     .feature-item h2 svg {
