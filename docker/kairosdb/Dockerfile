@@ -2,15 +2,6 @@
 
 FROM adoptopenjdk:8-jre-hotspot-focal
 
-# Create a backup of the existing sources.list
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup
-
-# Create a new sources.list file
-RUN touch /etc/apt/sources.list
-
-# Add the new server repository for focal packages
-RUN echo "deb https://ubuntu.mirror.garr.it/ubuntu/ focal main" > /etc/apt/sources.list
-
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
