@@ -67,16 +67,14 @@
           /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(0, 0%, 100%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
           */
           margin: 0 0px;
-          background-color: var(--md-primary-bg-color) 99%;
+          background-color: var(--md-primary-bg-color);
           background-image: url('assets/images/home_bg-fs8.png');
           background-repeat: no-repeat;
           background-size: cover;
         }
       [data-md-color-scheme=slate] .tx-container{
-          /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(232, 15%, 21%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
-          */
           margin: 0 0px;
-          background-color: var(--md-primary-bg-color) 99%;
+          background-color: var(--md-primary-bg-color);
           background-image: url('assets/images/home_bg-fs8.png');
           background-repeat: no-repeat;
           background-size: cover;
@@ -185,7 +183,7 @@
           }
 
           .feature-item:hover {
-              /* background-color: #526cfe47; */
+              background-color: var(--md-default-fg-color--lightest);
               border-radius: 3px;
           }
 
@@ -193,7 +191,7 @@
       }
 
       .hr {
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid var(--md-default-fg-color--lightest);
           width: 100%;
           margin: 20px 0;
       }
@@ -229,7 +227,6 @@
         display: none;
       }
 
-      /* Hide hero image for now */
       .tx-hero__image {
         display: none;
       }
@@ -271,7 +268,7 @@
     }
 
     .feature-item h2 {
-        color: #333;
+        color: var(--md-default-fg-color);
         font-weight: 300;
         font-size: 25px;
         white-space: nowrap;
@@ -288,7 +285,7 @@
         line-height: 1.8em;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
-        color: #111;
+        color: var(--md-default-fg-color);
         margin: 0 0 10px;
         display: block;
     }
@@ -677,17 +674,6 @@
       <div class="md-grid md-typeset">
         <div class="tx-hero">
   
-          <!-- Hero image -->
-          <div class="tx-hero__image">
-            <img
-              src="assets/images/home_bg-fs8.png"
-              alt=""
-              width="1920"
-              height="600"
-              draggable="false"
-            >
-          </div>
-  
           <!-- Hero content -->
           <div class="tx-hero__content">
             <h1>A holistic solution for monitoring HPC resources</h1>
@@ -700,7 +686,7 @@
               Quick start
             </a>
             <a
-              href="https://github.com/EEESlab/examon"
+              href="https://github.com/ExamonHPC/examon"
               title="GitHub repository"
               class="md-button"
             >
@@ -754,7 +740,6 @@
       </div>
       <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <img src="assets/images/silost.png" alt="sp1" style="width: 100%;">
-        <p></p>
       </div>
     </div>
 
@@ -762,7 +747,6 @@
     <div class="top-hr second-row">
         <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <img src="assets/images/loopt.png" alt="sp1" style="width: 100%;">
-          <p></p>
         </div>
         <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <h2>Empowering Technology Transfer</h2>
@@ -778,7 +762,6 @@
       </div>
       <div class="feature-item" style="display: flex; flex-direction: column; align-items: center;justify-content: center;">
         <img src="assets/images/digitatwint-fs8.png" alt="sp1" style="width: 100%;">
-        <p></p>
       </div>
     </div>
 
@@ -814,7 +797,6 @@
       </div>
       <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <a href="https://dei.unibo.it/en/index.html" target="_blank"><img src="https://www.unibo.it/en/++theme++unibotheme.portale/img/header/sigillo1x_xl.png" alt="sp1" style="width: 100%;"></a>
-        <p></p>
       </div>
     </div>
 
@@ -921,7 +903,7 @@
   <div class="footer-bottom">
     <div class="footer-bottom-content">
       <div class="footer-copyright">
-        <p>&copy; 2024 ExaMon Project. Licensed under <a href="https://github.com/ExamonHPC/examon/blob/main/LICENSE" target="_blank">MIT License</a>.</p>
+        <p>&copy; 2025 ExaMon Project. Licensed under <a href="https://github.com/ExamonHPC/examon/blob/main/LICENSE" target="_blank">MIT License</a>.</p>
         <p>Developed by <a href="https://dei.unibo.it/en/index.html" target="_blank">DEI - University of Bologna</a></p>
       </div>
       <!-- <div class="footer-legal">

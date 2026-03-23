@@ -16,10 +16,6 @@ theme:
     - navigation.footer
     - announce.dismiss
   logo: assets/images/favicon.png
-  plugins:
-    - search:
-        lang: en
-        prebuild_index: true
   icon:
     annotation: material/arrow-right-circle
 
@@ -43,10 +39,8 @@ markdown_extensions:
   - pymdownx.tabbed
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
   - attr_list
   - md_in_html
-  - pymdownx.superfences
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
