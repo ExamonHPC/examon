@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: examonhpc/examon-server
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5000
+
+config:
+  authUrl: "http://examon-grafana/api/datasources/id/kairosdb"
+  cassandraIp: "examon-cassandra-dc1-service"
+  cassandraKeySpace: "kairosdb"
+  cassandraUser: ""
+  cassandraPassword: ""
+  serverHost: "0.0.0.0"
+  serverPort: 5000
+  threadsNum: 8
+  schedulerType: "SLURM"
+  cacheType: "simple"
+  cacheTimeout: 18000
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "2"
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

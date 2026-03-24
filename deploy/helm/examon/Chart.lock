@@ -1,0 +1,24 @@
+dependencies:
+- name: k8ssandra-operator
+  repository: https://helm.k8ssandra.io/stable
+  version: 1.30.2
+- name: grafana
+  repository: https://grafana.github.io/helm-charts
+  version: 8.15.0
+- name: mosquitto
+  repository: file://subcharts/mosquitto
+  version: 0.1.0
+- name: kairosdb
+  repository: file://subcharts/kairosdb
+  version: 0.1.0
+- name: mqtt2kairosdb
+  repository: file://subcharts/mqtt2kairosdb
+  version: 0.1.0
+- name: random-pub
+  repository: file://subcharts/random-pub
+  version: 0.1.0
+- name: examon-server
+  repository: file://subcharts/examon-server
+  version: 0.1.0
+digest: sha256:ade88248e9d1e5ad9a2584aac8950bd8eb7a28ea6d91d6516ff66dddc759d34c
+generated: "2026-03-24T19:43:43.867395324Z"

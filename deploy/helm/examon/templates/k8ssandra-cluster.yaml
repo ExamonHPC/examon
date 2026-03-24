@@ -1,0 +1,44 @@
+{{- if .Values.cassandra.enabled }}
+apiVersion: k8ssandra.io/v1alpha1
+kind: K8ssandraCluster
+metadata:
+  name: {{ include "examon.fullname" . }}-cassandra
+  labels:
+    {{- include "examon.labels" . | nindent 4 }}
+spec:
+  cassandra:
+    serverVersion: {{ .Values.cassandra.serverVersion | default "4.0.14" | quote }}
+    datacenters:
+      - metadata:
+          name: dc1
+        size: {{ .Values.cassandra.datacenters.dc1.size | default 1 }}
+        storageConfig:
+          cassandraDataVolumeClaimSpec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: {{ .Values.cassandra.datacenters.dc1.storage | default "10Gi" }}
+            {{- if .Values.cassandra.datacenters.dc1.storageClass }}
+            storageClassName: {{ .Values.cassandra.datacenters.dc1.storageClass }}
+            {{- end }}
+        config:
+          jvmOptions:
+            heapSize: {{ .Values.cassandra.datacenters.dc1.heapSize | default "512M" }}
+        resources:
+          requests:
+            memory: {{ .Values.cassandra.datacenters.dc1.resources.requests.memory | default "512Mi" }}
+            cpu: {{ .Values.cassandra.datacenters.dc1.resources.requests.cpu | default "500m" }}
+          limits:
+            memory: {{ .Values.cassandra.datacenters.dc1.resources.limits.memory | default "2Gi" }}
+            cpu: {{ .Values.cassandra.datacenters.dc1.resources.limits.cpu | default "2" }}
+        {{- if .Values.cassandra.datacenters.dc1.podAntiAffinity }}
+        racks:
+          {{- toYaml .Values.cassandra.datacenters.dc1.racks | nindent 10 }}
+        {{- end }}
+  {{- if .Values.cassandra.reaper }}
+  reaper:
+    autoScheduling:
+      enabled: {{ .Values.cassandra.reaper.enabled | default false }}
+  {{- end }}
+{{- end }}

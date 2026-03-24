@@ -5,3 +5,6 @@
 examon-cache
 build
 site
+
+# Helm secret override files (never commit real credentials)
+deploy/helm/examon/values-*.secret.yaml

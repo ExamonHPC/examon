@@ -1,0 +1,28 @@
+enabled: true
+replicaCount: 1
+
+image:
+  repository: examonhpc/random-pub
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+config:
+  mqttBroker: "examon-mosquitto"
+  mqttPort: 1883
+  mqttTopic: ""
+  mqttUser: ""
+  mqttPassword: ""
+  numSensors: 10
+  sampleInterval: 2
+
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "50m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

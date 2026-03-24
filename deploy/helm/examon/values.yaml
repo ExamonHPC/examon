@@ -1,0 +1,188 @@
+# ExaMon Helm Chart - Default Values (sensible baseline)
+# Override with values-local.yaml, values-staging.yaml, or values-production.yaml
+#
+# SECRETS: Password fields in this file MUST remain empty or contain obvious
+# placeholders. Real credentials must be passed at deploy time via --set flags.
+# See docs/Deployment/kubernetes-local.md for details.
+
+# -- Component toggles
+cassandra:
+  enabled: true
+kairosdb:
+  enabled: true
+grafana:
+  enabled: true
+mosquitto:
+  enabled: true
+mqtt2kairosdb:
+  enabled: true
+random-pub:
+  enabled: true
+examon-server:
+  enabled: true
+
+# -- Cassandra configuration (via K8ssandra Operator)
+cassandra:
+  enabled: true
+  serverVersion: "4.0.14"
+  datacenters:
+    dc1:
+      size: 1
+      storage: "10Gi"
+      storageClass: ""
+      heapSize: "512M"
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "500m"
+        limits:
+          memory: "2Gi"
+          cpu: "2"
+      podAntiAffinity: false
+      racks: []
+  reaper:
+    enabled: false
+
+# -- Grafana subchart overrides
+grafana:
+  enabled: true
+  adminPassword: ""  # pass via --set grafana.adminPassword=... at deploy time
+  plugins:
+    - ae3e-plotly-panel
+    - grafana-piechart-panel
+    - yesoreyeram-infinity-datasource
+    - marcusolsson-gantt-panel
+    - flant-statusmap-panel
+    - gapit-htmlgraphics-panel
+  env:
+    GF_PANELS_DISABLE_SANITIZE_HTML: "true"
+  sidecar:
+    datasources:
+      enabled: true
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: kairosdb
+          type: grafana-kairosdb-datasource
+          access: proxy
+          url: http://examon-kairosdb:8083
+          isDefault: true
+  persistence:
+    enabled: false
+    size: 10Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "1"
+
+# -- KairosDB
+kairosdb:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: examonhpc/kairosdb
+    tag: "1.3.0"
+  config:
+    cassandraHostList: "examon-cassandra-dc1-service:9042"
+    jettyPort: 8083
+    javaOpts: "-Xmx1g -Xms512m"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "2"
+
+# -- Mosquitto MQTT Broker
+mosquitto:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: eclipse-mosquitto
+    tag: "2"
+  persistence:
+    enabled: false
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# -- MQTT to KairosDB bridge
+mqtt2kairosdb:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: examonhpc/mqtt2kairosdb
+    tag: "latest"
+  config:
+    mqtt:
+      broker: "examon-mosquitto"
+      port: 1883
+      topic: "org/#"
+    kairosdb:
+      servers: "examon-kairosdb"
+      port: 8083
+    daemon:
+      numWorkers: 4
+      logLevel: "INFO"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "1"
+
+# -- Random data publisher (test/demo)
+random-pub:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: examonhpc/random-pub
+    tag: "latest"
+  config:
+    mqttBroker: "examon-mosquitto"
+    mqttPort: 1883
+    sampleInterval: 1
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# -- ExaMon REST API Server
+examon-server:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: examonhpc/examon-server
+    tag: "latest"
+  config:
+    authUrl: "http://examon-grafana/api/datasources/id/kairosdb"
+    cassandraIp: "examon-cassandra-dc1-service"
+    cassandraKeySpace: "kairosdb"
+    cassandraUser: ""
+    cassandraPassword: ""
+    serverHost: "0.0.0.0"
+    serverPort: 5000
+    threadsNum: 8
+    schedulerType: "SLURM"
+    cacheType: "simple"
+    cacheTimeout: 18000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "2"

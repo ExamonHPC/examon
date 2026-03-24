@@ -1,0 +1,39 @@
+replicaCount: 1
+
+image:
+  repository: examonhpc/mosquitto
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  mqttPort: 1883
+  websocketPort: 9001
+
+persistence:
+  enabled: false
+  size: 1Gi
+  storageClass: ""
+
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "50m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+
+config:
+  persistence: "false"
+  maxInflightMessages: 0
+  maxQueuedMessages: 0
+  maxConnections: -1
+  allowAnonymous: "true"
+
+tls:
+  enabled: false
+  secretName: ""
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

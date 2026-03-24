@@ -1,0 +1,173 @@
+# ExaMon Production Values
+# Full HA, production resources, Let's Encrypt TLS, Medusa backups.
+# Targets a real Kubernetes cluster (EKS/GKE/AKS or on-prem).
+#
+# SECRETS: Do NOT put real passwords in this file. Pass them at deploy time:
+#   helm upgrade examon ./deploy/helm/examon -f values-production.yaml \
+#     --set examon-server.config.cassandraPassword="$(kubectl get secret \
+#       examon-cassandra-superuser -n examon -o jsonpath='{.data.password}' | base64 -d)" \
+#     --set grafana.adminPassword="<your-grafana-password>" \
+#     -n examon
+
+cassandra:
+  enabled: true
+  serverVersion: "4.0.14"
+  datacenters:
+    dc1:
+      size: 3
+      storage: "100Gi"
+      storageClass: ""
+      heapSize: "2G"
+      resources:
+        requests:
+          memory: "4Gi"
+          cpu: "2"
+        limits:
+          memory: "8Gi"
+          cpu: "4"
+      podAntiAffinity: true
+      racks:
+        - name: rack1
+          affinityLabels:
+            topology.kubernetes.io/zone: ""
+        - name: rack2
+          affinityLabels:
+            topology.kubernetes.io/zone: ""
+        - name: rack3
+          affinityLabels:
+            topology.kubernetes.io/zone: ""
+  reaper:
+    enabled: true
+
+grafana:
+  enabled: true
+  # Set via --set or external secret in production
+  adminPassword: ""
+  plugins:
+    - ae3e-plotly-panel
+    - grafana-piechart-panel
+    - yesoreyeram-infinity-datasource
+    - marcusolsson-gantt-panel
+    - flant-statusmap-panel
+    - gapit-htmlgraphics-panel
+  env:
+    GF_PANELS_DISABLE_SANITIZE_HTML: "true"
+  persistence:
+    enabled: true
+    size: 10Gi
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: kairosdb
+          type: grafana-kairosdb-datasource
+          access: proxy
+          url: http://examon-kairosdb:8083
+          isDefault: true
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "2"
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - grafana.example.com
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.example.com
+
+kairosdb:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: ghcr.io/examonhpc/kairosdb
+    tag: "1.3.0"
+  config:
+    cassandraHostList: "examon-cassandra-dc1-service:9042"
+    jettyPort: 8083
+    javaOpts: "-Xmx2g -Xms2g"
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1"
+    limits:
+      memory: "4Gi"
+      cpu: "2"
+
+mosquitto:
+  enabled: true
+  image:
+    repository: ghcr.io/examonhpc/mosquitto
+    tag: "latest"
+  persistence:
+    enabled: true
+    size: 5Gi
+  tls:
+    enabled: true
+    secretName: mosquitto-tls
+  service:
+    type: LoadBalancer
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "1"
+
+mqtt2kairosdb:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: ghcr.io/examonhpc/mqtt2kairosdb
+    tag: "latest"
+  config:
+    mqtt:
+      broker: "examon-mosquitto"
+    kairosdb:
+      servers: "examon-kairosdb"
+    daemon:
+      numWorkers: 4
+      logLevel: "INFO"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "2"
+
+random-pub:
+  enabled: false
+
+examon-server:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: ghcr.io/examonhpc/examon-server
+    tag: "latest"
+  config:
+    authUrl: "http://examon-grafana/api/datasources/id/kairosdb"
+    cassandraIp: "examon-cassandra-dc1-service"
+    cassandraKeySpace: "kairosdb"
+    cassandraUser: ""
+    cassandraPassword: ""
+    serverHost: "0.0.0.0"
+    serverPort: 5000
+    threadsNum: 8
+    schedulerType: "SLURM"
+    cacheType: "simple"
+    cacheTimeout: 18000
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2"

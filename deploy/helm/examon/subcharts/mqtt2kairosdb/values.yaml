@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: examonhpc/mqtt2kairosdb
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+config:
+  mqtt:
+    broker: "examon-mosquitto"
+    port: 1883
+    topic: "org/#"
+  kairosdb:
+    servers: "examon-kairosdb"
+    port: 8083
+    user: ""
+    password: ""
+  daemon:
+    ts: 5
+    flushInterval: 1
+    numWorkers: 4
+    outProtocol: "kairosdb"
+    logLevel: "INFO"
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "1"
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

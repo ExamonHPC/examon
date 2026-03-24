@@ -46,7 +46,11 @@ markdown_extensions:
   - pymdownx.superfences
   - attr_list
   - md_in_html
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -55,6 +59,19 @@ nav:
     - Home: "index.md"
     - Introduction: "Introduction.md"
     - Getting started: "getting_started.md"
+    - Deployment:
+      - Overview: Deployment/index.md
+      - Prerequisites: Deployment/prerequisites.md
+      - Architecture: Deployment/architecture.md
+      - Kubernetes:
+        - Helm Chart Guide: Deployment/kubernetes.md
+        - Local Development: Deployment/kubernetes-local.md
+        - Staging: Deployment/kubernetes-staging.md
+        - Production: Deployment/kubernetes-production.md
+      - Docker Compose: Deployment/docker-compose.md
+      - Configuration Reference: Deployment/configuration.md
+      - Troubleshooting: Deployment/troubleshooting.md
+      - Upgrading from v0.4.0: Deployment/upgrading.md
     - Administrators:
       - Getting started: Administrators/Getting_started.md
     - Users:

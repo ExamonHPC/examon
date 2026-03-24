@@ -1,0 +1,36 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: examon-staging
+servers: 1
+agents: 3
+registries:
+  create:
+    name: examon-registry
+    hostPort: "5111"
+ports:
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 1883:1883
+    nodeFilters:
+      - loadbalancer
+options:
+  k3s:
+    nodeLabels:
+      - label: topology.kubernetes.io/zone=zone-a
+        nodeFilters:
+          - agent:0
+      - label: topology.kubernetes.io/zone=zone-b
+        nodeFilters:
+          - agent:1
+      - label: topology.kubernetes.io/zone=zone-c
+        nodeFilters:
+          - agent:2
+    extraArgs:
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*

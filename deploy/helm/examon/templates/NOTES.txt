@@ -1,0 +1,37 @@
+ExaMon has been deployed successfully!
+
+Components installed:
+{{- if .Values.cassandra.enabled }}
+  - Cassandra (via K8ssandra Operator)
+{{- end }}
+{{- if .Values.kairosdb.enabled }}
+  - KairosDB ({{ .Values.kairosdb.replicaCount }} replicas)
+{{- end }}
+{{- if .Values.grafana.enabled }}
+  - Grafana
+{{- end }}
+{{- if .Values.mosquitto.enabled }}
+  - Mosquitto MQTT Broker
+{{- end }}
+{{- if index .Values "mqtt2kairosdb" "enabled" }}
+  - mqtt2kairosdb bridge
+{{- end }}
+{{- if index .Values "random-pub" "enabled" }}
+  - Random publisher (test data)
+{{- end }}
+{{- if index .Values "examon-server" "enabled" }}
+  - ExaMon REST API Server
+{{- end }}
+
+To check the status of all pods:
+  kubectl get pods -n {{ .Release.Namespace }}
+
+To access Grafana:
+  kubectl port-forward svc/{{ .Release.Name }}-grafana 3000:80 -n {{ .Release.Namespace }}
+  Then open http://localhost:3000 in your browser.
+
+To access the ExaMon API:
+  kubectl port-forward svc/{{ .Release.Name }}-examon-server 5000:5000 -n {{ .Release.Namespace }}
+
+To access the MQTT broker:
+  kubectl port-forward svc/{{ .Release.Name }}-mosquitto 1883:1883 -n {{ .Release.Namespace }}

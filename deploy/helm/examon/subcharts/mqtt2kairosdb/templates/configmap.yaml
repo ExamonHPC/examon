@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mqtt2kairosdb.fullname" . }}
+  labels:
+    {{- include "mqtt2kairosdb.labels" . | nindent 4 }}
+data:
+  mqtt2kairosdb.conf: |
+    [MQTT]
+    MQTT_BROKER = {{ .Values.config.mqtt.broker }}
+    MQTT_PORT = {{ .Values.config.mqtt.port }}
+    MQTT_TOPIC = {{ .Values.config.mqtt.topic }}
+
+    [KairosDB]
+    K_SERVERS = {{ .Values.config.kairosdb.servers }}
+    K_PORT = {{ .Values.config.kairosdb.port }}
+    K_USER = {{ .Values.config.kairosdb.user }}
+    K_PASSWORD = {{ .Values.config.kairosdb.password }}
+
+    [Daemon]
+    TS = {{ .Values.config.daemon.ts }}
+    FLUSH_TO_DB_INTERVAL_S = {{ .Values.config.daemon.flushInterval }}
+    NUM_WORKERS = {{ .Values.config.daemon.numWorkers }}
+    OUT_PROTOCOL = {{ .Values.config.daemon.outProtocol }}
+    LOG_FILENAME = mqtt2kairosdb.log
+    PID_FILENAME = mqtt2kairosdb.pid
+    LOG_LEVEL = {{ .Values.config.daemon.logLevel }}

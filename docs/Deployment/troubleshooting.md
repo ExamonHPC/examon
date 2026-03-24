@@ -1,0 +1,623 @@
+# Troubleshooting
+
+This guide covers the systematic debugging approach for ExaMon Kubernetes
+deployments, followed by specific issues encountered and their solutions.
+
+## Systematic Debugging Methodology
+
+When pods are not healthy, follow this top-down approach:
+
+### Step 1: Get the Big Picture
+
+```bash
+kubectl get pods -n examon -o wide
+```
+
+Identify which pods are unhealthy and note their **Status** column:
+
+| Status | Meaning | Next Step |
+|--------|---------|-----------|
+| `Pending` | Cannot be scheduled | Check node resources / PVC binding |
+| `ImagePullBackOff` | Cannot pull container image | Check registry, image name/tag |
+| `CrashLoopBackOff` | Container starts and exits | Check container logs |
+| `RunContainerError` | Container cannot start at all | Check `kubectl describe pod` |
+| `Init:0/1` | Init container not finished | Wait or check init container logs |
+| `Running` but `0/1` Ready | Readiness probe failing | Check probe config and app health |
+
+### Step 2: Read the Logs
+
+```bash
+kubectl logs <pod-name> -n examon
+kubectl logs <pod-name> -n examon --previous   # if container already restarted
+```
+
+The logs tell you **why** the application crashed. Common patterns:
+
+- **Connection refused / No host available** → wrong service name or target not ready
+- **Authentication error** → missing or wrong credentials
+- **Configuration error** → missing config key, wrong config format
+- **OOM / Java heap errors** → resource limits vs JVM heap mismatch
+- **Module access errors (Java)** → missing `--add-opens` JVM flags
+
+### Step 3: Inspect the Pod Spec
+
+```bash
+kubectl describe pod <pod-name> -n examon
+```
+
+Look for:
+
+- **Events section** at the bottom: scheduling failures, probe failures, image pull errors
+- **Container State / Last State**: exit codes and error messages
+- **Environment variables**: verify they have the expected values
+- **Volume mounts**: verify ConfigMaps are mounted correctly
+
+### Step 4: Verify What Helm Actually Deployed
+
+```bash
+# See the rendered manifest for a specific component
+helm get manifest examon -n examon | grep -A30 "Source: examon/charts/<subchart>"
+
+# Compare with what you expect from the templates
+helm template examon ./deploy/helm/examon \
+  -f ./deploy/helm/examon/values-local.yaml -n examon \
+  -s charts/<subchart>/templates/deployment.yaml
+```
+
+This catches issues where:
+
+- Template changes were not picked up (forgot `helm dependency update`)
+- Umbrella chart `values.yaml` overrides subchart defaults unexpectedly
+- The wrong values file was used
+
+### Step 5: Test Connectivity from Inside the Cluster
+
+```bash
+# DNS resolution
+kubectl run debug --rm -it --image=busybox -- nslookup <service-name>.examon.svc.cluster.local
+
+# TCP connectivity
+kubectl exec <any-running-pod> -n examon -- nc -zv <service-name> <port>
+
+# HTTP endpoint
+kubectl exec <any-running-pod> -n examon -- wget -qO- http://<service-name>:<port>/health
+```
+
+### Step 6: Fix, Rebuild, Redeploy
+
+After fixing the root cause:
+
+1. If you changed a **Dockerfile** or application code:
+   ```bash
+   docker build -t examon-registry:5111/examon/<service>:<new-tag> \
+     -f deploy/docker/<service>/Dockerfile deploy/docker/<service>/
+   docker push examon-registry:5111/examon/<service>:<new-tag>
+   ```
+   Update the tag in the values file, then upgrade.
+
+2. If you changed a **subchart template** (anything under `subcharts/`):
+   ```bash
+   cd deploy/helm/examon && helm dependency update && cd ../../..
+   ```
+
+3. Upgrade:
+   ```bash
+   helm upgrade examon ./deploy/helm/examon \
+     -f ./deploy/helm/examon/values-local.yaml -n examon --timeout 10m
+   ```
+
+4. If pods don't restart automatically (same image tag / unchanged pod spec):
+   ```bash
+   kubectl rollout restart deployment/<deployment-name> -n examon
+   # For StatefulSets (like mosquitto):
+   kubectl rollout restart statefulset/<statefulset-name> -n examon
+   ```
+
+5. If a Helm upgrade is stuck (`another operation is in progress`):
+   ```bash
+   helm history examon -n examon                    # find the last good revision
+   helm rollback examon <last-good-revision> -n examon
+   # Then retry the upgrade
+   ```
+
+## Specific Issues and Solutions
+
+### 1. Mosquitto CrashLoopBackOff: "Address in use"
+
+**Symptom:** Mosquitto pod crashes with:
+```
+Error: Address in use
+```
+
+**Root cause:** In Mosquitto 2.x, if configuration directives like
+`max_connections` appear before `listener`, Mosquitto creates a default
+listener on port 1883. When the explicit `listener 1883 0.0.0.0` directive
+is then processed, the port is already bound.
+
+**Solution:** In the mosquitto ConfigMap template
+(`subcharts/mosquitto/templates/configmap.yaml`), ensure `listener` is the
+**first** directive:
+
+```yaml
+data:
+  mosquitto.conf: |
+    listener {{ .Values.service.mqttPort }} 0.0.0.0
+    allow_anonymous {{ .Values.config.allowAnonymous }}
+    persistence {{ .Values.config.persistence }}
+    max_inflight_messages {{ .Values.config.maxInflightMessages }}
+    max_queued_messages {{ .Values.config.maxQueuedMessages }}
+    max_connections {{ .Values.config.maxConnections }}
+```
+
+**Files changed:** `deploy/helm/examon/subcharts/mosquitto/templates/configmap.yaml`
+
+---
+
+### 2. KairosDB CrashLoopBackOff: Java Module Access Error
+
+**Symptom:** KairosDB crashes with:
+```
+java.lang.reflect.InaccessibleObjectException: Unable to make protected final
+java.lang.Class java.lang.ClassLoader.defineClass(...) accessible: module
+java.base does not "opens java.lang" to unnamed module
+```
+
+**Root cause:** KairosDB 1.3.0 uses Google Guice with cglib, which requires
+reflective access to internal JDK classes. Java 17+ restricts this access by
+default via the module system.
+
+**Solution:** Add `--add-opens` flags to the JVM options in
+`deploy/docker/kairosdb/kairosdb-env.sh`:
+
+```bash
+if [ -z "$JAVA_OPTS" ]; then
+  JAVA_OPTS="-Xmx512m -Xms256m"
+fi
+
+JAVA_OPTS="$JAVA_OPTS --add-opens java.base/java.lang=ALL-UNNAMED"
+JAVA_OPTS="$JAVA_OPTS --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+JAVA_OPTS="$JAVA_OPTS --add-opens java.base/java.util=ALL-UNNAMED"
+```
+
+The `if` guard also ensures that `JAVA_OPTS` passed from Kubernetes environment
+variables (via Helm values) are respected, rather than being overwritten by a
+hardcoded heap size.
+
+**Files changed:** `deploy/docker/kairosdb/kairosdb-env.sh`
+
+---
+
+### 3. KairosDB CrashLoopBackOff: OOM / Hardcoded 8G Heap
+
+**Symptom:** KairosDB crashes or gets OOM-killed despite setting
+`config.javaOpts: "-Xmx512m"` in Helm values.
+
+**Root cause:** The original `kairosdb-env.sh` hardcoded
+`JAVA_OPTS="-Xmx8G -Xms8G"`, unconditionally overwriting whatever was
+passed via the `JAVA_OPTS` environment variable from the Kubernetes
+Deployment spec.
+
+**Solution:** Modified `kairosdb-env.sh` to only set defaults when `JAVA_OPTS`
+is not already defined (see fix in issue #2 above — the `if [ -z "$JAVA_OPTS" ]`
+guard serves both purposes).
+
+**Files changed:** `deploy/docker/kairosdb/kairosdb-env.sh`
+
+---
+
+### 4. KairosDB CrashLoopBackOff: Connecting to localhost Instead of Cassandra Service
+
+**Symptom:** KairosDB logs show:
+```
+Connecting to localhost:9042
+NoHostAvailableException: All host(s) tried for query failed
+(tried: localhost/127.0.0.1:9042)
+```
+
+despite `CASSANDRA_HOST_LIST` being set correctly in the pod env.
+
+**Root cause:** KairosDB 1.3.0 introduced a new **HOCON-format** configuration
+file (`kairosdb.conf`) that takes precedence over the legacy
+`kairosdb.properties`. The `config-kairos.sh` entrypoint only patched the
+`.properties` file via `sed`, but `kairosdb.conf` still had
+`cql_host_list: ["localhost"]`.
+
+**Solution:** Updated `config-kairos.sh` to patch **both** config files:
+
+```bash
+# Legacy .properties file
+sed -i "s/^kairosdb.datastore.cassandra.cql_host_list.*$/kairosdb.datastore.cassandra.cql_host_list=$CASSANDRA_HOST_LIST/" \
+  /opt/kairosdb/conf/kairosdb.properties
+
+# HOCON .conf file (KairosDB 1.3.0+)
+CASS_HOST=$(echo "$CASSANDRA_HOST_LIST" | sed 's/:.*$//')
+sed -i "s|cql_host_list: \[\"localhost\"\]|cql_host_list: [\"${CASS_HOST}\"]|g" \
+  /opt/kairosdb/conf/kairosdb.conf
+```
+
+**Files changed:** `deploy/docker/kairosdb/config-kairos.sh`
+
+---
+
+### 5. KairosDB CrashLoopBackOff: Cassandra Authentication Required
+
+**Symptom:** KairosDB logs show:
+```
+AuthenticationException: Authentication error on host ...:
+Host ... requires authentication, but no authenticator found
+in Cluster configuration
+```
+
+**Root cause:** K8ssandra deploys Cassandra with authentication enabled by
+default. KairosDB was not configured with credentials.
+
+**Solution:**
+
+1. The kairosdb Helm subchart now supports reading credentials from a
+   Kubernetes Secret via `config.cassandraAuth.secretName`:
+
+   ```yaml
+   kairosdb:
+     config:
+       cassandraAuth:
+         secretName: "examon-cassandra-superuser"
+   ```
+
+2. `config-kairos.sh` was updated to set the auth properties in both
+   config files when `CASSANDRA_USER` and `CASSANDRA_PASSWORD` env vars
+   are present.
+
+**Files changed:**
+- `deploy/docker/kairosdb/config-kairos.sh`
+- `deploy/helm/examon/subcharts/kairosdb/templates/deployment.yaml`
+- `deploy/helm/examon/subcharts/kairosdb/values.yaml`
+
+---
+
+### 6. examon-server CrashLoopBackOff: "CASSANDRA_KEY_SPACE is not defined"
+
+**Symptom:** examon-server crashes at startup with:
+```
+ERROR - CASSANDRA_KEY_SPACE is not defined in the configuration file.
+```
+
+**Root cause:** The `cassandraKeySpace` field in the umbrella chart's
+`values.yaml` was empty (`""`). The examon-server application requires a
+non-empty keyspace name.
+
+**Solution:** Set `cassandraKeySpace: "kairosdb"` in the umbrella chart's
+default values and in the environment-specific values files. The keyspace
+`kairosdb` is the default keyspace created by KairosDB when it first connects
+to Cassandra.
+
+**Files changed:**
+- `deploy/helm/examon/values.yaml`
+- `deploy/helm/examon/subcharts/examon-server/values.yaml`
+
+---
+
+### 7. examon-server CrashLoopBackOff: Cassandra "Password must not be null"
+
+**Symptom:** examon-server logs show:
+```
+AuthenticationFailed: Failed to authenticate to ...:
+Error from server: code=0100 [Bad credentials] message="Password must not be null"
+```
+
+**Root cause:** K8ssandra enables Cassandra authentication by default.
+The examon-server `server.conf` ConfigMap had empty `CASSANDRA_USER` and
+`CASSANDRA_PASSW` fields.
+
+**Solution:** Set the Cassandra superuser credentials in the environment
+values file:
+
+```yaml
+examon-server:
+  config:
+    cassandraUser: "examon-cassandra-superuser"
+    cassandraPassword: "<password-from-secret>"
+```
+
+Retrieve the password with:
+```bash
+kubectl get secret examon-cassandra-superuser -n examon \
+  -o jsonpath='{.data.password}' | base64 -d && echo
+```
+
+**Files changed:** `deploy/helm/examon/values-local.yaml` (and equivalent for staging/production)
+
+---
+
+### 8. examon-server CrashLoopBackOff: Cannot Connect to Grafana on Port 3000
+
+**Symptom:** examon-server logs show:
+```
+ConnectionError: HTTPConnectionPool(host='examon-grafana', port=3000):
+Max retries exceeded ... [Errno 111] Connection refused
+```
+
+**Root cause:** The Grafana Helm chart exposes its Kubernetes service on
+port **80** (proxying to container port 3000). The `authUrl` was configured
+with `http://examon-grafana:3000/...`, which hits a non-listening port.
+
+**Solution:** Remove the port from the auth URL:
+
+```yaml
+examon-server:
+  config:
+    authUrl: "http://examon-grafana/api/datasources/id/kairosdb"
+```
+
+**Files changed:**
+- `deploy/helm/examon/values.yaml`
+- `deploy/helm/examon/subcharts/examon-server/values.yaml`
+
+---
+
+### 9. examon-server Not Ready: Readiness Probe Returns 401
+
+**Symptom:** examon-server is `Running` but shows `0/1 Ready`. Events show:
+```
+Readiness probe failed: HTTP probe failed with statuscode: 401
+```
+
+**Root cause:** The readiness and liveness probes were configured as HTTP GET
+on `/`, but the examon-server root endpoint requires Grafana-based
+authentication and returns 401 for unauthenticated requests. Kubernetes only
+considers HTTP 200-399 as healthy.
+
+**Solution:** Changed the probes from `httpGet` to `tcpSocket`, which simply
+checks that the port is accepting connections:
+
+```yaml
+readinessProbe:
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+livenessProbe:
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 20
+```
+
+**Files changed:** `deploy/helm/examon/subcharts/examon-server/templates/deployment.yaml`
+
+---
+
+### 10. random-pub RunContainerError: "executable file not found"
+
+**Symptom:** random-pub pod shows `RunContainerError` with:
+```
+exec: "-b": executable file not found in $PATH
+```
+
+**Root cause:** The random-pub Deployment template specified CLI `args`
+(`["-b", "examon-mosquitto", "-p", "1883", ...]`) without an explicit
+`command`. The Python base image's default entrypoint tried to execute `"-b"`
+as a command. Additionally, `random_pub.py` is an `ExamonApp`-based
+application that reads configuration from a `random_pub.conf` file, not CLI
+arguments.
+
+**Solution:**
+
+1. Removed the `args` from the Deployment template
+2. Created a ConfigMap template to generate `random_pub.conf` from Helm values
+3. Added a volume mount to provide the config file to the container
+
+The ConfigMap generates the correct INI-format config file:
+
+```ini
+[MQTT]
+MQTT_BROKER = examon-mosquitto
+MQTT_PORT = 1883
+...
+
+[Daemon]
+NUM_SENSORS = 10
+TS = 2
+```
+
+**Files changed:**
+- `deploy/helm/examon/subcharts/random-pub/templates/deployment.yaml`
+- `deploy/helm/examon/subcharts/random-pub/templates/configmap.yaml` (new)
+- `deploy/helm/examon/subcharts/random-pub/values.yaml`
+
+---
+
+### 11. Cassandra Service Name Mismatch
+
+**Symptom:** KairosDB or examon-server cannot connect to Cassandra, despite
+Cassandra pods being healthy.
+
+**Root cause:** The default `cassandraHostList` and `cassandraIp` values
+referenced `examon-k8ssandra-operator-dc1-service`, but the actual Kubernetes
+service created by K8ssandra is `examon-cassandra-dc1-service`.
+
+**How to find the correct name:**
+```bash
+kubectl get svc -n examon | grep cass
+```
+
+**Solution:** Updated all references in `values.yaml` and subchart defaults
+to use `examon-cassandra-dc1-service`.
+
+**Files changed:**
+- `deploy/helm/examon/values.yaml`
+- `deploy/helm/examon/subcharts/kairosdb/values.yaml`
+- `deploy/helm/examon/subcharts/examon-server/values.yaml`
+
+---
+
+### 12. K3d Image Caching: Updated Image Not Used
+
+**Symptom:** After rebuilding and pushing a Docker image with the same tag,
+the new pod still runs the old image.
+
+**Root cause:** K3d nodes use containerd with `imagePullPolicy: IfNotPresent`.
+If the same tag was pulled before, containerd uses the cached copy.
+
+**Solution:** Use a **new tag** for each image rebuild:
+
+```bash
+docker build -t examon-registry:5111/examon/kairosdb:1.3.0-fix1 ...
+docker push examon-registry:5111/examon/kairosdb:1.3.0-fix1
+
+# Update the tag in values-local.yaml, then:
+helm upgrade examon ./deploy/helm/examon \
+  -f ./deploy/helm/examon/values-local.yaml -n examon
+```
+
+Alternatively, set `imagePullPolicy: Always` in the values file for
+development (at the cost of slower pod startup).
+
+---
+
+### 13. Helm Subchart Template Changes Not Applied
+
+**Symptom:** After editing a file under `deploy/helm/examon/subcharts/`,
+`helm upgrade` succeeds but the deployed manifest still contains the old
+template content.
+
+**Root cause:** Helm packages subcharts into `.tgz` archives inside
+`deploy/helm/examon/charts/`. The `helm upgrade` command uses these archives,
+not the `subcharts/` source directory. If you don't rebuild the archives,
+your changes are invisible.
+
+**Solution:**
+
+```bash
+cd deploy/helm/examon
+helm dependency update    # rebuilds the .tgz archives from subcharts/
+cd ../../..
+
+helm upgrade examon ./deploy/helm/examon \
+  -f ./deploy/helm/examon/values-local.yaml -n examon
+```
+
+---
+
+### 14. Helm Upgrade Fails: "another operation is in progress"
+
+**Symptom:**
+```
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+```
+
+**Root cause:** A previous Helm operation timed out or was interrupted,
+leaving the release in a `pending-upgrade` or `pending-install` state.
+
+**Solution:**
+
+```bash
+# Check release history
+helm history examon -n examon
+
+# Rollback to the last successful revision
+helm rollback examon <revision-number> -n examon
+
+# Then retry the upgrade
+helm upgrade examon ./deploy/helm/examon ...
+```
+
+---
+
+### 15. K8ssandra Operator Webhook Certificate Conflict
+
+**Symptom:**
+```
+failed calling webhook "vk8ssandracluster.kb.io":
+tls: failed to verify certificate: x509: certificate is valid for
+examon-k8ssandra-operator-webhook-service.examon.svc, not
+k8ssandra-operator-webhook-service.examon.svc
+```
+
+**Root cause:** K8ssandra operator was installed both as a standalone Helm
+release **and** as a dependency of the ExaMon umbrella chart. The two
+installations create webhook services with different names but the same
+CRD validators, causing certificate mismatches.
+
+**Solution:**
+
+1. Uninstall the standalone release:
+   ```bash
+   helm uninstall k8ssandra-operator -n examon
+   ```
+
+2. Rely solely on the umbrella chart's dependency. The `k8s-local-setup.sh`
+   script does **not** install K8ssandra separately.
+
+**Files changed:** `scripts/k8s-local-setup.sh`
+
+---
+
+### 16. Registry Hostname Not Resolved (K3d)
+
+**Symptom:** `docker push` fails with:
+```
+dial tcp: lookup examon-registry: no such host
+```
+
+**Root cause:** K3d creates the registry as a Docker container named
+`examon-registry`. The host machine cannot resolve this hostname without
+an explicit `/etc/hosts` entry.
+
+**Solution:**
+
+```bash
+echo "127.0.0.1 examon-registry" | sudo tee -a /etc/hosts
+```
+
+The automated setup script handles this automatically. See the
+[local deployment guide](kubernetes-local.md#step-2-register-the-k3d-registry-hostname).
+
+---
+
+## General Debugging Commands
+
+```bash
+# Pod status overview
+kubectl get pods -n examon -o wide
+
+# Recent events (sorted by time)
+kubectl get events -n examon --sort-by='.lastTimestamp'
+
+# Pod details and events
+kubectl describe pod <pod-name> -n examon
+
+# Container logs
+kubectl logs <pod-name> -n examon
+kubectl logs <pod-name> -n examon --previous
+
+# Exec into a running container
+kubectl exec -it <pod-name> -n examon -- bash
+
+# Check what Helm deployed
+helm get manifest examon -n examon
+helm get values examon -n examon
+
+# Cassandra health
+kubectl exec -it examon-cassandra-dc1-default-sts-0 -c cassandra -n examon \
+  -- nodetool status
+
+# Registry contents
+curl http://examon-registry:5111/v2/_catalog
+curl http://examon-registry:5111/v2/examon/<image>/tags/list
+```
+
+## Resetting the Environment
+
+### Local
+
+```bash
+k3d cluster delete examon-local
+./scripts/k8s-local-setup.sh
+```
+
+### Staging
+
+```bash
+k3d cluster delete examon-staging
+k3d cluster create --config deploy/k3d/staging-cluster.yaml
+```

@@ -1,0 +1,46 @@
+apiVersion: v2
+name: examon
+description: ExaMon HPC Monitoring Platform - Helm Umbrella Chart
+type: application
+version: 0.5.0
+appVersion: "0.5.0"
+
+maintainers:
+  - name: ExamonHPC
+    url: https://github.com/ExamonHPC
+
+dependencies:
+  - name: k8ssandra-operator
+    version: "~1.30"
+    repository: https://helm.k8ssandra.io/stable
+    condition: cassandra.enabled
+
+  - name: grafana
+    version: "~8.x"
+    repository: https://grafana.github.io/helm-charts
+    condition: grafana.enabled
+
+  - name: mosquitto
+    repository: "file://subcharts/mosquitto"
+    version: "0.1.0"
+    condition: mosquitto.enabled
+
+  - name: kairosdb
+    repository: "file://subcharts/kairosdb"
+    version: "0.1.0"
+    condition: kairosdb.enabled
+
+  - name: mqtt2kairosdb
+    repository: "file://subcharts/mqtt2kairosdb"
+    version: "0.1.0"
+    condition: mqtt2kairosdb.enabled
+
+  - name: random-pub
+    repository: "file://subcharts/random-pub"
+    version: "0.1.0"
+    condition: random-pub.enabled
+
+  - name: examon-server
+    repository: "file://subcharts/examon-server"
+    version: "0.1.0"
+    condition: examon-server.enabled

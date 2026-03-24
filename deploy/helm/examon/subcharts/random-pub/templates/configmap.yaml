@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "random-pub.fullname" . }}
+  labels:
+    {{- include "random-pub.labels" . | nindent 4 }}
+data:
+  random_pub.conf: |
+    [MQTT]
+    MQTT_BROKER = {{ .Values.config.mqttBroker }}
+    MQTT_PORT = {{ .Values.config.mqttPort }}
+    MQTT_TOPIC = {{ .Values.config.mqttTopic }}
+    MQTT_USER = {{ .Values.config.mqttUser }}
+    MQTT_PASSWORD = {{ .Values.config.mqttPassword }}
+
+    [KairosDB]
+    K_SERVERS =
+    K_PORT =
+    K_USER =
+    K_PASSWORD =
+
+    [Daemon]
+    NUM_SENSORS = {{ .Values.config.numSensors }}
+    TS = {{ .Values.config.sampleInterval }}
+    LOG_FILENAME = random_pub.log
+    PID_FILENAME = random_pub.pid

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "examon-server.fullname" . }}
+  labels:
+    {{- include "examon-server.labels" . | nindent 4 }}
+data:
+  server.conf: |
+    [Server]
+    AUTH_URL = {{ .Values.config.authUrl }}
+    CASSANDRA_IP = {{ .Values.config.cassandraIp }}
+    CASSANDRA_KEY_SPACE = {{ .Values.config.cassandraKeySpace }}
+    CASSANDRA_USER = {{ .Values.config.cassandraUser }}
+    CASSANDRA_PASSW = {{ .Values.config.cassandraPassword }}
+    EXAMON_SERVER_HOST = {{ .Values.config.serverHost }}
+    EXAMON_SERVER_PORT = {{ .Values.config.serverPort }}
+    THREADS_NUM = {{ .Values.config.threadsNum }}
+    SCHEDULER_TYPE = {{ .Values.config.schedulerType }}
+    CACHE_TYPE = {{ .Values.config.cacheType }}
+    CACHE_TIMEOUT = {{ .Values.config.cacheTimeout }}

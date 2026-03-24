@@ -1,0 +1,29 @@
+replicaCount: 2
+
+image:
+  repository: examonhpc/kairosdb
+  tag: "1.3.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8083
+
+config:
+  cassandraHostList: "examon-cassandra-dc1-service:9042"
+  jettyPort: 8083
+  javaOpts: "-Xmx2g -Xms2g"
+  cassandraAuth:
+    secretName: "examon-cassandra-superuser"
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "4Gi"
+    cpu: "2"
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

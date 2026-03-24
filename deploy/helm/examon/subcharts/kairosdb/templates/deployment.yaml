@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kairosdb.fullname" . }}
+  labels:
+    {{- include "kairosdb.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kairosdb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kairosdb.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: kairosdb
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: CASSANDRA_HOST_LIST
+              value: {{ .Values.config.cassandraHostList | quote }}
+            - name: KAIROS_JETTY_PORT
+              value: {{ .Values.config.jettyPort | quote }}
+            - name: JAVA_OPTS
+              value: {{ .Values.config.javaOpts | quote }}
+            {{- if .Values.config.cassandraAuth.secretName }}
+            - name: CASSANDRA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.cassandraAuth.secretName }}
+                  key: username
+            - name: CASSANDRA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.cassandraAuth.secretName }}
+                  key: password
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.jettyPort }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health/check
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health/check
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /api/v1/health/check
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
