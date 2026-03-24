@@ -64,19 +64,15 @@
       }
       .tx-container{
           padding-top:1rem;
-          /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(0, 0%, 100%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
-          */
-          margin: 0 0px;
-          background-color: var(--md-primary-bg-color) 99%;
+          margin: 0;
+          background-color: var(--md-primary-bg-color);
           background-image: url('assets/images/home_bg-fs8.png');
           background-repeat: no-repeat;
           background-size: cover;
         }
       [data-md-color-scheme=slate] .tx-container{
-          /*background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(232, 15%, 21%, 1)' /></svg>") no-repeat bottom,linear-gradient(to bottom, var(--md-primary-fg-color), #a63fd9 99%, var(--md-default-bg-color) 99%)
-          */
           margin: 0 0px;
-          background-color: var(--md-primary-bg-color) 99%;
+          background-color: var(--md-primary-bg-color);
           background-image: url('assets/images/home_bg-fs8.png');
           background-repeat: no-repeat;
           background-size: cover;
@@ -185,7 +181,6 @@
           }
 
           .feature-item:hover {
-              /* background-color: #526cfe47; */
               border-radius: 3px;
           }
 
@@ -193,7 +188,7 @@
       }
 
       .hr {
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid var(--md-default-fg-color--lightest);
           width: 100%;
           margin: 20px 0;
       }
@@ -214,41 +209,52 @@
           background-color:var(--md-primary-bg-color);
           border-color:var(--md-primary-bg-color)
       }
-      /* Application header should be static for the landing page */
-      .md-header {
-        position: initial;
-      }
-  
       /* Remove spacing, as we cannot hide it completely */
       .md-main__inner {
         margin: 0;
       }
-  
+
       /* Hide main content for now */
       .md-content {
         display: none;
       }
 
-      /* Hide hero image for now */
       .tx-hero__image {
         display: none;
       }
-  
-      /* Hide table of contents */
-      @media screen and (min-width: 60em) {
-        .md-sidebar--secondary {
-          display: none;
-        }
+
+      /* Hide the ToC sidebar at all sizes */
+      .md-sidebar--secondary {
+        display: none;
       }
-  
-      /* Hide navigation */
-      @media screen and (min-width: 76.25em) {
+
+      /* Hide the nav sidebar on tablet/desktop (keep drawer working on mobile < 60em) */
+      @media screen and (min-width: 60em) {
         .md-sidebar--primary {
           display: none;
         }
-
       }
 
+
+    /* Dark mode: recolor SVG icons */
+    [data-md-color-scheme="slate"] .feature-item h2 svg {
+        fill: var(--md-default-fg-color);
+    }
+
+    [data-md-color-scheme="slate"] .feature-item h2 svg path[fill="none"],
+    [data-md-color-scheme="slate"] .feature-item h2 svg polygon[fill="none"] {
+        fill: none;
+        stroke: var(--md-default-fg-color);
+    }
+
+    [data-md-color-scheme="slate"] .feature-item h2 svg path:not([fill="none"]),
+    [data-md-color-scheme="slate"] .feature-item h2 svg polygon:not([fill="none"]) {
+        fill: var(--md-default-fg-color);
+    }
+
+    [data-md-color-scheme="slate"] .logo-grid img {
+        filter: brightness(0) invert(1);
+    }
 
     /* custom styles  */
     .feature-item h2 svg {
@@ -271,7 +277,7 @@
     }
 
     .feature-item h2 {
-        color: #333;
+        color: var(--md-default-fg-color);
         font-weight: 300;
         font-size: 25px;
         white-space: nowrap;
@@ -288,7 +294,7 @@
         line-height: 1.8em;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
-        color: #111;
+        color: var(--md-default-fg-color);
         margin: 0 0 10px;
         display: block;
     }
@@ -338,25 +344,25 @@
         object-fit: contain;
     }
 
-    /* Modern Footer Styles - Material Theme Compatible */
+    /* Footer */
     .modern-footer {
-      background-color: var(--md-footer-bg-color);
+      background: var(--md-footer-bg-color);
       color: var(--md-footer-fg-color);
       margin-top: 4rem;
-      border-top: 1px solid var(--md-default-fg-color--lightest);
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
     }
 
     .footer-main {
-      padding: 3rem 0 2rem;
+      max-width: 61rem;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 2.5rem;
     }
 
     .footer-content {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 3rem;
     }
 
     .footer-section {
@@ -365,48 +371,44 @@
     }
 
     .footer-brand {
-      max-width: 300px;
+      padding-right: 1.5rem;
     }
 
     .footer-logo {
-      max-height: 60px;
+      height: 36px;
       width: auto;
-      margin-bottom: 1rem;
-      filter: brightness(0.9);
+      margin-bottom: 1.25rem;
       object-fit: contain;
-      max-width: 100%;
+      filter: brightness(0) invert(1);
+      opacity: 0.92;
     }
 
-    /* Dark mode logo adjustment */
     [data-md-color-scheme="slate"] .footer-logo {
-      filter: brightness(1.2);
+      filter: brightness(0) invert(1);
+      opacity: 0.85;
     }
 
     .footer-description {
       color: var(--md-footer-fg-color--light);
-      line-height: 1.6;
+      line-height: 1.7;
+      font-size: 0.875rem;
       margin-bottom: 1.5rem;
-      font-size: 0.9rem;
     }
 
     .footer-title {
       color: var(--md-footer-fg-color);
-      font-size: 1.1rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      margin-bottom: 1rem;
-      position: relative;
-      text-align: left;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--md-primary-fg-color);
+      display: inline-block;
     }
 
     .footer-title::after {
-      content: '';
-      position: absolute;
-      bottom: -0.5rem;
-      left: 0;
-      width: 2rem;
-      height: 2px;
-      background: var(--md-primary-fg-color);
-      border-radius: 1px;
+      display: none;
     }
 
     .footer-links {
@@ -416,47 +418,47 @@
     }
 
     .footer-links li {
-      margin-bottom: 0.7rem;
+      margin-bottom: 0.6rem;
     }
 
     .footer-links a {
       color: var(--md-footer-fg-color--light);
       text-decoration: none;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-      position: relative;
+      font-size: 0.875rem;
+      transition: color 0.2s ease, padding-left 0.2s ease;
+      display: inline-block;
     }
 
     .footer-links a:hover {
       color: var(--md-footer-fg-color);
-      padding-left: 0;
+      padding-left: 4px;
     }
 
     .footer-social {
       display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
+      gap: 0.6rem;
+      margin-top: 0.25rem;
     }
 
     .social-link {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 2.5rem;
-      height: 2.5rem;
-      /* background: var(--md-default-fg-color--lightest); */
-      background: var(--md-footer-fg-color--light);
-      border-radius: 50%;
-      color: var(--md-footer-fg-color--lighter);
+      width: 2.25rem;
+      height: 2.25rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 0.375rem;
+      color: var(--md-footer-fg-color--light);
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       flex-shrink: 0;
     }
 
     .social-link .twemoji {
-      width: 1.2rem;
-      height: 1.2rem;
-      color: var(--md-footer-fg-color--lighter);
+      width: 1.1rem;
+      height: 1.1rem;
+      color: var(--md-footer-fg-color--light);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -471,100 +473,66 @@
 
     .social-link:hover {
       background: var(--md-primary-fg-color);
-      color: var(--md-primary-bg-color);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--md-shadow-z2);
+      border-color: var(--md-primary-fg-color);
+      transform: translateY(-1px);
     }
 
     .social-link:hover .twemoji {
       color: var(--md-primary-bg-color);
     }
 
+    .footer-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin: 0;
+    }
+
     .footer-bottom {
-      background: var(--md-default-bg-color--lighter);
-      border-top: 1px solid var(--md-default-fg-color--lightest);
-      padding: 1.5rem 0;
-    }
-
-    /* Dark mode footer bottom adjustment */
-    [data-md-color-scheme="slate"] .footer-bottom {
-      background: var(--md-default-bg-color--light);
-    }
-
-    .footer-bottom-content {
+      max-width: 61rem;
+      margin: 0 auto;
+      padding: 1.25rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
     }
 
     .footer-copyright p {
-      margin: 0.2rem 0;
+      margin: 0;
       color: var(--md-footer-fg-color--lighter);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+      line-height: 1.6;
     }
 
     .footer-copyright a {
       color: var(--md-footer-fg-color--light);
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: color 0.2s ease;
     }
 
     .footer-copyright a:hover {
       color: var(--md-footer-fg-color);
     }
 
-    .footer-legal {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .footer-legal a {
-      color: var(--md-footer-fg-color--lighter);
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: color 0.3s ease;
-    }
-
-    .footer-legal a:hover {
-      color: var(--md-footer-fg-color);
-    }
-
-    .separator {
-      color: var(--md-footer-fg-color--lightest);
-      font-size: 0.85rem;
-    }
-
-    /* --- Responsive Design --- */
-    @media screen and (max-width: 1024px) {
-      /* -- Tablet and Mobile -- */
-      
-      /* Hide navigation */
-      .md-sidebar--primary {
-        display: none;
-      }
-      
+    /* --- Responsive: Tablet (< 76.25em / ~1220px) --- */
+    @media screen and (max-width: 76.1875em) {
       .top-hr {
           display: flex;
           flex-direction: column;
           gap: 2rem;
           margin-right: auto;
           margin-left: auto;
-          padding: 0 .2rem;
+          padding: 0 1rem;
           max-width: 61rem;
       }
 
       .second-row .feature-item:nth-child(1) { order: 2; }
       .second-row .feature-item:nth-child(2) { order: 1; }
-      
+
       .top-hr .feature-item {
           margin-bottom: 1.5rem;
           text-align: center;
       }
-      
+
       .feature-item img {
           max-width: 100%;
           height: auto;
@@ -578,51 +546,60 @@
           gap: 2rem;
           width: 100%;
       }
-      
+
       .logo-grid a {
           flex: none;
           margin: 0;
           width: 60%;
           max-width: 250px;
       }
-      
+
       .logo-grid img {
           width: 100%;
           max-height: 160px;
           height: auto;
       }
-      
+
       .footer-content {
           grid-template-columns: 1fr 1fr;
       }
-      
+
       .footer-brand {
           grid-column: 1 / -1;
           max-width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+          padding-right: 0;
+          text-align: center;
       }
 
-      .footer-brand .footer-title {
-        text-align: center;
+      .footer-brand .footer-logo {
+          margin-left: auto;
+          margin-right: auto;
       }
-      
-      .footer-brand .footer-title::after {
-          left: 50%;
-          transform: translateX(-50%);
+
+      .footer-brand .footer-description {
+          max-width: 28rem;
+          margin-left: auto;
+          margin-right: auto;
+      }
+
+      .footer-social {
+          justify-content: center;
       }
     }
 
-    @media screen and (max-width: 768px) {
-      /* -- Mobile Only -- */
-
+    /* --- Responsive: Mobile (< 48em / ~768px) --- */
+    @media screen and (max-width: 48em) {
       .top-hr {
         display: grid;
       }
-      
+
+      .feature-item h2 {
+        white-space: normal;
+      }
+
       .footer-content {
           grid-template-columns: 1fr;
+          gap: 2rem;
       }
 
       .footer-section {
@@ -630,44 +607,24 @@
       }
 
       .footer-title {
-          text-align: center;
-      }
-      
-      .footer-title::after {
-        left: 50%;
-        transform: translateX(-50%);
+          margin-left: auto;
+          margin-right: auto;
       }
 
-      .footer-brand {
-          text-align: center;
-      }
-
-      .footer-logo {
-          max-height: 50px;
-      }
-      
-      .footer-bottom-content {
+      .footer-bottom {
           flex-direction: column;
-          gap: 1rem;
+          gap: 0.75rem;
           text-align: center;
       }
-      
+
       .footer-social {
           justify-content: center;
           flex-wrap: wrap;
       }
-      
+
       .logo-grid a {
           width: 80%;
           max-width: 300px;
-      }
-
-      .md-header__button:not([hidden]) {
-          display: none;
-      }
-
-      .md-sidebar {
-          display: none;
       }
     }
     </style>
@@ -676,17 +633,6 @@
     <section class="tx-container">
       <div class="md-grid md-typeset">
         <div class="tx-hero">
-  
-          <!-- Hero image -->
-          <div class="tx-hero__image">
-            <img
-              src="assets/images/home_bg-fs8.png"
-              alt=""
-              width="1920"
-              height="600"
-              draggable="false"
-            >
-          </div>
   
           <!-- Hero content -->
           <div class="tx-hero__content">
@@ -700,7 +646,7 @@
               Quick start
             </a>
             <a
-              href="https://github.com/EEESlab/examon"
+              href="https://github.com/ExamonHPC/examon"
               title="GitHub repository"
               class="md-button"
             >
@@ -754,7 +700,6 @@
       </div>
       <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <img src="assets/images/silost.png" alt="sp1" style="width: 100%;">
-        <p></p>
       </div>
     </div>
 
@@ -762,7 +707,6 @@
     <div class="top-hr second-row">
         <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <img src="assets/images/loopt.png" alt="sp1" style="width: 100%;">
-          <p></p>
         </div>
         <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <h2>Empowering Technology Transfer</h2>
@@ -778,7 +722,6 @@
       </div>
       <div class="feature-item" style="display: flex; flex-direction: column; align-items: center;justify-content: center;">
         <img src="assets/images/digitatwint-fs8.png" alt="sp1" style="width: 100%;">
-        <p></p>
       </div>
     </div>
 
@@ -814,7 +757,6 @@
       </div>
       <div class="feature-item" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <a href="https://dei.unibo.it/en/index.html" target="_blank"><img src="https://www.unibo.it/en/++theme++unibotheme.portale/img/header/sigillo1x_xl.png" alt="sp1" style="width: 100%;"></a>
-        <p></p>
       </div>
     </div>
 
@@ -862,10 +804,9 @@
 <footer class="modern-footer">
   <div class="footer-main">
     <div class="footer-content">
-      <!-- Company/Project Section -->
       <div class="footer-section footer-brand">
         <img src="https://github.com/fbeneventi/panels/raw/main/logo4_trasp.png" alt="ExaMon" class="footer-logo">
-        <p class="footer-description">A holistic solution for monitoring HPC resources, enabling data collection, analysis, and collaboration.</p>
+        <p class="footer-description">A holistic monitoring framework for HPC systems — collect, analyze, and act on operational data at scale.</p>
         <div class="footer-social">
           <a href="https://github.com/ExamonHPC/examon" class="social-link" aria-label="GitHub">
             <span class="twemoji">{% include ".icons/fontawesome/brands/github.svg" %}</span>
@@ -882,7 +823,6 @@
         </div>
       </div>
 
-      <!-- Quick Links -->
       <div class="footer-section">
         <h3 class="footer-title">Quick Links</h3>
         <ul class="footer-links">
@@ -893,9 +833,8 @@
         </ul>
       </div>
 
-      <!-- Documentation -->
       <div class="footer-section">
-        <h3 class="footer-title">Documentation</h3>
+        <h3 class="footer-title">Docs</h3>
         <ul class="footer-links">
           <li><a href="Administrators/Getting_started/">Administrator Guide</a></li>
           <li><a href="Users/Getting_started/">User Guide</a></li>
@@ -904,12 +843,11 @@
         </ul>
       </div>
 
-      <!-- Support -->
       <div class="footer-section">
-        <h3 class="footer-title">Support</h3>
+        <h3 class="footer-title">Community</h3>
         <ul class="footer-links">
           <li><a href="contactus/">Contact Us</a></li>
-          <li><a href="https://github.com/orgs/ExamonHPC/discussions">Community</a></li>
+          <li><a href="https://github.com/orgs/ExamonHPC/discussions">Discussions</a></li>
           <li><a href="https://github.com/ExamonHPC/examon/issues">Report Issues</a></li>
           <li><a href="contributing">Contributing</a></li>
         </ul>
@@ -917,18 +855,11 @@
     </div>
   </div>
 
-  <!-- Footer Bottom -->
+  <hr class="footer-divider">
+
   <div class="footer-bottom">
-    <div class="footer-bottom-content">
-      <div class="footer-copyright">
-        <p>&copy; 2024 ExaMon Project. Licensed under <a href="https://github.com/ExamonHPC/examon/blob/main/LICENSE" target="_blank">MIT License</a>.</p>
-        <p>Developed by <a href="https://dei.unibo.it/en/index.html" target="_blank">DEI - University of Bologna</a></p>
-      </div>
-      <!-- <div class="footer-legal">
-        <a href="#">Privacy Policy</a>
-        <span class="separator">|</span>
-        <a href="#">Terms of Service</a>
-      </div> -->
+    <div class="footer-copyright">
+      <p>&copy; 2026 ExaMon Project &middot; <a href="https://github.com/ExamonHPC/examon/blob/main/LICENSE" target="_blank">MIT License</a> &middot; <a href="https://dei.unibo.it/en/index.html" target="_blank">DEI &ndash; University of Bologna</a></p>
     </div>
   </div>
 </footer>

@@ -1,5 +1,5 @@
 site_name: ExaMon
-site_url: 'https://fbeneventi.github.io/' 
+site_url: 'https://examonhpc.github.io/examon' 
 repo_url: https://github.com/ExamonHPC/examon
 repo_name: ExamonHPC/examon
 site_description: Gain deeper insights into your data with advanced monitoring, analytics and visualization tools.
@@ -15,11 +15,20 @@ theme:
     - search.share
     - navigation.footer
     - announce.dismiss
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
   logo: assets/images/favicon.png
-  plugins:
-    - search:
-        lang: en
-        prebuild_index: true
   icon:
     annotation: material/arrow-right-circle
 
@@ -43,14 +52,8 @@ markdown_extensions:
   - pymdownx.tabbed
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
   - attr_list
   - md_in_html
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
