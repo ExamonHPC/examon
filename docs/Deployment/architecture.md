@@ -101,7 +101,7 @@ The ExaMon Helm chart uses an **umbrella chart** pattern:
 
 ```
 deploy/helm/examon/
-    Chart.yaml              # Dependencies: K8ssandra, Grafana, subcharts
+    Chart.yaml              # Dependencies: Grafana + local subcharts (K8ssandra operator installed separately)
     values.yaml             # Default configuration
     values-local.yaml       # Local K3d overrides
     values-staging.yaml     # Staging overrides

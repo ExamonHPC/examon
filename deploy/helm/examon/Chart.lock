@@ -1,7 +1,4 @@
 dependencies:
-- name: k8ssandra-operator
-  repository: https://helm.k8ssandra.io/stable
-  version: 1.30.2
 - name: grafana
   repository: https://grafana.github.io/helm-charts
   version: 8.15.0
@@ -20,5 +17,5 @@ dependencies:
 - name: examon-server
   repository: file://subcharts/examon-server
   version: 0.1.0
-digest: sha256:ade88248e9d1e5ad9a2584aac8950bd8eb7a28ea6d91d6516ff66dddc759d34c
-generated: "2026-03-24T19:43:43.867395324Z"
+digest: sha256:a068aca56afcd909fc980ba9b4b13e84f8f07f5e7e916c9d857450a33386f166
+generated: "2026-03-25T19:10:29.668390084Z"

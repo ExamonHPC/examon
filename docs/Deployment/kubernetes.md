@@ -46,7 +46,8 @@ and unique tags.
 
 ## Helm Chart Dependencies
 
-Before deploying, update the chart dependencies:
+Before deploying, add the required Helm repositories and update chart
+dependencies:
 
 ```bash
 helm repo add jetstack https://charts.jetstack.io
@@ -57,6 +58,10 @@ helm repo update
 cd deploy/helm/examon
 helm dependency update
 ```
+
+The `k8ssandra` repo is needed for installing the K8ssandra operator as a
+separate release (see below). The `grafana` repo is a dependency declared
+in `Chart.yaml`.
 
 ### cert-manager Prerequisite
 
@@ -77,14 +82,38 @@ re-run `helm dependency update` so Helm packages the updated templates.
 Without this step, Helm will continue using the stale archive and your changes
 will have no effect.
 
+## K8ssandra Operator (Separate Release)
+
+The K8ssandra operator is installed as a **separate Helm release** before
+deploying the ExaMon chart. This is required because the operator's
+validating webhook must be fully running before Helm submits the
+`K8ssandraCluster` custom resource. Bundling both in one release causes a
+race condition where the CR is rejected because the webhook endpoint is not
+yet available.
+
+```bash
+helm repo add k8ssandra https://helm.k8ssandra.io/stable
+helm repo update
+
+kubectl create namespace examon
+helm install k8ssandra-operator k8ssandra/k8ssandra-operator \
+  -n examon --wait --timeout 5m
+```
+
+The `--wait` flag ensures the operator pods and webhook are fully ready
+before returning. The setup scripts (`k8s-local-setup.sh`) handle this
+automatically.
+
 ## Deploying ExaMon
 
 ### Install
 
+With the K8ssandra operator already running:
+
 ```bash
 helm install examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-<environment>.yaml \
-  -n examon --create-namespace
+  -n examon --wait --timeout 10m
 ```
 
 Replace `<environment>` with `local`, `staging`, or `production`.
@@ -101,6 +130,9 @@ helm upgrade examon ./deploy/helm/examon \
 
 ```bash
 helm uninstall examon -n examon
+
+# Optionally uninstall the K8ssandra operator
+helm uninstall k8ssandra-operator -n examon
 ```
 
 ## Cassandra Authentication

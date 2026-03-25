@@ -543,32 +543,70 @@ helm upgrade examon ./deploy/helm/examon ...
 
 ---
 
-### 15. K8ssandra Operator Webhook Certificate Conflict
+### 15. K8ssandra Operator Webhook Not Ready
 
 **Symptom:**
 ```
 failed calling webhook "vk8ssandracluster.kb.io":
+no endpoints available for service "k8ssandra-operator-webhook-service"
+```
+
+**Root cause:** The `K8ssandraCluster` CR was submitted before the operator's
+webhook endpoint was ready. This happens when the operator and the CR are
+deployed in the same Helm release — Helm cannot guarantee ordering between
+a subchart's Deployment and the parent chart's custom resource.
+
+**Solution:**
+
+The K8ssandra operator is installed as a **separate Helm release** with
+`--wait`, which ensures the webhook is fully ready before returning. The
+ExaMon chart is then installed in a second `helm install`. This is the
+default behavior of `k8s-local-setup.sh` and the CI pipeline.
+
+If you hit this error, verify the operator is running:
+
+```bash
+helm list -n examon | grep k8ssandra-operator
+kubectl get pods -n examon -l app.kubernetes.io/name=k8ssandra-operator
+```
+
+If the operator release is missing, install it:
+
+```bash
+helm install k8ssandra-operator k8ssandra/k8ssandra-operator \
+  -n examon --wait --timeout 5m
+```
+
+Then retry the ExaMon chart install/upgrade.
+
+### 15b. K8ssandra Operator Webhook Certificate Conflict
+
+**Symptom:**
+```
 tls: failed to verify certificate: x509: certificate is valid for
 examon-k8ssandra-operator-webhook-service.examon.svc, not
 k8ssandra-operator-webhook-service.examon.svc
 ```
 
-**Root cause:** K8ssandra operator was installed both as a standalone Helm
-release **and** as a dependency of the ExaMon umbrella chart. The two
-installations create webhook services with different names but the same
-CRD validators, causing certificate mismatches.
+**Root cause:** Two K8ssandra operator installations exist — one standalone
+and one from a previous umbrella chart dependency. They create webhook
+services with different names but the same CRD validators.
 
 **Solution:**
 
-1. Uninstall the standalone release:
+1. Check for duplicate releases:
    ```bash
-   helm uninstall k8ssandra-operator -n examon
+   helm list -n examon | grep k8ssandra
    ```
 
-2. Rely solely on the umbrella chart's dependency. The `k8s-local-setup.sh`
-   script does **not** install K8ssandra separately.
+2. Uninstall the duplicate:
+   ```bash
+   helm uninstall <duplicate-release-name> -n examon
+   ```
 
-**Files changed:** `scripts/k8s-local-setup.sh`
+3. Keep only the standalone `k8ssandra-operator` release.
+
+**Files changed:** `deploy/helm/examon/Chart.yaml`, `scripts/k8s-local-setup.sh`
 
 ---
 

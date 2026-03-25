@@ -236,18 +236,29 @@ annotations:
   cert-manager.io/cluster-issuer: selfsigned-issuer
 ```
 
-## Step 4: Deploy
+## Step 4: Install K8ssandra Operator
+
+The K8ssandra operator must be installed as a separate Helm release before
+the ExaMon chart. Its validating webhook must be fully running before Helm
+submits the `K8ssandraCluster` custom resource:
 
 ```bash
 helm repo add k8ssandra https://helm.k8ssandra.io/stable
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
+kubectl create namespace examon 2>/dev/null || true
+helm install k8ssandra-operator k8ssandra/k8ssandra-operator \
+  -n examon --wait --timeout 5m
+```
+
+## Step 5: Deploy ExaMon
+
+```bash
 cd deploy/helm/examon
 helm dependency update
 cd ../../..
 
-kubectl create namespace examon 2>/dev/null || true
 helm install examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-production.yaml \
   --set grafana.adminPassword="$(openssl rand -base64 32)" \
@@ -259,11 +270,7 @@ examon-server read them from the K8ssandra-generated secret
 (`examon-cassandra-superuser`) via `secretKeyRef` environment variables.
 No second `helm upgrade` is needed.
 
-!!! warning
-    Do **not** install `k8ssandra-operator` as a separate Helm release.
-    It is bundled as a dependency of the ExaMon umbrella chart.
-
-## Step 5: Verify
+## Step 6: Verify
 
 ```bash
 # All pods running

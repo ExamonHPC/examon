@@ -287,6 +287,13 @@ Update `docs/Deployment/configuration.md` with the new parameter.
 | Dockerfile or container scripts | **Yes** | | Yes | Update image tags |
 | K3d/K8s cluster config (`deploy/k3d/`) | — | — | Recreate cluster | — |
 | External chart version (`Chart.yaml`) | | **Yes** | Yes | — |
+| K8ssandra operator version | | | `helm upgrade k8ssandra-operator` | — |
+
+!!! note "K8ssandra operator is a separate Helm release"
+    The K8ssandra operator is **not** listed in `Chart.yaml`. It is installed
+    as its own Helm release (`k8ssandra-operator`) before the ExaMon chart.
+    To upgrade it: `helm upgrade k8ssandra-operator k8ssandra/k8ssandra-operator -n examon --wait`.
+    Then upgrade ExaMon normally with `helm upgrade examon ...`.
 
 ## Values Inheritance Diagram
 

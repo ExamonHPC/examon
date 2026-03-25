@@ -83,35 +83,40 @@ helm install cert-manager jetstack/cert-manager \
   --set crds.enabled=true --wait
 ```
 
-### Step 5: Deploy ExaMon
+### Step 5: Install K8ssandra Operator
 
-The umbrella chart includes K8ssandra operator and Grafana as dependencies:
+The K8ssandra operator must be installed as a separate Helm release before
+the ExaMon chart (its validating webhook must be ready before the
+`K8ssandraCluster` CR is submitted):
 
 ```bash
 helm repo add k8ssandra https://helm.k8ssandra.io/stable
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
+kubectl create namespace examon 2>/dev/null || true
+helm install k8ssandra-operator k8ssandra/k8ssandra-operator \
+  -n examon --wait --timeout 5m
+```
+
+### Step 6: Deploy ExaMon
+
+```bash
 cd deploy/helm/examon
 helm dependency update
 cd ../../..
 
-kubectl create namespace examon 2>/dev/null || true
 helm install examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-staging.yaml \
   -n examon --wait --timeout 15m
 ```
-
-!!! warning
-    Do **not** install `k8ssandra-operator` as a separate Helm release.
-    It is bundled as a dependency of the ExaMon umbrella chart.
 
 !!! important
     After editing any subchart template, run `helm dependency update` in
     `deploy/helm/examon/` before upgrading. See the
     [local deployment guide](kubernetes-local.md) for details.
 
-### Step 6: Configure Cassandra Authentication
+### Step 7: Configure Cassandra Authentication
 
 K8ssandra enables Cassandra authentication by default. Both KairosDB and
 examon-server read credentials automatically from the K8ssandra-generated
@@ -135,7 +140,7 @@ helm upgrade examon ./deploy/helm/examon \
 For more details on service names, Grafana ports, and KairosDB configuration,
 see the [Important Configuration Details](kubernetes-local.md#important-configuration-details) section.
 
-### Step 7: Validate HA
+### Step 8: Validate HA
 
 ```bash
 # Verify pods are spread across nodes/zones

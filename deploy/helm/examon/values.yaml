@@ -34,7 +34,6 @@ examon-server:
 # -- Cassandra configuration (via K8ssandra Operator)
 cassandra:
   enabled: true
-  createCluster: true  # set to false to deploy the operator without creating a K8ssandraCluster CR
   serverVersion: "4.0.14"
   datacenters:
     dc1:

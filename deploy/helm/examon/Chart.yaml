@@ -10,10 +10,9 @@ maintainers:
     url: https://github.com/ExamonHPC
 
 dependencies:
-  - name: k8ssandra-operator
-    version: "~1.30"
-    repository: https://helm.k8ssandra.io/stable
-    condition: cassandra.enabled
+  # k8ssandra-operator is installed as a separate Helm release (see scripts/k8s-local-setup.sh)
+  # to avoid the webhook race condition when the operator and K8ssandraCluster CR
+  # are deployed in the same release.
 
   - name: grafana
     version: "~8.x"

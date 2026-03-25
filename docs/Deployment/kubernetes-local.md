@@ -22,7 +22,8 @@ This script will:
 2. Add the registry hostname to `/etc/hosts` (if not already present)
 3. Build and push all container images
 4. Install cert-manager (required by K8ssandra)
-5. Deploy the ExaMon umbrella chart (includes K8ssandra operator, Grafana, and all ExaMon services)
+5. Install the K8ssandra operator (separate Helm release, must be ready before ExaMon)
+6. Deploy the ExaMon chart (Grafana, Cassandra CR, and all ExaMon services)
 
 ## Manual Setup
 
@@ -86,30 +87,38 @@ helm install cert-manager jetstack/cert-manager \
   --set crds.enabled=true --wait --timeout 3m
 ```
 
-### Step 5: Deploy ExaMon
+### Step 5: Install K8ssandra Operator
 
-The umbrella chart includes K8ssandra operator and Grafana as dependencies.
-Add their Helm repos so `helm dependency update` can fetch them:
+The K8ssandra operator must be installed as a separate Helm release **before**
+the ExaMon chart. The operator's validating webhook needs to be fully running
+before Helm can create the `K8ssandraCluster` custom resource.
 
 ```bash
 helm repo add k8ssandra https://helm.k8ssandra.io/stable
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
+kubectl create namespace examon 2>/dev/null || true
+helm install k8ssandra-operator k8ssandra/k8ssandra-operator \
+  -n examon --wait --timeout 5m
+```
+
+The `--wait` flag ensures the operator pods and webhook endpoint are ready
+before the command returns.
+
+### Step 6: Deploy ExaMon
+
+Update Helm dependencies (pulls Grafana chart and packages local subcharts):
+
+```bash
 cd deploy/helm/examon
 helm dependency update
 cd ../../..
 
-kubectl create namespace examon 2>/dev/null || true
 helm install examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-local.yaml \
   -n examon --wait --timeout 10m
 ```
-
-!!! warning
-    Do **not** install `k8ssandra-operator` as a separate Helm release.
-    It is bundled as a dependency of the ExaMon umbrella chart. Installing it
-    separately causes webhook certificate conflicts.
 
 !!! important
     After editing any subchart template (e.g. files under
@@ -118,7 +127,7 @@ helm install examon ./deploy/helm/examon \
     to use the previously packaged subchart `.tgz` and your template changes will
     not take effect.
 
-### Step 6: Configure Cassandra Authentication
+### Step 7: Configure Cassandra Authentication
 
 K8ssandra creates Cassandra with authentication enabled by default. After the
 initial deployment, a superuser secret is automatically generated.
@@ -145,7 +154,7 @@ examon-server:
     This is expected — Kubernetes restarts them automatically and they
     connect once Cassandra is ready.
 
-### Step 7: Verify
+### Step 8: Verify
 
 ```bash
 kubectl get pods -n examon -o wide
@@ -160,7 +169,7 @@ All pods should reach `Running` / `Ready` status. Key things to confirm:
 - **examon-random-pub**: `1/1 Running` (publishing test data)
 - **examon-mqtt2kairosdb**: `1/1 Running` (bridging MQTT to KairosDB)
 
-### Step 8: Verify the Data Pipeline
+### Step 9: Verify the Data Pipeline
 
 Once all pods are running, verify the full data pipeline
 (`random_pub` → MQTT → `mqtt2kairosdb` → KairosDB → Cassandra) is working.

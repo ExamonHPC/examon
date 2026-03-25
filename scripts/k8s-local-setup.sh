@@ -78,18 +78,26 @@ else
   echo "    cert-manager already installed."
 fi
 
-# Update Helm dependencies (pulls k8ssandra-operator + grafana charts)
+# Update Helm dependencies (pulls grafana chart + local subcharts)
 echo "==> Updating Helm chart dependencies..."
 cd "${REPO_ROOT}/deploy/helm/examon"
 helm dependency update
 
-# Deploy ExaMon using a two-phase approach:
-#   Phase 1: deploy the K8ssandra operator (and Grafana, Mosquitto) but skip
-#            the K8ssandraCluster CR.  The operator's validating webhook must
-#            be ready before the CR is submitted.
-#   Phase 2: enable the CR (and remaining services) via helm upgrade.
-echo "==> Deploying ExaMon with local values..."
+# Install K8ssandra operator as a separate Helm release.
+# This must be fully ready (including its validating webhook) before the
+# ExaMon chart creates the K8ssandraCluster CR.
+echo "==> Installing K8ssandra operator..."
 kubectl create namespace "${NAMESPACE}" 2>/dev/null || true
+if ! helm status k8ssandra-operator -n "${NAMESPACE}" &>/dev/null; then
+  helm install k8ssandra-operator k8ssandra/k8ssandra-operator \
+    -n "${NAMESPACE}" --wait --timeout 5m
+else
+  echo "    K8ssandra operator already installed."
+fi
+
+# Deploy ExaMon (single helm install -- the operator and its webhook are
+# already running, so the K8ssandraCluster CR will be validated successfully)
+echo "==> Deploying ExaMon with local values..."
 
 HELM_SET_ARGS=()
 SECRET_FILE="${REPO_ROOT}/deploy/helm/examon/values-local.secret.yaml"
@@ -98,34 +106,9 @@ if [[ -f "$SECRET_FILE" ]]; then
   HELM_SET_ARGS+=(-f "$SECRET_FILE")
 fi
 
-CHART="${REPO_ROOT}/deploy/helm/examon"
-VALUES=(-f "${REPO_ROOT}/deploy/helm/examon/values-local.yaml" "${HELM_SET_ARGS[@]+"${HELM_SET_ARGS[@]}"}")
-
-echo "    Phase 1: deploying operator and independent services..."
-helm upgrade --install examon "$CHART" \
-  "${VALUES[@]}" \
-  --set cassandra.createCluster=false \
-  -n "${NAMESPACE}" --wait --timeout 5m
-
-echo "    Waiting for K8ssandra operator webhook..."
-for i in $(seq 1 60); do
-  EP=$(kubectl get endpoints examon-k8ssandra-operator-webhook-service \
-    -n "${NAMESPACE}" -o jsonpath='{.subsets[0].addresses[0].ip}' 2>/dev/null || true)
-  if [[ -n "$EP" ]]; then
-    echo "    Webhook endpoint ready at $EP."
-    break
-  fi
-  if [[ $i -eq 60 ]]; then
-    echo "ERROR: K8ssandra webhook did not become ready in 5 minutes."
-    kubectl get endpoints -n "${NAMESPACE}"
-    exit 1
-  fi
-  sleep 5
-done
-
-echo "    Phase 2: deploying full stack (Cassandra + all services)..."
-helm upgrade examon "$CHART" \
-  "${VALUES[@]}" \
+helm upgrade --install examon "${REPO_ROOT}/deploy/helm/examon" \
+  -f "${REPO_ROOT}/deploy/helm/examon/values-local.yaml" \
+  "${HELM_SET_ARGS[@]+"${HELM_SET_ARGS[@]}"}" \
   -n "${NAMESPACE}" --wait --timeout 10m
 
 echo ""

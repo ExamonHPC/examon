@@ -1,4 +1,4 @@
-{{- if and .Values.cassandra.enabled (ne (toString .Values.cassandra.createCluster) "false") }}
+{{- if .Values.cassandra.enabled }}
 apiVersion: k8ssandra.io/v1alpha1
 kind: K8ssandraCluster
 metadata:
