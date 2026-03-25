@@ -47,7 +47,7 @@ kairosdb:
   replicaCount: 1
   image:
     repository: examon-registry:5111/examon/kairosdb
-    tag: "1.3.0-fix3"
+    tag: "1.3.0"
   config:
     javaOpts: "-Xmx512m -Xms256m"
   resources:
