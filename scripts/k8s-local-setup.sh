@@ -83,7 +83,11 @@ echo "==> Updating Helm chart dependencies..."
 cd "${REPO_ROOT}/deploy/helm/examon"
 helm dependency update
 
-# Deploy ExaMon (k8ssandra-operator is installed as part of the umbrella chart)
+# Deploy ExaMon using a two-phase approach:
+#   Phase 1: deploy the K8ssandra operator (and Grafana, Mosquitto) but skip
+#            the K8ssandraCluster CR.  The operator's validating webhook must
+#            be ready before the CR is submitted.
+#   Phase 2: enable the CR (and remaining services) via helm upgrade.
 echo "==> Deploying ExaMon with local values..."
 kubectl create namespace "${NAMESPACE}" 2>/dev/null || true
 
@@ -94,14 +98,35 @@ if [[ -f "$SECRET_FILE" ]]; then
   HELM_SET_ARGS+=(-f "$SECRET_FILE")
 fi
 
-helm upgrade --install examon "${REPO_ROOT}/deploy/helm/examon" \
-  -f "${REPO_ROOT}/deploy/helm/examon/values-local.yaml" \
-  "${HELM_SET_ARGS[@]+"${HELM_SET_ARGS[@]}"}" \
-  -n "${NAMESPACE}" --wait --timeout 10m
+CHART="${REPO_ROOT}/deploy/helm/examon"
+VALUES=(-f "${REPO_ROOT}/deploy/helm/examon/values-local.yaml" "${HELM_SET_ARGS[@]+"${HELM_SET_ARGS[@]}"}")
 
-# Cassandra credentials: examon-server and kairosdb read them automatically
-# from the K8ssandra-generated secret (examon-cassandra-superuser) via
-# secretKeyRef env vars. No second helm upgrade is needed.
+echo "    Phase 1: deploying operator and independent services..."
+helm upgrade --install examon "$CHART" \
+  "${VALUES[@]}" \
+  --set cassandra.createCluster=false \
+  -n "${NAMESPACE}" --wait --timeout 5m
+
+echo "    Waiting for K8ssandra operator webhook..."
+for i in $(seq 1 60); do
+  EP=$(kubectl get endpoints examon-k8ssandra-operator-webhook-service \
+    -n "${NAMESPACE}" -o jsonpath='{.subsets[0].addresses[0].ip}' 2>/dev/null || true)
+  if [[ -n "$EP" ]]; then
+    echo "    Webhook endpoint ready at $EP."
+    break
+  fi
+  if [[ $i -eq 60 ]]; then
+    echo "ERROR: K8ssandra webhook did not become ready in 5 minutes."
+    kubectl get endpoints -n "${NAMESPACE}"
+    exit 1
+  fi
+  sleep 5
+done
+
+echo "    Phase 2: deploying full stack (Cassandra + all services)..."
+helm upgrade examon "$CHART" \
+  "${VALUES[@]}" \
+  -n "${NAMESPACE}" --wait --timeout 10m
 
 echo ""
 echo "=== ExaMon local deployment complete! ==="
