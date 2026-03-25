@@ -13,6 +13,18 @@
 # USER-FACING SERVICES:
 #   Grafana + ExaMon API → exposed via Ingress (HTTP/HTTPS)
 #   MQTT broker          → exposed via LoadBalancer (TCP, L4)
+#
+# IMAGE PULL SECRETS:
+#   If your images live in a private registry (e.g. ghcr.io), create a pull
+#   secret first and reference it globally:
+#     kubectl create secret docker-registry ghcr-cred \
+#       --docker-server=ghcr.io --docker-username=<user> \
+#       --docker-password=<PAT> -n examon
+#   Then either set it globally below, or per-subchart via imagePullSecrets.
+
+global:
+  imagePullSecrets: []
+  # - name: ghcr-cred
 
 cassandra:
   enabled: true

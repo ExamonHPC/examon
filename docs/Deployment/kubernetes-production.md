@@ -73,6 +73,29 @@ Build images and push to your production registry:
 Update `values-production.yaml` image repositories if using a different
 registry.
 
+If your registry is **private** (requires authentication), create an image
+pull secret and enable it globally:
+
+```bash
+kubectl create secret docker-registry ghcr-cred \
+  --docker-server=ghcr.io \
+  --docker-username=<github-user> \
+  --docker-password=<personal-access-token> \
+  -n examon
+```
+
+Then set it in your values or via `--set`:
+
+```yaml
+# values-production.yaml
+global:
+  imagePullSecrets:
+    - name: ghcr-cred
+```
+
+See the [Private Container Registries](kubernetes.md#private-container-registries)
+section for per-subchart overrides and further details.
+
 ## Step 2: Install cert-manager
 
 ```bash

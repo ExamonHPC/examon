@@ -5,6 +5,11 @@ image:
   tag: "1.3.0"
   pullPolicy: IfNotPresent
 
+imagePullSecrets: []
+
+global:
+  imagePullSecrets: []
+
 service:
   type: ClusterIP
   port: 8083

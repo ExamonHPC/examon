@@ -187,6 +187,78 @@ For production, use a secrets management solution such as:
 | `random-pub.config.mqttPassword` | MQTT password (if auth enabled) | `""` |
 | `mqtt2kairosdb.config.kairosdb.password` | KairosDB password (if auth enabled) | `""` |
 
+## Private Container Registries
+
+When pulling images from a private registry (e.g. GitHub Container Registry,
+private Docker Hub, or a corporate registry), Kubernetes needs credentials to
+authenticate. All ExaMon subcharts support `imagePullSecrets` at both
+per-subchart and global levels.
+
+### Step 1: Create the Pull Secret
+
+```bash
+kubectl create secret docker-registry ghcr-cred \
+  --docker-server=ghcr.io \
+  --docker-username=<github-user> \
+  --docker-password=<personal-access-token> \
+  -n examon
+```
+
+Replace `ghcr.io` with your registry server, and provide the appropriate
+credentials. For GHCR, the password is a Personal Access Token (PAT) with
+`read:packages` scope.
+
+### Step 2: Reference the Secret in Values
+
+**Option A — Global (recommended):** Set once, applies to all subcharts.
+
+```yaml
+global:
+  imagePullSecrets:
+    - name: ghcr-cred
+```
+
+This can be set in `values-production.yaml`, via `--set`, or in a secret
+override file:
+
+```bash
+helm upgrade examon ./deploy/helm/examon \
+  -f ./deploy/helm/examon/values-production.yaml \
+  --set 'global.imagePullSecrets[0].name=ghcr-cred' \
+  -n examon
+```
+
+**Option B — Per-subchart:** Override for a specific component only.
+
+```yaml
+kairosdb:
+  imagePullSecrets:
+    - name: ghcr-cred
+mqtt2kairosdb:
+  imagePullSecrets:
+    - name: another-registry-cred
+```
+
+Per-subchart values take priority over global values (via `coalesce`). If a
+subchart has its own `imagePullSecrets` set, the global value is ignored for
+that subchart.
+
+### Supported Subcharts
+
+| Subchart | Template | Supports `imagePullSecrets` |
+|----------|----------|:-:|
+| `kairosdb` | `deployment.yaml` | Yes |
+| `examon-server` | `deployment.yaml` | Yes |
+| `mosquitto` | `statefulset.yaml` | Yes |
+| `mqtt2kairosdb` | `deployment.yaml` | Yes |
+| `random-pub` | `deployment.yaml` | Yes |
+| `grafana` (upstream) | upstream chart | Yes (via `grafana.image.pullSecrets`) |
+
+!!! note "Local Development"
+    For local K3d with a local registry (`examon-registry:5111`), image pull
+    secrets are not needed — K3d connects to the local registry without
+    authentication.
+
 ## Service Name Reference
 
 | Service | Kubernetes Service Name | Port |

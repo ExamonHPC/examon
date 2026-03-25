@@ -5,6 +5,11 @@ image:
   tag: "latest"
   pullPolicy: IfNotPresent
 
+imagePullSecrets: []
+
+global:
+  imagePullSecrets: []
+
 service:
   type: ClusterIP
   mqttPort: 1883

@@ -5,6 +5,16 @@
 # placeholders. Real credentials must be passed at deploy time via --set flags.
 # See docs/Deployment/kubernetes-local.md for details.
 
+# -- Global image pull secrets (applied to all subcharts that support it)
+# Create a secret first:  kubectl create secret docker-registry ghcr-cred \
+#   --docker-server=ghcr.io --docker-username=<user> --docker-password=<PAT> -n examon
+# Then reference it here:
+#   global:
+#     imagePullSecrets:
+#       - name: ghcr-cred
+global:
+  imagePullSecrets: []
+
 # -- Component toggles
 cassandra:
   enabled: true

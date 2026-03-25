@@ -6,6 +6,11 @@ image:
   tag: "latest"
   pullPolicy: IfNotPresent
 
+imagePullSecrets: []
+
+global:
+  imagePullSecrets: []
+
 config:
   mqttBroker: "examon-mosquitto"
   mqttPort: 1883
