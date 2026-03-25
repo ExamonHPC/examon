@@ -65,20 +65,26 @@ jobs:
           helm install examon deploy/helm/examon \
             -f deploy/helm/examon/values-local.yaml \
             --set cassandra.enabled=false \
-            -n examon --create-namespace --timeout 10m
+            -n examon --create-namespace --wait --timeout 10m
 
       - name: Wait for K8ssandra operator webhook
         run: |
-          echo "Waiting for K8ssandra operator to be ready..."
-          kubectl wait --for=condition=Ready pod \
-            -l app.kubernetes.io/name=k8ssandra-operator \
-            -n examon --timeout=120s
-          kubectl wait --for=condition=Ready pod \
-            -l app.kubernetes.io/name=cass-operator \
-            -n examon --timeout=120s
-          echo "Waiting for webhook endpoint registration..."
-          sleep 10
-          echo "Operators ready."
+          echo "Waiting for operator webhook endpoint to be registered..."
+          for i in $(seq 1 30); do
+            EP=$(kubectl get endpoints examon-k8ssandra-operator-webhook-service \
+              -n examon -o jsonpath='{.subsets[0].addresses[0].ip}' 2>/dev/null || true)
+            if [[ -n "$EP" ]]; then
+              echo "Webhook endpoint ready at $EP."
+              break
+            fi
+            echo "  attempt $i/30 — endpoint not ready yet, waiting 5s..."
+            sleep 5
+          done
+          if [[ -z "$EP" ]]; then
+            echo "ERROR: Webhook endpoint did not become ready in time."
+            kubectl get endpoints -n examon
+            exit 1
+          fi
 
       - name: "Deploy ExaMon (phase 2: full stack with Cassandra)"
         run: |
