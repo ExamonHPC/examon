@@ -5,6 +5,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 NAMESPACE="${NAMESPACE:-examon}"
 
+CI_MODE=false
+for arg in "$@"; do
+  case "$arg" in
+    --ci) CI_MODE=true ;;
+  esac
+done
+
 echo "=== ExaMon Local K8s Setup ==="
 
 # Check prerequisites
@@ -18,12 +25,17 @@ done
 # Create K3d cluster
 echo "==> Creating K3d cluster..."
 if k3d cluster list | grep -q examon-local; then
-  echo "    Cluster 'examon-local' already exists. Delete with: k3d cluster delete examon-local"
-  read -p "    Delete and recreate? [y/N] " -r
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
+  if [[ "$CI_MODE" == true ]]; then
+    echo "    Cluster 'examon-local' already exists. Deleting (CI mode)..."
     k3d cluster delete examon-local
   else
-    echo "    Using existing cluster."
+    echo "    Cluster 'examon-local' already exists. Delete with: k3d cluster delete examon-local"
+    read -p "    Delete and recreate? [y/N] " -r
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      k3d cluster delete examon-local
+    else
+      echo "    Using existing cluster."
+    fi
   fi
 fi
 
