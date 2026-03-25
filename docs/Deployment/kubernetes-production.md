@@ -250,26 +250,18 @@ cd ../../..
 kubectl create namespace examon 2>/dev/null || true
 helm install examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-production.yaml \
-  --set examon-server.config.cassandraPassword="placeholder" \
   --set grafana.adminPassword="$(openssl rand -base64 32)" \
   -n examon --wait --timeout 20m
 ```
 
+Cassandra credentials are injected automatically — both KairosDB and
+examon-server read them from the K8ssandra-generated secret
+(`examon-cassandra-superuser`) via `secretKeyRef` environment variables.
+No second `helm upgrade` is needed.
+
 !!! warning
     Do **not** install `k8ssandra-operator` as a separate Helm release.
     It is bundled as a dependency of the ExaMon umbrella chart.
-
-After the initial deploy, inject the real Cassandra credentials:
-
-```bash
-helm upgrade examon ./deploy/helm/examon \
-  -f ./deploy/helm/examon/values-production.yaml \
-  --set examon-server.config.cassandraPassword="$(kubectl get secret \
-    examon-cassandra-superuser -n examon \
-    -o jsonpath='{.data.password}' | base64 -d)" \
-  --set grafana.adminPassword="<your-grafana-password>" \
-  -n examon --timeout 20m
-```
 
 ## Step 5: Verify
 

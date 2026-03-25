@@ -96,7 +96,8 @@ helm uninstall examon -n examon
 ## Cassandra Authentication
 
 K8ssandra creates Cassandra with authentication enabled by default. A
-superuser secret is generated automatically during the first deployment:
+superuser secret (`examon-cassandra-superuser`) is generated automatically
+during the first deployment. You can inspect it with:
 
 ```bash
 kubectl get secret examon-cassandra-superuser -n examon \
@@ -105,38 +106,74 @@ kubectl get secret examon-cassandra-superuser -n examon \
   -o jsonpath='{.data.password}' | base64 -d && echo
 ```
 
-**KairosDB** reads credentials from this secret automatically via the
-`cassandraAuth.secretName` setting in its subchart values (injected as
-`CASSANDRA_USER` / `CASSANDRA_PASSWORD` environment variables). No
-additional configuration is needed.
+### Automatic credential injection
 
-**examon-server** reads credentials from its `server.conf` ConfigMap.
-Credentials must be passed at deploy time via `--set` — never hardcode them
-in values files that are committed to git:
+Both services that connect to Cassandra read credentials **automatically**
+from this secret — no manual `--set` flags are needed:
+
+| Service | Mechanism | Values key |
+|---------|-----------|------------|
+| **KairosDB** | `secretKeyRef` env vars (`CASSANDRA_USER`, `CASSANDRA_PASSWORD`) | `kairosdb.config.cassandraAuth.secretName` |
+| **examon-server** | `secretKeyRef` env vars override `server.conf` at runtime | `examon-server.config.cassandraAuth.secretName` |
+
+All environment values files (`values-local.yaml`, `values-staging.yaml`,
+`values-production.yaml`) have this pre-configured:
+
+```yaml
+examon-server:
+  config:
+    cassandraAuth:
+      secretName: "examon-cassandra-superuser"  # K8ssandra auto-generated
+```
+
+The `server.py` application checks environment variables `CASSANDRA_USER`
+and `CASSANDRA_PASSWORD` first, falling back to `server.conf` values if the
+env vars are not set. This means a simple `helm install` (or upgrade) is
+sufficient — the pod will authenticate to Cassandra automatically on
+startup once the secret exists.
+
+!!! note "Bootstrap ordering"
+    On a fresh `helm install`, `examon-server` and `kairosdb` may restart a
+    few times while Cassandra initializes and the superuser secret is
+    created. This is expected — Kubernetes will restart them automatically
+    and they will connect once Cassandra is ready.
+
+### Custom secret name
+
+If you use a different secret (e.g. created by External Secrets Operator),
+override the secret name and key names:
+
+```yaml
+examon-server:
+  config:
+    cassandraAuth:
+      secretName: "my-custom-cassandra-secret"
+      usernameKey: "user"       # default: "username"
+      passwordKey: "pass"       # default: "password"
+```
+
+Set `secretName` to `""` to disable automatic injection and fall back to
+`server.conf` values only (useful for non-K8ssandra Cassandra clusters
+where you manage credentials differently).
+
+## Secrets Management
+
+**Never commit real passwords** to values files. Cassandra credentials are
+handled automatically (see above). The remaining secret that needs to be
+passed at deploy time is the **Grafana admin password**:
 
 ```bash
 helm upgrade examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-<env>.yaml \
-  --set examon-server.config.cassandraPassword="$(kubectl get secret \
-    examon-cassandra-superuser -n examon \
-    -o jsonpath='{.data.password}' | base64 -d)" \
+  --set grafana.adminPassword="my-grafana-password" \
   -n examon
 ```
-
-## Secrets Management
-
-**Never commit real passwords** to values files. The values files checked
-into git contain empty strings for all secret fields. Pass credentials at
-deploy time using one of these methods:
 
 ### Method 1: --set flags (recommended for local/staging)
 
 ```bash
 helm upgrade examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-local.yaml \
-  --set examon-server.config.cassandraPassword="$(kubectl get secret \
-    examon-cassandra-superuser -n examon \
-    -o jsonpath='{.data.password}' | base64 -d)" \
   --set grafana.adminPassword="my-grafana-password" \
   -n examon
 ```
@@ -149,9 +186,6 @@ be committed:
 
 ```yaml
 # values-local.secret.yaml — DO NOT COMMIT
-examon-server:
-  config:
-    cassandraPassword: "actual-password-here"
 grafana:
   adminPassword: "my-grafana-password"
 ```
@@ -179,13 +213,13 @@ For production, use a secrets management solution such as:
 
 ### Secret fields reference
 
-| Values path | Description | Default |
-|-------------|-------------|---------|
-| `grafana.adminPassword` | Grafana admin password | `""` |
-| `examon-server.config.cassandraUser` | Cassandra username | `examon-cassandra-superuser` |
-| `examon-server.config.cassandraPassword` | Cassandra password | `""` |
-| `random-pub.config.mqttPassword` | MQTT password (if auth enabled) | `""` |
-| `mqtt2kairosdb.config.kairosdb.password` | KairosDB password (if auth enabled) | `""` |
+| Values path | Description | Injected from |
+|-------------|-------------|---------------|
+| `grafana.adminPassword` | Grafana admin password | `--set` flag |
+| `examon-server.config.cassandraAuth.secretName` | K8s Secret for Cassandra creds | Auto from K8ssandra |
+| `kairosdb.config.cassandraAuth.secretName` | K8s Secret for Cassandra creds | Auto from K8ssandra |
+| `random-pub.config.mqttPassword` | MQTT password (if auth enabled) | `--set` flag |
+| `mqtt2kairosdb.config.kairosdb.password` | KairosDB password (if auth enabled) | `--set` flag |
 
 ## Private Container Registries
 

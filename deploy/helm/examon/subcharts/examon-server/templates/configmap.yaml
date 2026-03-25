@@ -10,8 +10,8 @@ data:
     AUTH_URL = {{ .Values.config.authUrl }}
     CASSANDRA_IP = {{ .Values.config.cassandraIp }}
     CASSANDRA_KEY_SPACE = {{ .Values.config.cassandraKeySpace }}
-    CASSANDRA_USER = {{ .Values.config.cassandraUser }}
-    CASSANDRA_PASSW = {{ .Values.config.cassandraPassword }}
+    CASSANDRA_USER = {{ .Values.config.cassandraUser | default "" }}
+    CASSANDRA_PASSW = {{ .Values.config.cassandraPassword | default "" }}
     EXAMON_SERVER_HOST = {{ .Values.config.serverHost }}
     EXAMON_SERVER_PORT = {{ .Values.config.serverPort }}
     THREADS_NUM = {{ .Values.config.threadsNum }}

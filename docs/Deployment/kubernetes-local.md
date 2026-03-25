@@ -123,27 +123,27 @@ helm install examon ./deploy/helm/examon \
 K8ssandra creates Cassandra with authentication enabled by default. After the
 initial deployment, a superuser secret is automatically generated.
 
-KairosDB reads these credentials from the K8ssandra secret automatically (via
-`secretKeyRef`). No additional configuration is needed for KairosDB.
+Both **KairosDB** and **examon-server** read these credentials automatically
+from the K8ssandra secret via `secretKeyRef` environment variables. No
+manual `--set` flags or second `helm upgrade` is needed — the pods pick up
+credentials on startup once the secret exists.
 
-For examon-server, pass the Cassandra password at deploy time using `--set`:
+`examon-server` uses env var overrides (`CASSANDRA_USER`, `CASSANDRA_PASSWORD`)
+that take priority over the `server.conf` ConfigMap values. This is configured
+via the `cassandraAuth.secretName` setting in values:
 
-```bash
-helm upgrade examon ./deploy/helm/examon \
-  -f ./deploy/helm/examon/values-local.yaml \
-  --set examon-server.config.cassandraPassword="$(kubectl get secret \
-    examon-cassandra-superuser -n examon \
-    -o jsonpath='{.data.password}' | base64 -d)" \
-  -n examon --timeout 10m
+```yaml
+examon-server:
+  config:
+    cassandraAuth:
+      secretName: "examon-cassandra-superuser"  # K8ssandra auto-generated
 ```
 
-!!! warning
-    **Never hardcode real passwords** in values files that are committed to
-    git. The `cassandraPassword` field in `values-local.yaml` is intentionally
-    empty. Always pass secrets via `--set` or use a gitignored secret override
-    file (`values-local.secret.yaml`). See the
-    [Secrets Management](kubernetes.md#secrets-management) guide for all
-    available methods.
+!!! note "Bootstrap restarts"
+    On a fresh install, `examon-server` and `kairosdb` may restart a few
+    times while Cassandra initializes and creates the superuser secret.
+    This is expected — Kubernetes restarts them automatically and they
+    connect once Cassandra is ready.
 
 ### Step 7: Verify
 

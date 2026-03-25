@@ -20,6 +20,10 @@ config:
   cassandraKeySpace: "kairosdb"
   cassandraUser: ""
   cassandraPassword: ""
+  cassandraAuth:
+    secretName: ""
+    usernameKey: "username"
+    passwordKey: "password"
   serverHost: "0.0.0.0"
   serverPort: 5000
   threadsNum: 8

@@ -3,12 +3,12 @@
 # Targets a real Kubernetes cluster: on-prem (OpenStack, RKE2, kubeadm)
 # or cloud-managed (EKS, GKE, AKS).
 #
-# SECRETS: Do NOT put real passwords in this file. Pass them at deploy time:
+# SECRETS: Do NOT put real passwords in this file. Cassandra credentials are
+# injected automatically from the K8ssandra-generated secret
+# (examon-cassandra-superuser) via secretKeyRef — no --set flags needed.
+# Only Grafana admin password requires --set:
 #   helm upgrade examon ./deploy/helm/examon -f values-production.yaml \
-#     --set examon-server.config.cassandraPassword="$(kubectl get secret \
-#       examon-cassandra-superuser -n examon -o jsonpath='{.data.password}' | base64 -d)" \
-#     --set grafana.adminPassword="<your-grafana-password>" \
-#     -n examon
+#     --set grafana.adminPassword="<your-grafana-password>" -n examon
 #
 # USER-FACING SERVICES:
 #   Grafana + ExaMon API → exposed via Ingress (HTTP/HTTPS)
@@ -180,8 +180,8 @@ examon-server:
     authUrl: "http://examon-grafana/api/datasources/id/kairosdb"
     cassandraIp: "examon-cassandra-dc1-service"
     cassandraKeySpace: "kairosdb"
-    cassandraUser: ""
-    cassandraPassword: ""
+    cassandraAuth:
+      secretName: "examon-cassandra-superuser"
     serverHost: "0.0.0.0"
     serverPort: 5000
     threadsNum: 8

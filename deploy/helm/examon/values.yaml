@@ -183,6 +183,10 @@ examon-server:
     cassandraKeySpace: "kairosdb"
     cassandraUser: ""
     cassandraPassword: ""
+    cassandraAuth:
+      secretName: "examon-cassandra-superuser"
+      usernameKey: "username"
+      passwordKey: "password"
     serverHost: "0.0.0.0"
     serverPort: 5000
     threadsNum: 8

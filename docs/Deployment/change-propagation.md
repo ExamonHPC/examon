@@ -348,16 +348,30 @@ Secret values (passwords, API keys) must **never** be committed in plain text
 to any values file. All secret fields in the checked-in values files contain
 empty strings.
 
-### How to pass secrets at deploy time
+### Automatic Cassandra credential injection
+
+Both **KairosDB** and **examon-server** read Cassandra credentials
+automatically from the K8ssandra-generated secret (`examon-cassandra-superuser`)
+via `secretKeyRef` environment variables. No `--set` flags are needed for
+Cassandra passwords. This is configured via:
+
+```yaml
+examon-server:
+  config:
+    cassandraAuth:
+      secretName: "examon-cassandra-superuser"
+```
+
+### How to pass remaining secrets at deploy time
+
+The only secret that still requires `--set` is the **Grafana admin password**:
 
 1. **`--set` flags** (recommended for local/staging):
 
     ```bash
     helm upgrade examon ./deploy/helm/examon \
       -f ./deploy/helm/examon/values-local.yaml \
-      --set examon-server.config.cassandraPassword="$(kubectl get secret \
-        examon-cassandra-superuser -n examon \
-        -o jsonpath='{.data.password}' | base64 -d)" \
+      --set grafana.adminPassword="my-grafana-password" \
       -n examon
     ```
 
@@ -369,9 +383,6 @@ empty strings.
 
     ```yaml
     # values-local.secret.yaml — DO NOT COMMIT
-    examon-server:
-      config:
-        cassandraPassword: "actual-password"
     grafana:
       adminPassword: "my-grafana-password"
     ```
@@ -388,18 +399,13 @@ empty strings.
 
 ### Which fields are secrets?
 
-| Field | Service |
-|-------|---------|
-| `grafana.adminPassword` | Grafana |
-| `examon-server.config.cassandraPassword` | examon-server |
-| `random-pub.config.mqttPassword` | random-pub |
-| `mqtt2kairosdb.config.kairosdb.password` | mqtt2kairosdb |
-
-### KairosDB exception
-
-KairosDB does **not** need secret values in values files. It reads Cassandra
-credentials directly from a K8s Secret via `secretKeyRef` in the Deployment
-template (controlled by `kairosdb.config.cassandraAuth.secretName`).
+| Field | Service | How injected |
+|-------|---------|-------------|
+| `grafana.adminPassword` | Grafana | `--set` flag |
+| `examon-server.config.cassandraAuth.secretName` | examon-server | Auto via K8s `secretKeyRef` |
+| `kairosdb.config.cassandraAuth.secretName` | KairosDB | Auto via K8s `secretKeyRef` |
+| `random-pub.config.mqttPassword` | random-pub | `--set` flag |
+| `mqtt2kairosdb.config.kairosdb.password` | mqtt2kairosdb | `--set` flag |
 
 ## Common Mistakes and How to Avoid Them
 

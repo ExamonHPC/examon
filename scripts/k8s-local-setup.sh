@@ -87,17 +87,9 @@ helm upgrade --install examon "${REPO_ROOT}/deploy/helm/examon" \
   "${HELM_SET_ARGS[@]+"${HELM_SET_ARGS[@]}"}" \
   -n "${NAMESPACE}" --wait --timeout 10m
 
-# Inject Cassandra credentials (secret is created by K8ssandra after first deploy)
-if kubectl get secret examon-cassandra-superuser -n "${NAMESPACE}" &>/dev/null; then
-  CASS_PASS="$(kubectl get secret examon-cassandra-superuser -n "${NAMESPACE}" \
-    -o jsonpath='{.data.password}' | base64 -d)"
-  echo "==> Injecting Cassandra credentials into examon-server..."
-  helm upgrade examon "${REPO_ROOT}/deploy/helm/examon" \
-    -f "${REPO_ROOT}/deploy/helm/examon/values-local.yaml" \
-    "${HELM_SET_ARGS[@]+"${HELM_SET_ARGS[@]}"}" \
-    --set examon-server.config.cassandraPassword="${CASS_PASS}" \
-    -n "${NAMESPACE}" --timeout 10m
-fi
+# Cassandra credentials: examon-server and kairosdb read them automatically
+# from the K8ssandra-generated secret (examon-cassandra-superuser) via
+# secretKeyRef env vars. No second helm upgrade is needed.
 
 echo ""
 echo "=== ExaMon local deployment complete! ==="

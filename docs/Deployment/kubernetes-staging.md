@@ -113,16 +113,16 @@ helm install examon ./deploy/helm/examon \
 
 ### Step 6: Configure Cassandra Authentication
 
-K8ssandra enables Cassandra authentication by default. KairosDB reads
-credentials from the K8ssandra secret automatically. For examon-server,
-pass the Cassandra password at deploy time:
+K8ssandra enables Cassandra authentication by default. Both KairosDB and
+examon-server read credentials automatically from the K8ssandra-generated
+secret (`examon-cassandra-superuser`) via `secretKeyRef` environment
+variables. No manual `--set` for Cassandra passwords is needed.
+
+Only Grafana admin password requires a `--set` flag:
 
 ```bash
 helm upgrade examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-staging.yaml \
-  --set examon-server.config.cassandraPassword="$(kubectl get secret \
-    examon-cassandra-superuser -n examon \
-    -o jsonpath='{.data.password}' | base64 -d)" \
   --set grafana.adminPassword="<your-grafana-password>" \
   -n examon --timeout 15m
 ```

@@ -1,11 +1,12 @@
 # ExaMon Local Development Values (K3d)
 # Single-node Cassandra, minimal resources, no TLS, no NetworkPolicies.
 #
-# SECRETS: Do NOT put real passwords in this file. Pass them at deploy time:
+# SECRETS: Do NOT put real passwords in this file. Cassandra credentials are
+# injected automatically from the K8ssandra-generated secret
+# (examon-cassandra-superuser) via secretKeyRef — no --set flags needed.
+# Only Grafana admin password requires --set:
 #   helm upgrade examon ./deploy/helm/examon -f values-local.yaml \
-#     --set examon-server.config.cassandraPassword="$(kubectl get secret \
-#       examon-cassandra-superuser -n examon -o jsonpath='{.data.password}' | base64 -d)" \
-#     -n examon
+#     --set grafana.adminPassword="<password>" -n examon
 
 cassandra:
   enabled: true
@@ -122,9 +123,8 @@ examon-server:
     authUrl: "http://examon-grafana/api/datasources/id/kairosdb"
     cassandraIp: "examon-cassandra-dc1-service"
     cassandraKeySpace: "kairosdb"
-    # Cassandra credentials — pass via --set at deploy time (see header comment)
-    cassandraUser: "examon-cassandra-superuser"
-    cassandraPassword: ""
+    cassandraAuth:
+      secretName: "examon-cassandra-superuser"
   resources:
     requests:
       memory: "128Mi"

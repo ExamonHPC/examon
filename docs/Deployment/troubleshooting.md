@@ -305,26 +305,29 @@ Error from server: code=0100 [Bad credentials] message="Password must not be nul
 ```
 
 **Root cause:** K8ssandra enables Cassandra authentication by default.
-The examon-server `server.conf` ConfigMap had empty `CASSANDRA_USER` and
-`CASSANDRA_PASSW` fields.
+The examon-server pod needs Cassandra credentials to connect.
 
-**Solution:** Set the Cassandra superuser credentials in the environment
-values file:
+**Solution (current):** This is now handled automatically. The deployment
+template injects `CASSANDRA_USER` and `CASSANDRA_PASSWORD` environment
+variables from the K8ssandra-generated secret (`examon-cassandra-superuser`)
+via `secretKeyRef`. The `server.py` application checks these env vars first,
+falling back to `server.conf` values.
+
+Verify the `cassandraAuth.secretName` is set in your values file:
 
 ```yaml
 examon-server:
   config:
-    cassandraUser: "examon-cassandra-superuser"
-    cassandraPassword: "<password-from-secret>"
+    cassandraAuth:
+      secretName: "examon-cassandra-superuser"
 ```
 
-Retrieve the password with:
-```bash
-kubectl get secret examon-cassandra-superuser -n examon \
-  -o jsonpath='{.data.password}' | base64 -d && echo
-```
+If the error persists on a fresh install, it's likely a bootstrap timing
+issue — `examon-server` starts before the K8ssandra secret is created.
+Wait for Kubernetes to restart the pod automatically (it will succeed once
+the secret exists).
 
-**Files changed:** `deploy/helm/examon/values-local.yaml` (and equivalent for staging/production)
+**Files involved:** `deploy/helm/examon/subcharts/examon-server/templates/deployment.yaml`, `web/examon-server/server.py`
 
 ---
 
@@ -458,19 +461,27 @@ the new pod still runs the old image.
 **Root cause:** K3d nodes use containerd with `imagePullPolicy: IfNotPresent`.
 If the same tag was pulled before, containerd uses the cached copy.
 
-**Solution:** Use a **new tag** for each image rebuild:
+**Solution (recommended):** Use `k3d image import` to push the rebuilt
+image directly into all K3d nodes, then restart the pod:
 
 ```bash
-docker build -t examon-registry:5111/examon/kairosdb:1.3.0-fix1 ...
-docker push examon-registry:5111/examon/kairosdb:1.3.0-fix1
+docker build -t examon-registry:5111/examon/<service>:latest \
+  -f deploy/docker/<service>/Dockerfile .
+docker push examon-registry:5111/examon/<service>:latest
 
-# Update the tag in values-local.yaml, then:
-helm upgrade examon ./deploy/helm/examon \
-  -f ./deploy/helm/examon/values-local.yaml -n examon
+# Import into K3d so containerd sees the new layers
+k3d image import examon-registry:5111/examon/<service>:latest -c examon-local
+
+# Force the pod to restart with the new image
+kubectl rollout restart deployment/examon-<service> -n examon
 ```
 
-Alternatively, set `imagePullPolicy: Always` in the values file for
-development (at the cost of slower pod startup).
+**Alternative approaches:**
+
+- **New tag per rebuild:** Avoids the caching problem entirely. Update the
+  tag in values and run `helm upgrade`.
+- **`imagePullPolicy: Always`**: Set in values for development (at the
+  cost of slower pod startup and requiring registry access on every restart).
 
 ---
 
@@ -571,6 +582,35 @@ echo "127.0.0.1 examon-registry" | sudo tee -a /etc/hosts
 
 The automated setup script handles this automatically. See the
 [local deployment guide](kubernetes-local.md#step-2-register-the-k3d-registry-hostname).
+
+---
+
+### 17. Fresh Install: examon-server and KairosDB CrashLoop During Bootstrap
+
+**Symptom:** On a fresh `helm install`, `examon-server` and `kairosdb` pods
+enter `CrashLoopBackOff` with connection errors to Cassandra. After several
+minutes, they recover and become `Running` / `Ready`.
+
+**Root cause:** This is **expected behavior**, not a bug. Helm deploys all
+components simultaneously, but Cassandra takes 2-5 minutes to initialize
+(schema creation, superuser secret generation). KairosDB and examon-server
+start before Cassandra is ready and fail their initial connection attempts.
+
+**Why it resolves itself:**
+
+- Both KairosDB and examon-server have retry logic with exponential backoff.
+- Kubernetes restarts crashed pods automatically.
+- Once Cassandra is ready and the `examon-cassandra-superuser` secret exists,
+  the pods connect successfully on the next restart.
+- Cassandra credentials are injected via `secretKeyRef` environment variables,
+  so no manual `helm upgrade --set` is needed.
+
+**When to worry:** If the pods are still in `CrashLoopBackOff` after
+**10 minutes**, check:
+
+1. Cassandra pod status: `kubectl get pods -l app.kubernetes.io/name=cassandra -n examon`
+2. Cassandra logs: `kubectl logs examon-cassandra-dc1-default-sts-0 -c cassandra -n examon`
+3. Whether the superuser secret exists: `kubectl get secret examon-cassandra-superuser -n examon`
 
 ---
 

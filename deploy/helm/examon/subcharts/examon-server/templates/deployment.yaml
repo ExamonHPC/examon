@@ -36,6 +36,19 @@ spec:
         - name: examon-server
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.config.cassandraAuth.secretName }}
+          env:
+            - name: CASSANDRA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.cassandraAuth.secretName }}
+                  key: {{ .Values.config.cassandraAuth.usernameKey | default "username" }}
+            - name: CASSANDRA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.cassandraAuth.secretName }}
+                  key: {{ .Values.config.cassandraAuth.passwordKey | default "password" }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.config.serverPort }}

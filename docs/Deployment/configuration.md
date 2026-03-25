@@ -104,8 +104,11 @@ Grafana uses the [official Grafana Helm chart](https://github.com/grafana/helm-c
 | `examon-server.config.authUrl` | Grafana auth URL (use port 80, not 3000) | `http://examon-grafana/api/datasources/id/kairosdb` |
 | `examon-server.config.cassandraIp` | Cassandra CQL service name | `examon-cassandra-dc1-service` |
 | `examon-server.config.cassandraKeySpace` | Cassandra keyspace (created by KairosDB) | `kairosdb` |
-| `examon-server.config.cassandraUser` | Cassandra username | `""` |
-| `examon-server.config.cassandraPassword` | Cassandra password | `""` |
+| `examon-server.config.cassandraUser` | Cassandra username (fallback if secretKeyRef not set) | `""` |
+| `examon-server.config.cassandraPassword` | Cassandra password (fallback if secretKeyRef not set) | `""` |
+| `examon-server.config.cassandraAuth.secretName` | K8s Secret with Cassandra creds (auto from K8ssandra) | `"examon-cassandra-superuser"` |
+| `examon-server.config.cassandraAuth.usernameKey` | Key in secret for username | `"username"` |
+| `examon-server.config.cassandraAuth.passwordKey` | Key in secret for password | `"password"` |
 | `examon-server.config.serverHost` | API server bind address | `0.0.0.0` |
 | `examon-server.config.serverPort` | API server port | `5000` |
 | `examon-server.config.threadsNum` | Server threads | `8` |
