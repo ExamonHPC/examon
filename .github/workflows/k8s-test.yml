@@ -26,7 +26,7 @@ jobs:
         run: curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
       - name: Install Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v5
         with:
           version: 'latest'
 
@@ -60,11 +60,31 @@ jobs:
       - name: Update Helm dependencies
         run: helm dependency update deploy/helm/examon
 
-      - name: Deploy ExaMon
+      - name: "Deploy ExaMon (phase 1: operators only)"
         run: |
           helm install examon deploy/helm/examon \
             -f deploy/helm/examon/values-local.yaml \
-            -n examon --create-namespace --timeout 15m
+            --set cassandra.enabled=false \
+            -n examon --create-namespace --timeout 10m
+
+      - name: Wait for K8ssandra operator webhook
+        run: |
+          echo "Waiting for K8ssandra operator to be ready..."
+          kubectl wait --for=condition=Ready pod \
+            -l app.kubernetes.io/name=k8ssandra-operator \
+            -n examon --timeout=120s
+          kubectl wait --for=condition=Ready pod \
+            -l app.kubernetes.io/name=cass-operator \
+            -n examon --timeout=120s
+          echo "Waiting for webhook endpoint registration..."
+          sleep 10
+          echo "Operators ready."
+
+      - name: "Deploy ExaMon (phase 2: full stack with Cassandra)"
+        run: |
+          helm upgrade examon deploy/helm/examon \
+            -f deploy/helm/examon/values-local.yaml \
+            -n examon --timeout 15m
 
       - name: Wait for Cassandra to be ready
         run: |
