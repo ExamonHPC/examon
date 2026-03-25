@@ -60,11 +60,15 @@ jobs:
       - name: Update Helm dependencies
         run: helm dependency update deploy/helm/examon
 
-      - name: "Deploy ExaMon (phase 1: everything except K8ssandraCluster CR)"
+      - name: "Deploy ExaMon (phase 1: operator + independent services)"
         run: |
           helm install examon deploy/helm/examon \
             -f deploy/helm/examon/values-local.yaml \
             --set cassandra.createCluster=false \
+            --set kairosdb.enabled=false \
+            --set examon-server.enabled=false \
+            --set mqtt2kairosdb.enabled=false \
+            --set random-pub.enabled=false \
             -n examon --create-namespace --wait --timeout 5m
 
       - name: Wait for K8ssandra operator webhook
@@ -87,7 +91,7 @@ jobs:
             exit 1
           fi
 
-      - name: "Deploy ExaMon (phase 2: create K8ssandraCluster CR)"
+      - name: "Deploy ExaMon (phase 2: full stack with Cassandra)"
         run: |
           helm upgrade examon deploy/helm/examon \
             -f deploy/helm/examon/values-local.yaml \
