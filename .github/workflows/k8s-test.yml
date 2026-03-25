@@ -60,37 +60,34 @@ jobs:
       - name: Update Helm dependencies
         run: helm dependency update deploy/helm/examon
 
-      - name: "Deploy ExaMon (phase 1: operators and independent services)"
+      - name: "Deploy ExaMon (phase 1: everything except K8ssandraCluster CR)"
         run: |
           helm install examon deploy/helm/examon \
             -f deploy/helm/examon/values-local.yaml \
-            --set cassandra.enabled=false \
-            --set kairosdb.enabled=false \
-            --set examon-server.enabled=false \
-            --set mqtt2kairosdb.enabled=false \
-            --set random-pub.enabled=false \
+            --set cassandra.createCluster=false \
             -n examon --create-namespace --wait --timeout 5m
 
       - name: Wait for K8ssandra operator webhook
         run: |
           echo "Waiting for operator webhook endpoint to be registered..."
-          for i in $(seq 1 30); do
+          for i in $(seq 1 60); do
             EP=$(kubectl get endpoints examon-k8ssandra-operator-webhook-service \
               -n examon -o jsonpath='{.subsets[0].addresses[0].ip}' 2>/dev/null || true)
             if [[ -n "$EP" ]]; then
               echo "Webhook endpoint ready at $EP."
               break
             fi
-            echo "  attempt $i/30 — endpoint not ready yet, waiting 5s..."
+            echo "  attempt $i/60 — endpoint not ready yet, waiting 5s..."
             sleep 5
           done
           if [[ -z "$EP" ]]; then
             echo "ERROR: Webhook endpoint did not become ready in time."
             kubectl get endpoints -n examon
+            kubectl get pods -n examon -o wide
             exit 1
           fi
 
-      - name: "Deploy ExaMon (phase 2: full stack)"
+      - name: "Deploy ExaMon (phase 2: create K8ssandraCluster CR)"
         run: |
           helm upgrade examon deploy/helm/examon \
             -f deploy/helm/examon/values-local.yaml \
