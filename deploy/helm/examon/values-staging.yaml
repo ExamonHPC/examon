@@ -41,6 +41,9 @@ cassandra:
 grafana:
   enabled: true
   adminPassword: ""  # pass via --set grafana.adminPassword=... at deploy time
+  service:
+    type: NodePort
+    nodePort: 3000
   plugins:
     - ae3e-plotly-panel
     - grafana-piechart-panel
@@ -152,6 +155,9 @@ examon-server:
   image:
     repository: examon-registry:5111/examon/examon-server
     tag: "latest"
+  service:
+    type: NodePort
+    nodePort: 5000
   config:
     authUrl: "http://examon-grafana/api/datasources/id/kairosdb"
     cassandraIp: "examon-cassandra-dc1-service"

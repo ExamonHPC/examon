@@ -30,6 +30,13 @@ resources:
     memory: "1Gi"
     cpu: "2"
 
+ingress:
+  enabled: false
+  ingressClassName: ""
+  annotations: {}
+  hosts: []
+  tls: []
+
 nodeSelector: {}
 tolerations: []
 affinity: {}

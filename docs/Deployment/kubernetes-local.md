@@ -193,16 +193,27 @@ Cassandra.
 
 ## Accessing Services
 
-The K3d cluster exposes **MQTT (1883)** directly on the host via
-the load balancer and a Mosquitto `NodePort` service. Other services
-require `kubectl port-forward`:
+All user-facing services are exposed directly on the host via the K3d load
+balancer and `NodePort` services — no `kubectl port-forward` or Kubernetes
+knowledge required. External clients (e.g. `examon-client` on user laptops,
+admins accessing Grafana) connect to these addresses just like with Docker
+Compose:
 
-| Service | Address | Access |
-|---------|---------|--------|
-| MQTT | `localhost:1883` | Direct (K3d load balancer → NodePort) |
-| Grafana | `localhost:3000` | `kubectl port-forward svc/examon-grafana 3000:80 -n examon` |
-| ExaMon API | `localhost:5000` | `kubectl port-forward svc/examon-examon-server 5000:5000 -n examon` |
-| KairosDB | `localhost:8083` | `kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon` |
+| Service | Address | Protocol | Users |
+|---------|---------|----------|-------|
+| MQTT broker | `<host>:1883` | MQTT | `examon-client`, publishers, subscribers |
+| Grafana | `<host>:3000` | HTTP | Admins, dashboard users |
+| ExaMon API | `<host>:5000` | HTTP | `examon-client`, data consumers |
+
+Replace `<host>` with `localhost` for local access or the VM's IP/hostname
+for remote access.
+
+For internal/debugging services (not user-facing), use `kubectl port-forward`:
+
+```bash
+# KairosDB web UI (debugging only)
+kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon
+```
 
 ## Important Configuration Details
 

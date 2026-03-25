@@ -1,6 +1,7 @@
 # ExaMon Production Values
-# Full HA, production resources, Let's Encrypt TLS, Medusa backups.
-# Targets a real Kubernetes cluster (EKS/GKE/AKS or on-prem).
+# Full HA, production resources, TLS, Medusa backups.
+# Targets a real Kubernetes cluster: on-prem (OpenStack, RKE2, kubeadm)
+# or cloud-managed (EKS, GKE, AKS).
 #
 # SECRETS: Do NOT put real passwords in this file. Pass them at deploy time:
 #   helm upgrade examon ./deploy/helm/examon -f values-production.yaml \
@@ -8,6 +9,10 @@
 #       examon-cassandra-superuser -n examon -o jsonpath='{.data.password}' | base64 -d)" \
 #     --set grafana.adminPassword="<your-grafana-password>" \
 #     -n examon
+#
+# USER-FACING SERVICES:
+#   Grafana + ExaMon API → exposed via Ingress (HTTP/HTTPS)
+#   MQTT broker          → exposed via LoadBalancer (TCP, L4)
 
 cassandra:
   enabled: true
@@ -73,10 +78,11 @@ grafana:
       cpu: "2"
   ingress:
     enabled: true
+    ingressClassName: nginx  # adjust to your cluster: nginx, traefik, openstack, etc.
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
-      - grafana.example.com
+      - grafana.example.com  # replace with your actual domain
     tls:
       - secretName: grafana-tls
         hosts:
@@ -113,6 +119,12 @@ mosquitto:
     secretName: mosquitto-tls
   service:
     type: LoadBalancer
+    annotations: {}
+    # OpenStack example:
+    #   loadbalancer.openstack.org/flavor-id: "<flavor-uuid>"
+    # Cloud provider examples:
+    #   service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    #   cloud.google.com/l4-rbs: "enabled"
   resources:
     requests:
       memory: "128Mi"
@@ -164,6 +176,20 @@ examon-server:
     schedulerType: "SLURM"
     cacheType: "simple"
     cacheTimeout: 18000
+  ingress:
+    enabled: true
+    ingressClassName: nginx  # adjust to your cluster
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: api.examon.example.com  # replace with your actual domain
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: examon-api-tls
+        hosts:
+          - api.examon.example.com
   resources:
     requests:
       memory: "512Mi"

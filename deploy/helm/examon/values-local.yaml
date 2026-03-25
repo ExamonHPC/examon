@@ -29,6 +29,9 @@ cassandra:
 grafana:
   enabled: true
   adminPassword: "admin"  # dev-only default; override via --set for non-local envs
+  service:
+    type: NodePort
+    nodePort: 3000
   persistence:
     enabled: false
   resources:
@@ -112,6 +115,9 @@ examon-server:
   image:
     repository: examon-registry:5111/examon/examon-server
     tag: "latest"
+  service:
+    type: NodePort
+    nodePort: 5000
   config:
     authUrl: "http://examon-grafana/api/datasources/id/kairosdb"
     cassandraIp: "examon-cassandra-dc1-service"

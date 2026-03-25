@@ -221,30 +221,48 @@ curl http://localhost:8083/api/v1/health/check
 
 ## Accessing Services
 
+### User-Facing Services
+
+ExaMon exposes three services that external users and clients need to reach
+directly (the same services that were accessible in Docker Compose):
+
+| Service | Port | Protocol | Users |
+|---------|------|----------|-------|
+| **MQTT broker** | 1883 | MQTT | `examon-client`, publishers, subscribers |
+| **Grafana** | 3000 | HTTP | Admins, dashboard users |
+| **ExaMon API** | 5000 | HTTP | `examon-client`, data consumers |
+
 ### K3d Environments (Local & Staging)
 
-The K3d cluster configs expose MQTT directly on the host via the load
-balancer and a Mosquitto `NodePort` service (the k3s port range is extended
-to `1883-32767` to allow this).
+In K3d deployments, these services are configured as `NodePort` and mapped
+through the K3d load balancer so they are directly reachable on the host
+(or VM) without `kubectl` or any Kubernetes knowledge. The k3s API server
+port range is extended to `1883-32767` to allow standard ports as NodePorts.
 
 | Service | Local | Staging |
 |---------|-------|---------|
-| MQTT | `localhost:1883` | `localhost:1883` |
-| HTTP | `localhost:8880` | `localhost:80` |
-| HTTPS | — | `localhost:443` |
+| MQTT | `<host>:1883` | `<host>:1883` |
+| Grafana | `<host>:3000` | `<host>:3000` |
+| ExaMon API | `<host>:5000` | `<host>:5000` |
 
-Other services require `kubectl port-forward`:
-
-```bash
-kubectl port-forward svc/examon-grafana 3000:80 -n examon
-kubectl port-forward svc/examon-examon-server 5000:5000 -n examon
-kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon
-```
+Internal services (KairosDB, Cassandra) are only accessible via
+`kubectl port-forward` for debugging.
 
 ### Production
 
-In production, services are exposed via an Ingress controller with proper
-DNS and TLS. Use `kubectl port-forward` for debugging when needed.
+In production, HTTP services (Grafana, ExaMon API) are exposed via an
+**Ingress controller** with TLS termination and DNS, while the MQTT broker
+uses a **LoadBalancer** service (TCP L4) since MQTT is not an HTTP protocol:
+
+| Service | Method | Example address |
+|---------|--------|-----------------|
+| Grafana | Ingress + TLS | `https://grafana.examon.example.com` |
+| ExaMon API | Ingress + TLS | `https://api.examon.example.com` |
+| MQTT | LoadBalancer (TCP) | `mqtt.examon.example.com:1883` |
+
+This works on OpenStack (with Octavia), RKE2, cloud providers, and bare
+metal (with MetalLB). See the [Production guide](kubernetes-production.md)
+for platform-specific details.
 
 ## Managing Plugins
 
