@@ -272,40 +272,161 @@ These are generated from the Helm `values.yaml` settings by each subchart's
 
 ## Local Development Workflow
 
-### Rebuilding a Single Image
+The inner-loop development cycle on K3d follows a simple pattern: **edit code,
+rebuild the image, redeploy to the cluster**. This section covers the
+recommended workflow and its alternatives.
 
-When you change code for a service (e.g., examon-server):
+### Understanding Image Pull Behavior
+
+K3d nodes run containerd, which maintains its own image cache independently
+from your host Docker daemon. When a pod starts, containerd decides whether
+to pull the image based on the Kubernetes `imagePullPolicy`:
+
+| Policy | Behavior | Best for |
+|--------|----------|----------|
+| `Always` | Re-pulls from registry on every pod start | **Local development** (always gets the latest build) |
+| `IfNotPresent` | Uses cached image if tag exists locally | Staging, production (stable tags) |
+| `Never` | Only uses pre-imported images | Air-gapped or `k3d image import` workflows |
+
+`values-local.yaml` sets `pullPolicy: Always` for all custom ExaMon images.
+This means the standard build-push-restart cycle works reliably with the
+`:latest` tag — no stale cache surprises.
+
+### Scenario 1: Application Code Change
+
+When you modify application code (Python, config files, etc.) for a single
+service:
+
+```bash
+# 1. Rebuild the image
+docker build -t examon-registry:5111/examon/examon-server:latest \
+  -f deploy/docker/examon-server/Dockerfile .
+
+# 2. Push to the local registry
+docker push examon-registry:5111/examon/examon-server:latest
+
+# 3. Restart the deployment (containerd re-pulls from registry)
+kubectl rollout restart deployment/examon-examon-server -n examon
+
+# 4. Verify
+kubectl logs -f deployment/examon-examon-server -n examon
+```
+
+This takes roughly 10-30 seconds depending on the image size.
+
+Replace `examon-server` with the service you are working on. The mapping is:
+
+| Service | Dockerfile | Deployment name |
+|---------|-----------|-----------------|
+| examon-server | `deploy/docker/examon-server/Dockerfile` | `examon-examon-server` |
+| kairosdb | `deploy/docker/kairosdb/Dockerfile` | `examon-kairosdb` |
+| mqtt2kairosdb | `deploy/docker/mqtt2kairosdb/Dockerfile` | `examon-mqtt2kairosdb` |
+| random-pub | `deploy/docker/random-pub/Dockerfile` | `examon-random-pub` |
+| mosquitto | `deploy/docker/mosquitto/Dockerfile` | `examon-mosquitto` (StatefulSet) |
+
+For **mosquitto** (a StatefulSet), use:
+```bash
+kubectl rollout restart statefulset/examon-mosquitto -n examon
+```
+
+### Scenario 2: Helm Template Change
+
+When you modify files under `deploy/helm/examon/subcharts/` (e.g., adding an
+env var to a deployment template, changing a ConfigMap):
+
+```bash
+# 1. Rebuild the Helm dependency archives
+cd deploy/helm/examon && helm dependency update && cd ../../..
+
+# 2. Upgrade the release (Helm detects the template change and recreates pods)
+helm upgrade examon ./deploy/helm/examon \
+  -f ./deploy/helm/examon/values-local.yaml \
+  -n examon --timeout 10m
+```
+
+!!! warning
+    Without `helm dependency update`, Helm uses stale `.tgz` archives in
+    `charts/` and your template changes will have no effect. This is the
+    most common "my changes aren't working" mistake.
+
+### Scenario 3: Helm Values Change
+
+When you only change `values-local.yaml` (e.g., resource limits, config
+parameters, replica count):
+
+```bash
+helm upgrade examon ./deploy/helm/examon \
+  -f ./deploy/helm/examon/values-local.yaml \
+  -n examon --timeout 10m
+```
+
+No image rebuild or dependency update is needed.
+
+### Quick Reference
+
+| What changed | Build image? | `helm dep update`? | Deploy command |
+|-------------|:---:|:---:|----------------|
+| Application code | Yes | No | `kubectl rollout restart` |
+| Helm template (`subcharts/`) | No | **Yes** | `helm upgrade` |
+| Helm values | No | No | `helm upgrade` |
+| Both code + template | Yes | **Yes** | `helm upgrade` (picks up new image too) |
+
+### Alternative: `k3d image import` (Without `pullPolicy: Always`)
+
+If you are working in an environment where `pullPolicy` is set to
+`IfNotPresent` (e.g., debugging in staging), the registry push alone will
+not update the containerd cache. Use `k3d image import` to bypass the
+registry and load the image directly into all K3d nodes:
 
 ```bash
 docker build -t examon-registry:5111/examon/examon-server:latest \
   -f deploy/docker/examon-server/Dockerfile .
 docker push examon-registry:5111/examon/examon-server:latest
 
-# Restart the deployment to pick up the new image
+# Force-load into K3d containerd cache
+k3d image import examon-registry:5111/examon/examon-server:latest \
+  -c examon-local
+
+# Restart to pick up the imported image
 kubectl rollout restart deployment/examon-examon-server -n examon
 ```
 
-!!! tip
-    If you use `imagePullPolicy: IfNotPresent` (the default) and push a new
-    image with the **same tag**, K3d nodes will keep the cached version. Either
-    use a new tag, or use `imagePullPolicy: Always` in the values file. An
-    alternative is to force-delete the pod so the new ReplicaSet pulls the
-    updated image.
+### Alternative: Unique Tags (CI/CD Pattern)
 
-### Rebuilding After Subchart Template Changes
-
-When you modify files under `deploy/helm/examon/subcharts/`, you must rebuild
-the Helm dependencies before upgrading:
+For reproducible, traceable builds (recommended for CI pipelines and
+shared staging environments), use the git commit SHA as the image tag:
 
 ```bash
-cd deploy/helm/examon
-helm dependency update
-cd ../../..
+TAG=$(git rev-parse --short HEAD)
+
+docker build -t examon-registry:5111/examon/examon-server:${TAG} \
+  -f deploy/docker/examon-server/Dockerfile .
+docker push examon-registry:5111/examon/examon-server:${TAG}
 
 helm upgrade examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-local.yaml \
-  -n examon --timeout 10m
+  --set examon-server.image.tag="${TAG}" \
+  -n examon
 ```
+
+This eliminates caching issues entirely because each build gets a unique
+tag that containerd has never seen before.
+
+### Optional: Automated Workflows with Tilt or Skaffold
+
+For teams that want a fully automated file-watch -> rebuild -> redeploy
+loop (similar to frontend hot-reload), tools like
+[Tilt](https://tilt.dev/) and [Skaffold](https://skaffold.dev/) integrate
+well with K3d and Helm charts:
+
+- **Tilt** provides a web dashboard, live-updates (sync files into running
+  containers without a full rebuild), and multi-service orchestration.
+- **Skaffold** is a CLI-first tool that handles the build-push-deploy
+  pipeline, supports file syncing, and integrates with CI/CD.
+
+Both tools work with ExaMon's Helm chart structure out of the box. They
+are optional power-ups — the manual workflow above is sufficient for most
+development tasks.
 
 ### Teardown
 

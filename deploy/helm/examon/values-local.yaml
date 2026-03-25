@@ -49,6 +49,7 @@ kairosdb:
   image:
     repository: examon-registry:5111/examon/kairosdb
     tag: "1.3.0"
+    pullPolicy: Always
   config:
     javaOpts: "-Xmx512m -Xms256m"
   resources:
@@ -64,6 +65,7 @@ mosquitto:
   image:
     repository: examon-registry:5111/examon/mosquitto
     tag: "latest"
+    pullPolicy: Always
   service:
     type: NodePort
     nodePort: 1883
@@ -82,6 +84,7 @@ mqtt2kairosdb:
   image:
     repository: examon-registry:5111/examon/mqtt2kairosdb
     tag: "latest"
+    pullPolicy: Always
   config:
     mqtt:
       broker: "examon-mosquitto"
@@ -100,6 +103,7 @@ random-pub:
   image:
     repository: examon-registry:5111/examon/random-pub
     tag: "latest"
+    pullPolicy: Always
   config:
     mqttBroker: "examon-mosquitto"
   resources:
@@ -116,6 +120,7 @@ examon-server:
   image:
     repository: examon-registry:5111/examon/examon-server
     tag: "latest"
+    pullPolicy: Always
   service:
     type: NodePort
     nodePort: 5000

@@ -34,6 +34,16 @@ For production (GitHub Container Registry):
 ./scripts/build-and-push-images.sh ghcr.io/examonhpc
 ```
 
+### Iterative Development (Single Service)
+
+During development, you typically modify and rebuild a single service
+rather than all images. The recommended inner-loop workflow — build, push
+to the local registry, restart the pod — is documented in detail in the
+[Local Development Workflow](kubernetes-local.md#local-development-workflow)
+section. That section also covers K3d image caching behavior, the
+`pullPolicy: Always` setting, and alternatives like `k3d image import`
+and unique tags.
+
 ## Helm Chart Dependencies
 
 Before deploying, update the chart dependencies:

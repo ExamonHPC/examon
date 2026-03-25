@@ -458,11 +458,20 @@ to use `examon-cassandra-dc1-service`.
 **Symptom:** After rebuilding and pushing a Docker image with the same tag,
 the new pod still runs the old image.
 
-**Root cause:** K3d nodes use containerd with `imagePullPolicy: IfNotPresent`.
-If the same tag was pulled before, containerd uses the cached copy.
+**Root cause:** K3d nodes run containerd, which caches images independently
+from the host Docker daemon. With `imagePullPolicy: IfNotPresent` (the
+subchart default), containerd resolves the tag from its local cache and
+never re-pulls from the registry — even if the registry has a newer image
+with the same tag.
 
-**Solution (recommended):** Use `k3d image import` to push the rebuilt
-image directly into all K3d nodes, then restart the pod:
+**Prevention:** `values-local.yaml` now sets `pullPolicy: Always` for all
+custom images. With this setting, the standard build-push-restart workflow
+works correctly because containerd re-pulls from the registry every time.
+See the [Local Development Workflow](kubernetes-local.md#local-development-workflow)
+for the full recommended cycle.
+
+**Fix (if `pullPolicy` is `IfNotPresent`):** Use `k3d image import` to
+load the rebuilt image directly into the K3d containerd cache:
 
 ```bash
 docker build -t examon-registry:5111/examon/<service>:latest \
@@ -476,12 +485,12 @@ k3d image import examon-registry:5111/examon/<service>:latest -c examon-local
 kubectl rollout restart deployment/examon-<service> -n examon
 ```
 
-**Alternative approaches:**
+**Other alternatives:**
 
-- **New tag per rebuild:** Avoids the caching problem entirely. Update the
-  tag in values and run `helm upgrade`.
-- **`imagePullPolicy: Always`**: Set in values for development (at the
-  cost of slower pod startup and requiring registry access on every restart).
+- **Unique tag per rebuild** (`git rev-parse --short HEAD`): Avoids the
+  caching problem entirely. Update the tag in values and run `helm upgrade`.
+- **`imagePullPolicy: Always`**: Set in values for development. This is
+  already the default in `values-local.yaml`.
 
 ---
 
