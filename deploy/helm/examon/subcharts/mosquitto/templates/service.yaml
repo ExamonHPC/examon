@@ -11,6 +11,9 @@ spec:
       targetPort: mqtt
       protocol: TCP
       name: mqtt
+      {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
     {{- if .Values.tls.enabled }}
     - port: 8883
       targetPort: mqtts

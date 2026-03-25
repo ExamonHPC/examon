@@ -91,6 +91,9 @@ mosquitto:
   image:
     repository: examon-registry:5111/examon/mosquitto
     tag: "latest"
+  service:
+    type: NodePort
+    nodePort: 1883
   persistence:
     enabled: true
     size: 1Gi

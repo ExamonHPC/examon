@@ -21,3 +21,6 @@ options:
       - arg: --disable=traefik
         nodeFilters:
           - server:*
+      - arg: --service-node-port-range=1883-32767
+        nodeFilters:
+          - server:*

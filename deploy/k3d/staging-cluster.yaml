@@ -20,6 +20,13 @@ ports:
       - loadbalancer
 options:
   k3s:
+    extraArgs:
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+      - arg: --service-node-port-range=1883-32767
+        nodeFilters:
+          - server:*
     nodeLabels:
       - label: topology.kubernetes.io/zone=zone-a
         nodeFilters:
@@ -30,7 +37,3 @@ options:
       - label: topology.kubernetes.io/zone=zone-c
         nodeFilters:
           - agent:2
-    extraArgs:
-      - arg: --disable=traefik
-        nodeFilters:
-          - server:*

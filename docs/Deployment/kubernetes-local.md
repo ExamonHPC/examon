@@ -160,18 +160,49 @@ All pods should reach `Running` / `Ready` status. Key things to confirm:
 - **examon-random-pub**: `1/1 Running` (publishing test data)
 - **examon-mqtt2kairosdb**: `1/1 Running` (bridging MQTT to KairosDB)
 
-## Accessing Services
+### Step 8: Verify the Data Pipeline
+
+Once all pods are running, verify the full data pipeline
+(`random_pub` → MQTT → `mqtt2kairosdb` → KairosDB → Cassandra) is working.
+
+**Check MQTT messages** are flowing from `random_pub`:
 
 ```bash
-# Grafana (default password: admin)
-kubectl port-forward svc/examon-grafana 3000:80 -n examon
-
-# MQTT broker
-kubectl port-forward svc/examon-mosquitto 1883:1883 -n examon
-
-# ExaMon API
-kubectl port-forward svc/examon-examon-server 5000:5000 -n examon
+mosquitto_sub -h localhost -p 1883 -t '#' -v
 ```
+
+You should see sensor readings arriving every few seconds.
+
+**Query KairosDB** to confirm data is reaching Cassandra. Port-forward to the
+KairosDB web UI:
+
+```bash
+kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon
+```
+
+Open [http://localhost:8083](http://localhost:8083), select the `random_sensor`
+metric, set the time range to the last 1 hour, and click **Graph**. You
+should see data points like this:
+
+![KairosDB random_sensor query](../images/kairosdb-random-sensor-query.png)
+
+If the graph shows data, the entire pipeline is working end-to-end:
+`random_pub` is publishing synthetic sensor data over MQTT, `mqtt2kairosdb`
+is consuming it and writing to KairosDB, and KairosDB is persisting it in
+Cassandra.
+
+## Accessing Services
+
+The K3d cluster exposes **MQTT (1883)** directly on the host via
+the load balancer and a Mosquitto `NodePort` service. Other services
+require `kubectl port-forward`:
+
+| Service | Address | Access |
+|---------|---------|--------|
+| MQTT | `localhost:1883` | Direct (K3d load balancer → NodePort) |
+| Grafana | `localhost:3000` | `kubectl port-forward svc/examon-grafana 3000:80 -n examon` |
+| ExaMon API | `localhost:5000` | `kubectl port-forward svc/examon-examon-server 5000:5000 -n examon` |
+| KairosDB | `localhost:8083` | `kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon` |
 
 ## Important Configuration Details
 

@@ -221,25 +221,30 @@ curl http://localhost:8083/api/v1/health/check
 
 ## Accessing Services
 
-### Grafana
+### K3d Environments (Local & Staging)
+
+The K3d cluster configs expose MQTT directly on the host via the load
+balancer and a Mosquitto `NodePort` service (the k3s port range is extended
+to `1883-32767` to allow this).
+
+| Service | Local | Staging |
+|---------|-------|---------|
+| MQTT | `localhost:1883` | `localhost:1883` |
+| HTTP | `localhost:8880` | `localhost:80` |
+| HTTPS | — | `localhost:443` |
+
+Other services require `kubectl port-forward`:
 
 ```bash
 kubectl port-forward svc/examon-grafana 3000:80 -n examon
-```
-
-Open [http://localhost:3000](http://localhost:3000). Default credentials depend on the environment values file.
-
-### MQTT Broker
-
-```bash
-kubectl port-forward svc/examon-mosquitto 1883:1883 -n examon
-```
-
-### ExaMon REST API
-
-```bash
 kubectl port-forward svc/examon-examon-server 5000:5000 -n examon
+kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon
 ```
+
+### Production
+
+In production, services are exposed via an Ingress controller with proper
+DNS and TLS. Use `kubectl port-forward` for debugging when needed.
 
 ## Managing Plugins
 

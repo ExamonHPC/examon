@@ -146,6 +146,20 @@ kubectl exec -it examon-cassandra-dc1-default-sts-0 -c cassandra -n examon \
   -- nodetool status
 ```
 
+## Accessing Services
+
+The staging K3d cluster exposes **HTTP (80)**, **HTTPS (443)**, and
+**MQTT (1883)** directly on the host via the load balancer:
+
+| Service | Address | Access |
+|---------|---------|--------|
+| MQTT | `localhost:1883` | Direct (K3d load balancer → NodePort) |
+| HTTP (Ingress) | `localhost:80` | Direct (K3d load balancer, requires Ingress) |
+| HTTPS (Ingress) | `localhost:443` | Direct (K3d load balancer, self-signed TLS) |
+| Grafana | `localhost:3000` | `kubectl port-forward svc/examon-grafana 3000:80 -n examon` |
+| ExaMon API | `localhost:5000` | `kubectl port-forward svc/examon-examon-server 5000:5000 -n examon` |
+| KairosDB | `localhost:8083` | `kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon` |
+
 ## Staging vs Production Comparison
 
 ```
