@@ -1,14 +1,16 @@
 # ExaMon v0.5.1 -- Technical Plan
 
 This document captures the planned improvements for v0.5.1, building on the
-v0.5.0 Kubernetes migration. It covers two main areas:
+v0.5.0 Kubernetes migration. It covers three main areas:
 
 1. **Data persistence, backup, and migration strategy** -- filling the gaps
    identified in the v0.5.0 deployment.
 2. **KairosDB HOCON ConfigMap overlay** -- replacing the current `sed`-patching
    entrypoint with a cleaner, Kubernetes-native configuration model.
+3. **Documentation gap analysis (README parity)** -- ensuring every operation
+   documented in the Docker Compose `README.md` has a complete K8s equivalent.
 
-Both items are documented here as a technical plan; implementation follows in a
+All items are documented here as a technical plan; implementation follows in a
 subsequent phase.
 
 ---
@@ -657,17 +659,10 @@ ingress        → grafana (3000), examon-server (5000)
 
 ---
 
-## 4. Implementation Phases
+## 4. Implementation Phases (Original)
 
-| Phase | Items | Depends On | Effort |
-|-------|-------|-----------|--------|
-| **Phase 1** | Cassandra Medusa backups, PV reclaim policy docs, Mosquitto persistence fix | -- | Medium |
-| **Phase 2** | KairosDB HOCON ConfigMap overlay, updated Dockerfile | -- | Medium |
-| **Phase 3** | Grafana dashboard-as-code + API backup script | -- | Medium |
-| **Phase 4** | Security contexts on all workloads | Phase 2 (KairosDB readOnlyRootFilesystem) | Medium |
-| **Phase 5** | PDBs, image versioning, expanded migration docs | -- | Low-Medium |
-| **Phase 6** | Observability (ServiceMonitors, alert rules, dashboards) | Phase 3 (Grafana provisioning) | Medium |
-| **Phase 7** | HPAs, NetworkPolicies | Phase 6 (metrics for HPA decisions) | Medium |
+See [section 7](#7-implementation-phases-updated) for the updated phase plan
+that includes documentation gap items from section 6.
 
 ---
 
@@ -684,3 +679,326 @@ ingress        → grafana (3000), examon-server (5000)
   backup/restore operator for Cassandra
 - [Grafana sidecar provisioning](https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards) --
   dashboard-as-code via ConfigMap sidecar
+
+---
+
+## 6. Documentation Gap Analysis (README vs. K8s Docs)
+
+A systematic comparison of the Docker Compose `README.md` against the full
+Kubernetes documentation identified six areas where the K8s docs do not cover
+functionality that users expect based on the README. These must be addressed
+so that every operation documented for Docker Compose has a clear, complete
+K8s equivalent.
+
+### 6.1 Gap Overview
+
+| # | README Feature | K8s Coverage | Severity | Environments |
+|---|----------------|-------------|----------|--------------|
+| D1 | Grafana dashboard import/provisioning | Not covered | **HIGH** | All |
+| D2 | Plugin management (start/stop/restart/status/logs) | Partially covered | **MEDIUM** | All |
+| D3 | Grafana first login & datasource setup walkthrough | Auto-provisioned but undocumented | **MEDIUM** | Mostly local |
+| D4 | Plugin `.conf` files replaced by Helm values | Not explained | **LOW** | All |
+| D5 | Custom volume paths / data persistence model | Partially covered | **LOW** | Production |
+| D6 | Log rotation and retention configuration | Not covered | **LOW** | Production |
+
+### 6.2 D1 — Grafana Dashboard Import and Provisioning
+
+**README reference:**
+
+> "To import the dashboards stored in the `dashboards/` folder:
+> [Import dashboard](https://grafana.com/docs/grafana/latest/dashboards/export-import/#import-dashboard)
+> To test the installation, you can import the `Examon Test - Random Sensor.json` dashboard."
+
+**Current K8s state:**
+
+- The `values.yaml` auto-provisions the KairosDB **datasource** via
+  `grafana.datasources.datasources.yaml`, which is correctly handled.
+- The `dashboards/Examon Test - Random Sensor.json` file exists in the repo
+  but is never referenced by any K8s template or documentation.
+- The upgrading guide (`upgrading.md` Step 4) only says "Re-import Grafana
+  dashboards through the Grafana UI or API" with no further instructions.
+- The v0.5.1 plan (section 1.2 GAP 2) already describes the Grafana sidecar
+  dashboard-as-code strategy but only as a future plan, not documentation.
+
+**TODO — Documentation additions:**
+
+- [ ] **D1a:** Add a "Grafana Dashboards" section to `kubernetes.md` covering:
+  - Manual dashboard import via Grafana UI (same procedure as README, with
+    K8s-specific URL — `http://localhost:3000` for local, or the Ingress URL
+    for production).
+  - API-based import (useful for scripting):
+    ```bash
+    # Port-forward to Grafana (if not using NodePort/Ingress)
+    kubectl port-forward svc/examon-grafana 3000:80 -n examon &
+
+    # Import dashboard JSON
+    curl -X POST -H "Content-Type: application/json" \
+      -H "Authorization: Basic $(echo -n admin:<password> | base64)" \
+      -d @dashboards/Examon\ Test\ -\ Random\ Sensor.json \
+      http://localhost:3000/api/dashboards/db
+    ```
+  - A note that the bundled `dashboards/Examon Test - Random Sensor.json`
+    can be used to verify the full data pipeline after installation.
+
+- [ ] **D1b:** (Implementation item, already tracked in section 1.2 GAP 2)
+  Enable Grafana sidecar dashboard provisioning so that bundled dashboards
+  are automatically loaded from ConfigMaps on deploy. This eliminates the
+  manual import step for core dashboards. Required changes:
+  - Set `grafana.sidecar.dashboards.enabled: true` and
+    `grafana.sidecar.dashboards.label: grafana_dashboard` in `values.yaml`.
+  - Create a ConfigMap template in the umbrella chart's `templates/` that
+    loads `dashboards/*.json` files with the `grafana_dashboard` label.
+  - Document: "Core dashboards are auto-provisioned on deploy. User-created
+    dashboards must be imported manually or backed up via the API."
+
+- [ ] **D1c:** Add environment-specific guidance:
+  - **Local/Staging:** Manual UI import is acceptable for testing. The
+    auto-provisioned test dashboard (after D1b) provides an out-of-the-box
+    verification experience.
+  - **Production:** Dashboard-as-code is recommended. User-created dashboards
+    should be exported via the Grafana API and stored in version control.
+
+### 6.3 D2 — Plugin Management (Start/Stop/Restart/Status/Logs)
+
+**README reference:**
+
+The README has a large section on `supervisorctl` commands:
+- `docker exec -it <container> supervisorctl start/stop/restart/status/tail <plugin>`
+- Opening the supervisor shell for interactive management.
+- Editing `supervisor.conf` for `autostart=True` to persist enable/disable.
+
+**Current K8s state:**
+
+- `kubernetes.md` has a brief "Managing Plugins" section showing
+  `--set random-pub.enabled=false` and `kubectl scale`.
+- The `kubernetes.md` "Logs" section shows `kubectl logs` commands.
+- No mapping table exists to help Docker Compose users translate their
+  existing workflows.
+
+**TODO — Documentation additions:**
+
+- [ ] **D2a:** Expand the "Managing Plugins" section in `kubernetes.md` with a
+  complete mapping table between Docker Compose `supervisorctl` operations and
+  their Kubernetes equivalents:
+
+  | Operation | Docker Compose | Kubernetes |
+  |-----------|---------------|------------|
+  | **Start** a plugin | `docker exec -it examon supervisorctl start plugins:random_pub` | `kubectl scale deployment examon-random-pub --replicas=1 -n examon` |
+  | **Stop** a plugin | `docker exec -it examon supervisorctl stop plugins:random_pub` | `kubectl scale deployment examon-random-pub --replicas=0 -n examon` |
+  | **Restart** a plugin | `docker exec -it examon supervisorctl restart plugins:random_pub` | `kubectl rollout restart deployment/examon-random-pub -n examon` |
+  | **Status** of all plugins | `docker exec -it examon supervisorctl status` | `kubectl get pods -n examon` |
+  | **Tail logs** of a plugin | `docker exec -it examon supervisorctl tail -f random_pub` | `kubectl logs -f deployment/examon-random-pub -n examon` |
+  | **Permanent enable** | Edit `supervisor.conf`, set `autostart=True` | Set `random-pub.enabled: true` in `values-<env>.yaml` + `helm upgrade` |
+  | **Permanent disable** | Edit `supervisor.conf`, set `autostart=False` | Set `random-pub.enabled: false` in `values-<env>.yaml` + `helm upgrade` |
+  | **Scale** a plugin | Not supported (single container) | `kubectl scale deployment examon-mqtt2kairosdb --replicas=3 -n examon` |
+
+- [ ] **D2b:** Add a note explaining the architectural difference: in Docker
+  Compose, all plugins run inside a single container managed by `supervisord`;
+  in Kubernetes, each plugin is an independent Deployment with its own pod(s),
+  enabling independent scaling, restarts, and resource limits.
+
+- [ ] **D2c:** Document how to get a shell inside a plugin pod for debugging:
+  ```bash
+  kubectl exec -it deployment/examon-examon-server -n examon -- /bin/bash
+  ```
+  This is the K8s equivalent of `docker exec -it <container> bash`.
+
+### 6.4 D3 — Grafana First Login and Datasource Setup Walkthrough
+
+**README reference:**
+
+> "Log in to the Grafana server using your browser and the default credentials...
+> http://localhost:3000 ... add a new data source and select `KairosDB`.
+> Fill out the form with: Name: kairosdb, Url: http://kairosdb:8083, Access: Server"
+
+**Current K8s state:**
+
+- The KairosDB datasource is **auto-provisioned** via
+  `grafana.datasources.datasources.yaml` in `values.yaml`. Users do NOT need
+  to add it manually — but this is never stated.
+- Grafana plugins (KairosDB, plotly, piechart, etc.) are auto-installed via
+  `grafana.plugins` in `values.yaml` — also not documented as a feature.
+- The `GF_PANELS_DISABLE_SANITIZE_HTML` setting is auto-configured via
+  `grafana.env` — not documented.
+- No "first login" walkthrough exists for K8s users.
+- The production guide briefly mentions auto-provisioning and has a manual
+  fallback, but local/staging docs skip this entirely.
+
+**TODO — Documentation additions:**
+
+- [ ] **D3a:** Add a "Grafana First Login" subsection to `kubernetes-local.md`
+  (after the data pipeline verification step), covering:
+  1. Open `http://localhost:3000` (for K3d) or the Ingress URL (production).
+  2. Log in as `admin` with the password set via `--set grafana.adminPassword`
+     (default: `Password` if not overridden).
+  3. Note: the KairosDB datasource is **already configured** — no manual setup
+     needed (unlike Docker Compose).
+  4. Note: the KairosDB Grafana plugin and other required plugins are
+     **auto-installed** during pod startup via the `grafana.plugins` list.
+  5. Link to the dashboard import section (D1a) for importing test dashboards.
+
+- [ ] **D3b:** Add a "What is auto-configured" callout in `kubernetes.md` listing
+  all the things that are automatically set up (datasources, plugins, HTML
+  sanitization) so users understand they don't need to replicate the README's
+  manual configuration steps.
+
+### 6.5 D4 — Plugin Configuration Files Replaced by Helm Values
+
+**README reference:**
+
+> "It is necessary to define all the properties of the `.conf` configuration file
+> of the plugins with the appropriate values related to the server hosting the
+> framework. In particular, it is necessary to define the IP addresses and ports
+> of the server where the KairosDB and/or MQTT broker services run..."
+
+Points users to `publishers/random_pub/random_pub.conf` and per-plugin READMEs.
+
+**Current K8s state:**
+
+- The `change-propagation.md` explains that `.conf` files are generated from
+  Helm values via ConfigMap templates, and `configuration.md` lists all
+  parameters. However, nowhere does the documentation explicitly say: "the
+  old `.conf` files in `publishers/` and `web/examon-server/` are **not used**
+  in K8s. All configuration is driven by Helm `values.yaml`."
+- A user coming from Docker Compose would naturally look for `.conf` files
+  to edit and would be confused.
+
+**TODO — Documentation additions:**
+
+- [ ] **D4a:** Add a paragraph to `kubernetes.md` (in the "Configuration" or
+  a new "Configuration Model" section) explicitly stating:
+
+  > In the Kubernetes deployment, plugin configuration files (`.conf`) are
+  > **generated automatically** from Helm values and mounted as ConfigMaps.
+  > Do not edit the `.conf` files in `publishers/` or `web/examon-server/`
+  > directly — those files are only used by the Docker Compose deployment.
+  > All configuration is managed via `values.yaml` and environment-specific
+  > override files.
+
+- [ ] **D4b:** Add a mapping reference of key old `.conf` fields to new Helm
+  values, either in `configuration.md` or `upgrading.md`:
+
+  | Old field (`random_pub.conf`) | New Helm value |
+  |-------------------------------|---------------|
+  | `MQTT_BROKER` | `random-pub.config.mqttBroker` |
+  | `MQTT_PORT` | `random-pub.config.mqttPort` |
+  | `MQTT_TOPIC` | `random-pub.config.mqttTopic` |
+  | `MQTT_USER` | `random-pub.config.mqttUser` |
+  | `MQTT_PASSWORD` | `random-pub.config.mqttPassword` |
+  | `NUM_SENSORS` | `random-pub.config.numSensors` |
+  | `TS` (sample interval) | `random-pub.config.sampleInterval` |
+
+  Similar tables for `mqtt2kairosdb.conf` and `server.conf`.
+
+### 6.6 D5 — Data Persistence Model and Custom Volume Paths
+
+**README reference:**
+
+> "Two Docker volumes are created... `examon_cassandra_volume`, `examon_grafana_volume`.
+> To set a custom volume path, use `driver_opts` with `type: none`, `device: /path/...`"
+
+**Current K8s state:**
+
+- `configuration.md` documents `cassandra.datacenters.dc1.storageClass`,
+  `grafana.persistence.enabled/size`, and `mosquitto.persistence.enabled/size`.
+- The production guide has a "Storage" section for Cassandra StorageClass.
+- Section 1 of this plan document covers backup/snapshot gaps.
+- However, there is no unified "Data Persistence" section explaining how K8s
+  PVCs replace Docker volumes, what happens to data on pod restart vs.
+  `helm uninstall` vs. cluster deletion, or how to specify custom storage
+  paths.
+
+**TODO — Documentation additions:**
+
+- [ ] **D5a:** Add a "Data Persistence" section to `kubernetes.md` covering:
+  - How PVCs replace Docker volumes (the K8s equivalent).
+  - What data survives what operations:
+
+    | Event | Cassandra data | Grafana data |
+    |-------|:---:|:---:|
+    | Pod restart | Survives | Survives |
+    | `helm upgrade` | Survives | Survives |
+    | `helm uninstall` | Depends on reclaim policy | Depends on reclaim policy |
+    | K3d cluster delete | **Lost** (local only) | **Lost** (local only) |
+    | Node failure (production) | Survives (replicas) | Survives (if PVC on shared storage) |
+
+  - Environment-specific behavior:
+    - **Local (K3d):** Uses `local-path` provisioner. Data persists across
+      pod restarts but is lost when the K3d cluster is deleted.
+    - **Staging (K3d):** Same as local; data is ephemeral to the cluster.
+    - **Production:** Set `storageClass` to match infrastructure
+      (e.g., `cinder-ssd`, `gp3`, `longhorn`). Use `reclaimPolicy: Retain`
+      for critical data (see section 1.2 GAP 4).
+
+- [ ] **D5b:** Add the K8s equivalent of "custom volume path": explain how to
+  use a `hostPath` PersistentVolume or a `local` StorageClass for bare-metal
+  deployments where data must reside on a specific disk/partition.
+
+### 6.7 D6 — Log Rotation and Retention
+
+**README reference (via docker-compose.yml):**
+
+Each service in `docker-compose.yml` specifies logging configuration:
+```yaml
+logging:
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "1"
+```
+
+**Current K8s state:**
+
+- The `kubernetes.md` "Logs" section shows `kubectl logs` commands but says
+  nothing about log rotation, retention, or aggregation.
+
+**TODO — Documentation additions:**
+
+- [ ] **D6a:** Add a note to the "Logs" section of `kubernetes.md` explaining:
+  - In Kubernetes, container log rotation is handled by the **container
+    runtime** (containerd/CRI-O), not by individual services. The Docker
+    Compose `json-file` settings have no direct K8s equivalent — containerd
+    handles rotation automatically.
+  - K3d default: containerd keeps ~10MB per container before rotation.
+  - Production recommendation: the default containerd rotation is sufficient
+    for cluster-level operations, but for persistent, searchable logs,
+    deploy a **log aggregation stack**:
+    - **Loki + Promtail + Grafana** (lightweight, integrates with existing
+      Grafana — recommended for ExaMon)
+    - **EFK** (Elasticsearch + Fluentd + Kibana) — heavier but more mature
+    - **Cloud-native** (CloudWatch, GCP Logging, Azure Monitor) — if on
+      managed K8s
+
+- [ ] **D6b:** For production, add a brief note in `kubernetes-production.md`
+  recommending a log retention strategy and linking to the Logs section.
+
+### 6.8 Implementation Priority
+
+| Priority | TODO | Effort | Depends On |
+|----------|------|--------|-----------|
+| **P0** | D1a (dashboard import docs) | Low | — |
+| **P0** | D2a (plugin management mapping table) | Low | — |
+| **P0** | D3a (Grafana first login) | Low | — |
+| **P1** | D1b (dashboard-as-code provisioning) | Medium | Grafana sidecar config |
+| **P1** | D4a, D4b (conf file replacement docs) | Low | — |
+| **P1** | D5a (persistence model docs) | Low | — |
+| **P2** | D1c (per-environment dashboard guidance) | Low | D1a |
+| **P2** | D2b, D2c (architecture note, exec shell) | Low | — |
+| **P2** | D3b (auto-configured callout) | Low | — |
+| **P2** | D5b (custom volume paths for bare metal) | Low | — |
+| **P2** | D6a, D6b (logging docs) | Low | — |
+
+---
+
+## 7. Implementation Phases (Updated)
+
+| Phase | Items | Depends On | Effort |
+|-------|-------|-----------|--------|
+| **Phase 1** | Cassandra Medusa backups, PV reclaim policy docs, Mosquitto persistence fix | — | Medium |
+| **Phase 2** | KairosDB HOCON ConfigMap overlay, updated Dockerfile | — | Medium |
+| **Phase 3** | Grafana dashboard-as-code + API backup script | — | Medium |
+| **Phase 4** | Documentation gaps D1–D6 (README parity) | D1b depends on Phase 3 | Low-Medium |
+| **Phase 5** | Security contexts on all workloads | Phase 2 (readOnlyRootFilesystem) | Medium |
+| **Phase 6** | PDBs, image versioning, expanded migration docs | — | Low-Medium |
+| **Phase 7** | Observability (ServiceMonitors, alert rules, dashboards) | Phase 3 (Grafana provisioning) | Medium |
+| **Phase 8** | HPAs, NetworkPolicies | Phase 7 (metrics for HPA decisions) | Medium |
