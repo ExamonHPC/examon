@@ -32,6 +32,16 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.config.cassandraAuth.secretName }}
+      initContainers:
+        - name: wait-cassandra-secret
+          image: busybox
+          command: ['sh', '-c', 'until [ -f /secret/username ] && nc -z examon-cassandra-dc1-service 9042; do echo "waiting for cassandra secret and connectivity..."; sleep 5; done; echo "Cassandra reachable, waiting for auth initialization..."; sleep 30']
+          volumeMounts:
+            - name: cassandra-secret
+              mountPath: /secret
+              readOnly: true
+      {{- end }}
       containers:
         - name: examon-server
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -73,3 +83,8 @@ spec:
         - name: config
           configMap:
             name: {{ include "examon-server.fullname" . }}
+        {{- if .Values.config.cassandraAuth.secretName }}
+        - name: cassandra-secret
+          secret:
+            secretName: {{ .Values.config.cassandraAuth.secretName }}
+        {{- end }}
