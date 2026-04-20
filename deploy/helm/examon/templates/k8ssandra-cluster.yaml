@@ -36,6 +36,15 @@ spec:
         racks:
           {{- toYaml .Values.cassandra.datacenters.dc1.racks | nindent 10 }}
         {{- end }}
+        {{- with .Values.cassandra.telemetry }}
+        telemetry:
+          prometheus:
+            enabled: {{ .prometheus.enabled | default false }}
+            {{- with .prometheus.commonLabels }}
+            commonLabels:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+        {{- end }}
   {{- if .Values.cassandra.reaper }}
   reaper:
     autoScheduling:
