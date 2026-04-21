@@ -35,8 +35,9 @@ spec:
       {{- if .Values.config.cassandraAuth.secretName }}
       initContainers:
         - name: wait-cassandra-secret
-          image: busybox
-          command: ['sh', '-c', 'until [ -f /secret/username ] && nc -z examon-cassandra-dc1-service 9042; do echo "waiting for cassandra secret and connectivity..."; sleep 5; done; echo "Cassandra reachable, waiting for auth initialization..."; sleep 30']
+          image: busybox:1.37
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', 'until [ -f /secret/username ] && nc -z {{ .Values.config.cassandraIp }} 9042; do echo "waiting for cassandra secret and connectivity..."; sleep 5; done; echo "Cassandra reachable, waiting for auth initialization..."; sleep 30']
           volumeMounts:
             - name: cassandra-secret
               mountPath: /secret
