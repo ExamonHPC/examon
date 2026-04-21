@@ -8,3 +8,4 @@ site
 
 # Helm secret override files (never commit real credentials)
 deploy/helm/examon/values-*.secret.yaml
+docs/Release_v0.5.1_plan.md
