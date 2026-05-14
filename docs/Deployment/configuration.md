@@ -52,9 +52,18 @@ Grafana uses the [official Grafana Helm chart](https://github.com/grafana/helm-c
 |-----------|-------------|---------|
 | `grafana.adminPassword` | Admin password | `Password` |
 | `grafana.plugins` | Grafana plugins to install | See `values.yaml` |
+| `grafana.datasources` | Datasource provisioning (KairosDB pre-configured with `uid: examon-kairosdb`, type `arpnetworking-kairosdb-datasource`) | See `values.yaml` |
+| `grafana.sidecar.dashboards.enabled` | Auto-load dashboards from ConfigMaps labeled `grafana_dashboard` | `true` |
 | `grafana.persistence.enabled` | Enable persistent storage | `false` |
 | `grafana.persistence.size` | PVC size | `10Gi` |
 | `grafana.ingress.enabled` | Enable ingress | `false` |
+
+The KairosDB datasource ships as the React-based
+[ArpNetworking fork](https://github.com/ArpNetworking/kairosdb-datasource)
+(`arpnetworking-kairosdb-datasource`). The legacy AngularJS
+`grafana-kairosdb-datasource` is not compatible with Grafana 11+ and is
+not used by this chart. The plugin is installed from its GitHub release
+URL and allowed via `grafana.ini.plugins.allow_loading_unsigned_plugins`.
 
 ## Mosquitto
 

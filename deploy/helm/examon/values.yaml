@@ -57,6 +57,11 @@ cassandra:
 grafana:
   enabled: true
   adminPassword: ""  # pass via --set grafana.adminPassword=... at deploy time
+  # Grafana plugins.
+  # The KairosDB datasource uses the React-based ArpNetworking fork
+  # (the original grafana-kairosdb-datasource is AngularJS-only and is
+  # blocked by Grafana 11+). It is shipped as an unsigned plugin and must
+  # be installed from a release URL with the GRAFANA_PLUGIN_ID appended.
   plugins:
     - ae3e-plotly-panel
     - grafana-piechart-panel
@@ -64,8 +69,12 @@ grafana:
     - marcusolsson-gantt-panel
     - flant-statusmap-panel
     - gapit-htmlgraphics-panel
+    - https://github.com/ArpNetworking/kairosdb-datasource/releases/download/v4.0.7/kairosdb-datasource.zip;arpnetworking-kairosdb-datasource
   env:
     GF_PANELS_DISABLE_SANITIZE_HTML: "true"
+  grafana.ini:
+    plugins:
+      allow_loading_unsigned_plugins: arpnetworking-kairosdb-datasource
   sidecar:
     datasources:
       enabled: true
@@ -74,7 +83,8 @@ grafana:
       apiVersion: 1
       datasources:
         - name: kairosdb
-          type: grafana-kairosdb-datasource
+          uid: examon-kairosdb
+          type: arpnetworking-kairosdb-datasource
           access: proxy
           url: http://examon-kairosdb:8083
           isDefault: true
