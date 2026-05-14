@@ -56,7 +56,7 @@ Grafana uses the [official Grafana Helm chart](https://github.com/grafana/helm-c
 | `grafana.adminPassword` | Admin password | `Password` |
 | `grafana.plugins` | Grafana plugins to install | See `values.yaml` |
 | `grafana.datasources` | Datasource provisioning (KairosDB pre-configured with `uid: examon-kairosdb`, type `arpnetworking-kairosdb-datasource`) | See `values.yaml` |
-| `grafana.sidecar.dashboards.enabled` | Auto-load dashboards from ConfigMaps labeled `grafana_dashboard` | `true` |
+| `grafana.sidecar.dashboards.enabled` | Auto-load dashboards from ConfigMaps labeled `grafana_dashboard=1` (cluster-wide; `searchNamespace: ALL`). See [Grafana Dashboards](kubernetes.md#grafana-dashboards) in the K8s guide for the recipe to add custom dashboards without editing the chart. | `true` |
 | `grafana.persistence.enabled` | Enable persistent storage | `false` |
 | `grafana.persistence.size` | PVC size | `10Gi` |
 | `grafana.ingress.enabled` | Enable ingress | `false` |

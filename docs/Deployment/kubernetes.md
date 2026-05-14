@@ -414,6 +414,8 @@ for platform-specific details.
 
 ## Grafana Dashboards
 
+### Bundled dashboard
+
 The chart auto-provisions a KairosDB datasource and bundles the test
 dashboard `Examon Test - Random Sensor.json` (Grafana 10+/11+ compatible).
 After install it appears automatically in Grafana — no manual import is
@@ -422,6 +424,131 @@ required to verify the data pipeline.
 The legacy v0.4.0 version of the same dashboard, kept for users of the
 docker-compose stack, lives under `dashboards/legacy/` and is **not**
 loaded by the chart.
+
+### How dashboard auto-provisioning works
+
+The chart enables the [Grafana dashboard sidecar](https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards)
+with the following defaults (see [`deploy/helm/examon/values.yaml`](../../deploy/helm/examon/values.yaml)):
+
+```yaml
+grafana:
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+```
+
+The sidecar watches **any namespace** for `ConfigMap`s carrying the label
+`grafana_dashboard=1`. Every JSON entry under the ConfigMap's `data:`
+field is loaded into Grafana as a dashboard, hot-reloaded within ~30s,
+and removed when the ConfigMap is deleted. The umbrella chart uses the
+same mechanism for its bundled dashboard via
+[`templates/grafana-dashboards.yaml`](../../deploy/helm/examon/templates/grafana-dashboards.yaml),
+which globs `dashboards/*.json` and emits one ConfigMap per file.
+
+Two equivalent ways to ship custom dashboards are described next:
+
+- **Strategy A (recommended):** create labeled ConfigMaps from outside the
+  chart. No chart edits, no `helm upgrade` needed — works with plain
+  `kubectl`, Kustomize, ArgoCD, Flux, etc.
+- **Strategy B:** drop extra `*.json` files into the chart's
+  `dashboards/` folder. Best for forks/maintainers who want dashboards
+  baked into the chart artifact itself.
+
+### Adding your own dashboards (Strategy A, recommended)
+
+**Single dashboard** — create a ConfigMap from a JSON file and label it:
+
+```bash
+kubectl -n examon create configmap my-dashboard \
+  --from-file=my-dashboard.json=./my-dashboard.json
+kubectl -n examon label configmap my-dashboard grafana_dashboard=1
+```
+
+Within ~30s the dashboard appears in Grafana under **Dashboards**. To
+remove it, delete the ConfigMap.
+
+**A whole directory of dashboards** — one ConfigMap per file:
+
+```bash
+for f in ./dashboards/*.json; do
+  name="examon-dash-$(basename "$f" .json | tr '[:upper:] _' '[:lower:]--')"
+  kubectl -n examon create configmap "$name" --from-file="$(basename "$f")=$f"
+  kubectl -n examon label configmap "$name" grafana_dashboard=1
+done
+```
+
+Keep one ConfigMap per dashboard (rather than packing many JSONs into a
+single ConfigMap) so you stay well below the 1 MiB ConfigMap size limit
+and so adding/removing a single dashboard does not invalidate the rest.
+
+**GitOps / YAML manifest variant** — useful with ArgoCD, Flux, or just
+plain `kubectl apply -f`:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-dashboard
+  namespace: examon
+  labels:
+    grafana_dashboard: "1"
+data:
+  my-dashboard.json: |-
+    {
+      "title": "My Dashboard",
+      "panels": [ /* ... */ ]
+    }
+```
+
+The ConfigMap does not have to live in the `examon` namespace — the
+sidecar runs with `searchNamespace: ALL`, so any namespace works. Pick
+the one that fits your RBAC / GitOps layout.
+
+### Bundling extra dashboards into the chart (Strategy B)
+
+If you maintain a fork of the umbrella chart and want dashboards shipped
+inside the chart artifact:
+
+1. Drop additional `*.json` files into
+   [`deploy/helm/examon/dashboards/`](../../deploy/helm/examon/dashboards/).
+2. Run `helm upgrade examon ./deploy/helm/examon -n examon`.
+
+The existing template iterates every `*.json` in that folder and emits
+one labeled ConfigMap per file automatically — no template changes are
+required. Set `bundledDashboards.enabled=false` to skip them at install
+time without removing the files.
+
+### Tips
+
+- **Datasource references.** Every panel and the dashboard root must
+  point at the chart-provisioned KairosDB datasource. Use:
+
+  ```json
+  { "type": "arpnetworking-kairosdb-datasource", "uid": "examon-kairosdb" }
+  ```
+
+  Dashboards exported from Grafana 7.x (v0.4.0 docker-compose stack)
+  still reference the legacy `grafana-kairosdb-datasource` plugin and
+  must be rewritten before import. See the `jq` snippet in
+  [upgrading.md](upgrading.md#step-4-restore-data).
+- **ConfigMap size limit.** Kubernetes caps each ConfigMap at 1 MiB. One
+  ConfigMap per dashboard keeps you safely under it.
+- **Grafana folder grouping (optional).** The Grafana sidecar can place
+  dashboards into named Grafana UI folders via an annotation on the
+  ConfigMap (default annotation name: `grafana_folder`). This is not
+  enabled by chart default; see the
+  [Grafana sidecar docs](https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards)
+  if you want to use it.
+- **Troubleshooting.** If a dashboard does not appear, give the sidecar
+  ~30s and then check:
+
+  ```bash
+  kubectl get configmap -n examon -l grafana_dashboard=1
+  kubectl logs -l app.kubernetes.io/name=grafana -c grafana-sc-dashboard -n examon
+  ```
 
 ## Managing Plugins
 

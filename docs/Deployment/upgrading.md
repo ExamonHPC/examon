@@ -94,10 +94,13 @@ user-created dashboards:
   ' dashboard.json > dashboard-v0.5.0.json
   ```
 
-  Then import the rewritten JSON via the Grafana UI or API. Alternatively
-  drop the rewritten JSON into a ConfigMap labeled
-  `grafana_dashboard: "1"` in the `examon` namespace; the sidecar will
-  load it automatically alongside the bundled dashboard.
+  Then import the rewritten JSON via the Grafana UI or API, or — for a
+  reproducible, GitOps-friendly setup — wrap it in a `grafana_dashboard=1`
+  labeled ConfigMap and let the Grafana sidecar load it automatically.
+  The full recipe (single dashboard, directory of dashboards, YAML
+  manifest variant) lives in
+  [Grafana Dashboards](kubernetes.md#grafana-dashboards) in the K8s
+  guide; this guide only covers the v0.4.0 → v0.5.0 JSON rewrite.
 
 ### Step 5: Update Publishers
 
