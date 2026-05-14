@@ -30,6 +30,8 @@ All ExaMon Helm chart configuration is managed through values files. This docume
 | `cassandra.datacenters.dc1.podAntiAffinity` | Enable pod anti-affinity | `false` |
 | `cassandra.datacenters.dc1.racks` | Rack definitions with zone labels | `[]` |
 | `cassandra.reaper.enabled` | Enable Reaper for repairs | `false` |
+| `cassandra.telemetry.prometheus.enabled` | Let K8ssandra emit a `ServiceMonitor` for Cassandra metrics. Requires the `ServiceMonitor` CRD (kube-prometheus-stack or equivalent) in the cluster. | `false` |
+| `cassandra.telemetry.prometheus.commonLabels` | Labels attached to every Cassandra metric. Use to match a `ServiceMonitor` selector (e.g. `release: kube-prometheus-stack`). | `{}` |
 
 ## KairosDB
 

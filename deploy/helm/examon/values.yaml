@@ -57,6 +57,19 @@ cassandra:
       racks: []
   reaper:
     enabled: false
+  # -- Native K8ssandra Prometheus telemetry.
+  # When enabled, K8ssandra creates a ServiceMonitor for Cassandra metrics
+  # that an existing Prometheus operator can scrape directly. Requires a
+  # ServiceMonitor CRD installed in the cluster (kube-prometheus-stack or
+  # similar). Disabled by default so the chart installs on clusters
+  # without Prometheus.
+  telemetry:
+    prometheus:
+      enabled: false
+      # commonLabels are attached to every metric emitted by Cassandra,
+      # e.g. release: kube-prometheus-stack to satisfy a serviceMonitor
+      # selector.
+      commonLabels: {}
 
 # -- Grafana subchart overrides
 grafana:
