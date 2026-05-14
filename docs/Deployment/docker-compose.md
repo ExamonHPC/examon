@@ -49,7 +49,7 @@ This Docker Compose stack runs Grafana 7.3.10 with the legacy AngularJS
 snapshot from `dashboards/legacy/Examon Test - Random Sensor.json`.
 
 The dashboards directly under `dashboards/` target the Kubernetes
-(v0.5.0+) stack instead — they use the React-based
+(v0.5.0+) stack instead: they use the React-based
 `arpnetworking-kairosdb-datasource` plugin and are not compatible with
 Grafana 7.x.
 

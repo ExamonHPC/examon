@@ -37,8 +37,8 @@ For production (GitHub Container Registry):
 ### Iterative Development (Single Service)
 
 During development, you typically modify and rebuild a single service
-rather than all images. The recommended inner-loop workflow — build, push
-to the local registry, restart the pod — is documented in detail in the
+rather than all images. The recommended inner-loop workflow (build, push
+to the local registry, restart the pod) is documented in detail in the
 [Local Development Workflow](kubernetes-local.md#local-development-workflow)
 section. That section also covers K3d image caching behavior, the
 `pullPolicy: Always` setting, and alternatives like `k3d image import`
@@ -151,7 +151,7 @@ kubectl get secret examon-cassandra-superuser -n examon \
 ### Automatic credential injection
 
 Both services that connect to Cassandra read credentials **automatically**
-from this secret — no manual `--set` flags are needed:
+from this secret. No manual `--set` flags are needed:
 
 | Service | Mechanism | Values key |
 |---------|-----------|------------|
@@ -171,13 +171,13 @@ examon-server:
 The `server.py` application checks environment variables `CASSANDRA_USER`
 and `CASSANDRA_PASSWORD` first, falling back to `server.conf` values if the
 env vars are not set. This means a simple `helm install` (or upgrade) is
-sufficient — the pod will authenticate to Cassandra automatically on
+sufficient: the pod will authenticate to Cassandra automatically on
 startup once the secret exists.
 
 !!! note "Bootstrap ordering"
     On a fresh `helm install`, `examon-server` and `kairosdb` may restart a
     few times while Cassandra initializes and the superuser secret is
-    created. This is expected — Kubernetes will restart them automatically
+    created. This is expected: Kubernetes will restart them automatically
     and they will connect once Cassandra is ready.
 
 ### Custom secret name
@@ -227,7 +227,7 @@ Create a file named `values-<env>.secret.yaml` (e.g.
 be committed:
 
 ```yaml
-# values-local.secret.yaml — DO NOT COMMIT
+# values-local.secret.yaml: DO NOT COMMIT
 grafana:
   adminPassword: "my-grafana-password"
 ```
@@ -245,12 +245,12 @@ helm upgrade examon ./deploy/helm/examon \
 
 For production, use a secrets management solution such as:
 
-- [External Secrets Operator](https://external-secrets.io/) — syncs
+- [External Secrets Operator](https://external-secrets.io/): syncs
   secrets from AWS Secrets Manager, Vault, GCP Secret Manager, etc.
-- [Sealed Secrets](https://sealed-secrets.netlify.app/) — encrypted
+- [Sealed Secrets](https://sealed-secrets.netlify.app/): encrypted
   secrets that are safe to commit to git
 - [SOPS](https://github.com/getsops/sops) with
-  [helm-secrets](https://github.com/jkroepke/helm-secrets) — encrypts
+  [helm-secrets](https://github.com/jkroepke/helm-secrets): encrypts
   values files in-place
 
 ### Secret fields reference
@@ -286,7 +286,7 @@ credentials. For GHCR, the password is a Personal Access Token (PAT) with
 
 ### Step 2: Reference the Secret in Values
 
-**Option A — Global (recommended):** Set once, applies to all subcharts.
+**Option A: Global (recommended).** Set once, applies to all subcharts.
 
 ```yaml
 global:
@@ -304,7 +304,7 @@ helm upgrade examon ./deploy/helm/examon \
   -n examon
 ```
 
-**Option B — Per-subchart:** Override for a specific component only.
+**Option B: Per-subchart.** Override for a specific component only.
 
 ```yaml
 kairosdb:
@@ -332,7 +332,7 @@ that subchart.
 
 !!! note "Local Development"
     For local K3d with a local registry (`examon-registry:5111`), image pull
-    secrets are not needed — K3d connects to the local registry without
+    secrets are not needed: K3d connects to the local registry without
     authentication.
 
 ## Service Name Reference
@@ -418,7 +418,7 @@ for platform-specific details.
 
 The chart auto-provisions a KairosDB datasource and bundles the test
 dashboard `Examon Test - Random Sensor.json` (Grafana 10+/11+ compatible).
-After install it appears automatically in Grafana — no manual import is
+After install it appears automatically in Grafana: no manual import is
 required to verify the data pipeline.
 
 The legacy v0.4.0 version of the same dashboard, kept for users of the
@@ -451,7 +451,7 @@ which globs `dashboards/*.json` and emits one ConfigMap per file.
 Two equivalent ways to ship custom dashboards are described next:
 
 - **Strategy A (recommended):** create labeled ConfigMaps from outside the
-  chart. No chart edits, no `helm upgrade` needed — works with plain
+  chart. No chart edits, no `helm upgrade` needed: works with plain
   `kubectl`, Kustomize, ArgoCD, Flux, etc.
 - **Strategy B:** drop extra `*.json` files into the chart's
   `dashboards/` folder. Best for forks/maintainers who want dashboards
@@ -459,7 +459,7 @@ Two equivalent ways to ship custom dashboards are described next:
 
 ### Adding your own dashboards (Strategy A, recommended)
 
-**Single dashboard** — create a ConfigMap from a JSON file and label it:
+**Single dashboard.** Create a ConfigMap from a JSON file and label it:
 
 ```bash
 kubectl -n examon create configmap my-dashboard \
@@ -470,7 +470,7 @@ kubectl -n examon label configmap my-dashboard grafana_dashboard=1
 Within ~30s the dashboard appears in Grafana under **Dashboards**. To
 remove it, delete the ConfigMap.
 
-**A whole directory of dashboards** — one ConfigMap per file:
+**A whole directory of dashboards.** One ConfigMap per file:
 
 ```bash
 for f in ./dashboards/*.json; do
@@ -484,7 +484,7 @@ Keep one ConfigMap per dashboard (rather than packing many JSONs into a
 single ConfigMap) so you stay well below the 1 MiB ConfigMap size limit
 and so adding/removing a single dashboard does not invalidate the rest.
 
-**GitOps / YAML manifest variant** — useful with ArgoCD, Flux, or just
+**GitOps / YAML manifest variant.** Useful with ArgoCD, Flux, or just
 plain `kubectl apply -f`:
 
 ```yaml
@@ -503,7 +503,7 @@ data:
     }
 ```
 
-The ConfigMap does not have to live in the `examon` namespace — the
+The ConfigMap does not have to live in the `examon` namespace: the
 sidecar runs with `searchNamespace: ALL`, so any namespace works. Pick
 the one that fits your RBAC / GitOps layout.
 
@@ -517,7 +517,7 @@ inside the chart artifact:
 2. Run `helm upgrade examon ./deploy/helm/examon -n examon`.
 
 The existing template iterates every `*.json` in that folder and emits
-one labeled ConfigMap per file automatically — no template changes are
+one labeled ConfigMap per file automatically: no template changes are
 required. Set `bundledDashboards.enabled=false` to skip them at install
 time without removing the files.
 

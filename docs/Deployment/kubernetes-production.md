@@ -1,6 +1,6 @@
 # Production Deployment
 
-Production targets a real Kubernetes cluster — on-premises (OpenStack,
+Production targets a real Kubernetes cluster: on-premises (OpenStack,
 RKE2, kubeadm) or cloud-managed (EKS, GKE, AKS).
 
 ## Service Exposure Architecture
@@ -265,7 +265,7 @@ helm install examon ./deploy/helm/examon \
   -n examon --wait --timeout 20m
 ```
 
-Cassandra credentials are injected automatically — both KairosDB and
+Cassandra credentials are injected automatically. Both KairosDB and
 examon-server read them from the K8ssandra-generated secret
 (`examon-cassandra-superuser`) via `secretKeyRef` environment variables.
 No second `helm upgrade` is needed.
@@ -316,7 +316,7 @@ Create DNS records pointing to the services:
 ### Configure Grafana Data Source
 
 The KairosDB data source is **fully auto-provisioned** by the chart on
-every deploy — no manual setup is required. The umbrella chart:
+every deploy; no manual setup is required. The umbrella chart:
 
 1. Installs the React-based [ArpNetworking
    KairosDB data source plugin](https://github.com/ArpNetworking/kairosdb-datasource)
@@ -354,8 +354,8 @@ both to monitor ExaMon itself and to scrape Cassandra.
 **Cassandra metrics (K8ssandra-native):** the umbrella chart exposes
 `cassandra.telemetry.prometheus.*`, which is wired straight into the
 K8ssandra `CassandraDatacenter` CR. When enabled, K8ssandra creates a
-`ServiceMonitor` for the Cassandra metric endpoint — no extra manifest to
-maintain. Requires the `ServiceMonitor` CRD (shipped by
+`ServiceMonitor` for the Cassandra metric endpoint, with no extra manifest
+to maintain. Requires the `ServiceMonitor` CRD (shipped by
 `kube-prometheus-stack`):
 
 ```yaml
@@ -397,7 +397,7 @@ kubectl scale deployment examon-kairosdb --replicas=3 -n examon
 kubectl scale deployment examon-examon-server --replicas=3 -n examon
 ```
 
-Cassandra scaling is managed via the K8ssandraCluster CR — update the
+Cassandra scaling is managed via the K8ssandraCluster CR: update the
 datacenter `size` in `values-production.yaml` and run `helm upgrade`.
 
 ## Platform-Specific Notes

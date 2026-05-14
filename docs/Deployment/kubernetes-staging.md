@@ -155,7 +155,7 @@ kubectl exec -it examon-cassandra-dc1-default-sts-0 -c cassandra -n examon \
 
 All user-facing services are exposed directly on the host via the K3d load
 balancer and `NodePort` services. External clients connect to the VM's
-IP/hostname — no Kubernetes knowledge required:
+IP/hostname; no Kubernetes knowledge required:
 
 | Service | Address | Protocol | Users |
 |---------|---------|----------|-------|

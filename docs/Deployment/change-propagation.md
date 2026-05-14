@@ -72,7 +72,7 @@ umbrella file, which wins over the subchart default.
    all environments unless they override it.
 3. If **environment-specific**: edit the relevant `values-<env>.yaml`.
 4. **Check all three environment files** to verify they are consistent.
-   Values files only override fields they explicitly set — if a file doesn't
+   Values files only override fields they explicitly set; if a file doesn't
    mention a field, it inherits from `values.yaml`.
 
 **Checklist for value changes:**
@@ -110,7 +110,7 @@ deploy/helm/examon/subcharts/<service>/templates/
     _helpers.tpl        # Template helper functions
 ```
 
-**Critical step — subchart packaging:**
+**Critical step: subchart packaging.**
 
 Helm does **not** read templates directly from `subcharts/`. Instead, it uses
 pre-packaged `.tgz` archives inside `deploy/helm/examon/charts/`. You must
@@ -191,7 +191,7 @@ the same tag (e.g. `latest`), nodes with `imagePullPolicy: IfNotPresent`
 For production images on GHCR, use semantic versioning (e.g. `1.3.0`,
 `1.3.1`). For development, use descriptive suffixes (e.g. `1.3.0-fix3`).
 
-**What to propagate — image tag changes:**
+**What to propagate when changing image tags:**
 
 | File | Update |
 |------|--------|
@@ -223,7 +223,7 @@ For production images on GHCR, use semantic versioning (e.g. `1.3.0`,
 
 This is the most complex scenario because it touches every layer:
 
-**Step 1 — Subchart template:**
+**Step 1: Subchart template.**
 Edit `subcharts/examon-server/templates/configmap.yaml` to render the new
 field:
 
@@ -231,7 +231,7 @@ field:
 CASSANDRA_TIMEOUT = {{ .Values.config.cassandraTimeout }}
 ```
 
-**Step 2 — Subchart default:**
+**Step 2: Subchart default.**
 Edit `subcharts/examon-server/values.yaml`:
 
 ```yaml
@@ -239,7 +239,7 @@ config:
   cassandraTimeout: 30
 ```
 
-**Step 3 — Umbrella default:**
+**Step 3: Umbrella default.**
 Edit `values.yaml`:
 
 ```yaml
@@ -248,7 +248,7 @@ examon-server:
     cassandraTimeout: 30
 ```
 
-**Step 4 — Environment overrides (if needed):**
+**Step 4: Environment overrides (if needed).**
 Edit `values-production.yaml`:
 
 ```yaml
@@ -257,7 +257,7 @@ examon-server:
     cassandraTimeout: 120
 ```
 
-**Step 5 — Rebuild and deploy:**
+**Step 5: Rebuild and deploy.**
 
 ```bash
 cd deploy/helm/examon && helm dependency update && cd ../../..
@@ -265,13 +265,13 @@ helm upgrade examon ./deploy/helm/examon \
   -f ./deploy/helm/examon/values-<env>.yaml -n examon
 ```
 
-**Step 6 — Verify:**
+**Step 6: Verify.**
 
 ```bash
 helm get manifest examon -n examon | grep CASSANDRA_TIMEOUT
 ```
 
-**Step 7 — Documentation:**
+**Step 7: Documentation.**
 Update `docs/Deployment/configuration.md` with the new parameter.
 
 ---
@@ -280,14 +280,14 @@ Update `docs/Deployment/configuration.md` with the new parameter.
 
 | What you changed | Rebuild image | `helm dependency update` | `helm upgrade` | Update values files |
 |------------------|:---:|:---:|:---:|:---:|
-| Value in `values-<env>.yaml` only | | | Yes | — |
+| Value in `values-<env>.yaml` only | | | Yes | N/A |
 | Value in umbrella `values.yaml` | | | Yes | Check env files |
 | Subchart template (`subcharts/*/templates/`) | | **Yes** | Yes | If new field |
 | Subchart `values.yaml` (defaults) | | **Yes** | Yes | Check umbrella + env files |
 | Dockerfile or container scripts | **Yes** | | Yes | Update image tags |
-| K3d/K8s cluster config (`deploy/k3d/`) | — | — | Recreate cluster | — |
-| External chart version (`Chart.yaml`) | | **Yes** | Yes | — |
-| K8ssandra operator version | | | `helm upgrade k8ssandra-operator` | — |
+| K3d/K8s cluster config (`deploy/k3d/`) | N/A | N/A | Recreate cluster | N/A |
+| External chart version (`Chart.yaml`) | | **Yes** | Yes | N/A |
+| K8ssandra operator version | | | `helm upgrade k8ssandra-operator` | N/A |
 
 !!! note "K8ssandra operator is a separate Helm release"
     The K8ssandra operator is **not** listed in `Chart.yaml`. It is installed
@@ -389,7 +389,7 @@ The only secret that still requires `--set` is the **Grafana admin password**:
     `deploy/helm/examon/values-*.secret.yaml` and will never be committed:
 
     ```yaml
-    # values-local.secret.yaml — DO NOT COMMIT
+    # values-local.secret.yaml: DO NOT COMMIT
     grafana:
       adminPassword: "my-grafana-password"
     ```
