@@ -412,6 +412,17 @@ This works on OpenStack (with Octavia), RKE2, cloud providers, and bare
 metal (with MetalLB). See the [Production guide](kubernetes-production.md)
 for platform-specific details.
 
+## Grafana Dashboards
+
+The chart auto-provisions a KairosDB datasource and bundles the test
+dashboard `Examon Test - Random Sensor.json` (Grafana 10+/11+ compatible).
+After install it appears automatically in Grafana — no manual import is
+required to verify the data pipeline.
+
+The legacy v0.4.0 version of the same dashboard, kept for users of the
+docker-compose stack, lives under `dashboards/legacy/` and is **not**
+loaded by the chart.
+
 ## Managing Plugins
 
 In the Kubernetes deployment, plugins run as separate Deployments. To enable/disable:

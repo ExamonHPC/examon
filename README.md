@@ -86,6 +86,12 @@ To import the dashboards stored in the `dashboards/` folder:
 
 To test the installation, you can import the `Examon Test - Random Sensor.json` dashboard.
 
+> **Docker Compose users:** the dashboards directly under `dashboards/` target
+> Grafana 10+/11+ and the React-based `arpnetworking-kairosdb-datasource`
+> plugin used by the Kubernetes (v0.5.0+) deployment. For this legacy Docker
+> Compose stack (Grafana 7.3.10 + `grafana-kairosdb-datasource`) import the
+> snapshots from `dashboards/legacy/` instead.
+
 
 ### Configure the plugins
 
