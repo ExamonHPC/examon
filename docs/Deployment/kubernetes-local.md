@@ -64,7 +64,7 @@ echo "127.0.0.1 examon-registry" | sudo tee -a /etc/hosts
 
 !!! note
     The automated setup script (`k8s-local-setup.sh`) performs this step
-    automatically. You only need to do this once per machine — the entry
+    automatically. You only need to do this once per machine; the entry
     persists across cluster recreations.
 
 ### Step 3: Build and Push Images
@@ -134,7 +134,7 @@ initial deployment, a superuser secret is automatically generated.
 
 Both **KairosDB** and **examon-server** read these credentials automatically
 from the K8ssandra secret via `secretKeyRef` environment variables. No
-manual `--set` flags or second `helm upgrade` is needed — the pods pick up
+manual `--set` flags or second `helm upgrade` is needed: the pods pick up
 credentials on startup once the secret exists.
 
 `examon-server` uses env var overrides (`CASSANDRA_USER`, `CASSANDRA_PASSWORD`)
@@ -151,7 +151,7 @@ examon-server:
 !!! note "Bootstrap restarts"
     On a fresh install, `examon-server` and `kairosdb` may restart a few
     times while Cassandra initializes and creates the superuser secret.
-    This is expected — Kubernetes restarts them automatically and they
+    This is expected: Kubernetes restarts them automatically and they
     connect once Cassandra is ready.
 
 ### Step 8: Verify
@@ -200,10 +200,33 @@ If the graph shows data, the entire pipeline is working end-to-end:
 is consuming it and writing to KairosDB, and KairosDB is persisting it in
 Cassandra.
 
+**Verify via Grafana (auto-provisioned).** Unlike the v0.4.0 docker-compose
+stack, no manual datasource or dashboard setup is required:
+
+1. Open [http://localhost:3000](http://localhost:3000) and log in as
+   `admin` with the password set via `--set grafana.adminPassword=...`
+   (default: `admin` for `values-local.yaml`).
+2. Under **Connections → Data sources**, the `kairosdb` data source
+   (type `arpnetworking-kairosdb-datasource`, `uid: examon-kairosdb`) is
+   already configured. Clicking **Test** returns *"Data source is
+   working"*.
+3. Under **Dashboards**, open **Examon Test - Random Sensor**. It is
+   loaded automatically by the Grafana dashboard sidecar from a
+   chart-bundled ConfigMap labeled `grafana_dashboard=1`. The dashboard
+   should render live data from `random_pub`.
+
+If the dashboard is missing, give the sidecar ~30s to pick it up after
+the initial install, then check:
+
+```bash
+kubectl get configmap -n examon -l grafana_dashboard=1
+kubectl logs -l app.kubernetes.io/name=grafana -c grafana-sc-dashboard -n examon
+```
+
 ## Accessing Services
 
 All user-facing services are exposed directly on the host via the K3d load
-balancer and `NodePort` services — no `kubectl port-forward` or Kubernetes
+balancer and `NodePort` services. No `kubectl port-forward` or Kubernetes
 knowledge required. External clients (e.g. `examon-client` on user laptops,
 admins accessing Grafana) connect to these addresses just like with Docker
 Compose:
@@ -256,8 +279,8 @@ examon-server:
 
 KairosDB 1.3.0 loads two configuration files:
 
-1. **`kairosdb.properties`** — legacy Java properties format
-2. **`kairosdb.conf`** — HOCON format (takes precedence)
+1. **`kairosdb.properties`**: legacy Java properties format
+2. **`kairosdb.conf`**: HOCON format (takes precedence)
 
 The `config-kairos.sh` entrypoint script patches both files at startup using
 environment variables (`CASSANDRA_HOST_LIST`, `CASSANDRA_USER`,
@@ -272,9 +295,9 @@ built on the `ExamonApp` framework from the `examon-common` library. They
 expect their configuration in `.conf` files (INI format) mounted in the
 working directory:
 
-- `random_pub.conf` — mounted from ConfigMap via Helm
-- `mqtt2kairosdb.conf` — mounted from ConfigMap via Helm
-- `server.conf` — mounted from ConfigMap via Helm
+- `random_pub.conf`: mounted from ConfigMap via Helm
+- `mqtt2kairosdb.conf`: mounted from ConfigMap via Helm
+- `server.conf`: mounted from ConfigMap via Helm
 
 These are generated from the Helm `values.yaml` settings by each subchart's
 `configmap.yaml` template.
@@ -299,7 +322,7 @@ to pull the image based on the Kubernetes `imagePullPolicy`:
 
 `values-local.yaml` sets `pullPolicy: Always` for all custom ExaMon images.
 This means the standard build-push-restart cycle works reliably with the
-`:latest` tag — no stale cache surprises.
+`:latest` tag, with no stale cache surprises.
 
 ### Scenario 1: Application Code Change
 
@@ -434,7 +457,7 @@ well with K3d and Helm charts:
   pipeline, supports file syncing, and integrates with CI/CD.
 
 Both tools work with ExaMon's Helm chart structure out of the box. They
-are optional power-ups — the manual workflow above is sufficient for most
+are optional power-ups; the manual workflow above is sufficient for most
 development tasks.
 
 ### Teardown

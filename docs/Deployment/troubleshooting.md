@@ -198,7 +198,7 @@ passed via the `JAVA_OPTS` environment variable from the Kubernetes
 Deployment spec.
 
 **Solution:** Modified `kairosdb-env.sh` to only set defaults when `JAVA_OPTS`
-is not already defined (see fix in issue #2 above — the `if [ -z "$JAVA_OPTS" ]`
+is not already defined (see fix in issue #2 above; the `if [ -z "$JAVA_OPTS" ]`
 guard serves both purposes).
 
 **Files changed:** `deploy/docker/kairosdb/kairosdb-env.sh`
@@ -323,7 +323,7 @@ examon-server:
 ```
 
 If the error persists on a fresh install, it's likely a bootstrap timing
-issue — `examon-server` starts before the K8ssandra secret is created.
+issue: `examon-server` starts before the K8ssandra secret is created.
 Wait for Kubernetes to restart the pod automatically (it will succeed once
 the secret exists).
 
@@ -461,7 +461,7 @@ the new pod still runs the old image.
 **Root cause:** K3d nodes run containerd, which caches images independently
 from the host Docker daemon. With `imagePullPolicy: IfNotPresent` (the
 subchart default), containerd resolves the tag from its local cache and
-never re-pulls from the registry — even if the registry has a newer image
+never re-pulls from the registry, even if the registry has a newer image
 with the same tag.
 
 **Prevention:** `values-local.yaml` now sets `pullPolicy: Always` for all
@@ -553,7 +553,7 @@ no endpoints available for service "k8ssandra-operator-webhook-service"
 
 **Root cause:** The `K8ssandraCluster` CR was submitted before the operator's
 webhook endpoint was ready. This happens when the operator and the CR are
-deployed in the same Helm release — Helm cannot guarantee ordering between
+deployed in the same Helm release: Helm cannot guarantee ordering between
 a subchart's Deployment and the parent chart's custom resource.
 
 **Solution:**
@@ -588,7 +588,7 @@ examon-k8ssandra-operator-webhook-service.examon.svc, not
 k8ssandra-operator-webhook-service.examon.svc
 ```
 
-**Root cause:** Two K8ssandra operator installations exist — one standalone
+**Root cause:** Two K8ssandra operator installations exist: one standalone
 and one from a previous umbrella chart dependency. They create webhook
 services with different names but the same CRD validators.
 
@@ -658,6 +658,73 @@ start before Cassandra is ready and fail their initial connection attempts.
 1. Cassandra pod status: `kubectl get pods -l app.kubernetes.io/name=cassandra -n examon`
 2. Cassandra logs: `kubectl logs examon-cassandra-dc1-default-sts-0 -c cassandra -n examon`
 3. Whether the superuser secret exists: `kubectl get secret examon-cassandra-superuser -n examon`
+
+---
+
+### 18. Grafana: KairosDB Data Source Fails or Dashboards Show "No Data"
+
+**Symptom:** On a freshly installed v0.5.0 chart, the Grafana KairosDB
+data source either does not appear, fails the **Test** action, or panels
+show "No data" / `Datasource not found` errors. The browser console
+typically reports a plugin loading or AngularJS-related failure.
+
+**Root cause:** The original `grafana-kairosdb-datasource` plugin is
+AngularJS-based and is no longer compatible with Grafana 11+ (AngularJS
+support has been removed). The v0.5.0 chart switches to the React-based
+[ArpNetworking
+fork](https://github.com/ArpNetworking/kairosdb-datasource), which is
+unsigned and must be explicitly whitelisted in the Grafana config. The
+auto-provisioned data source must also reference the plugin by its new
+`type`. This is tracked as [Issue #25](https://github.com/ExamonHPC/examon/issues/25).
+
+**Resolution.** Re-`helm upgrade` with the chart's defaults; they
+already encode all three pieces:
+
+1. Plugin install in `grafana.plugins`:
+   ```yaml
+   grafana:
+     plugins:
+       - https://github.com/ArpNetworking/kairosdb-datasource/releases/download/v1.4.0/arpnetworking-kairosdb-datasource-1.4.0.zip;arpnetworking-kairosdb-datasource
+   ```
+2. Unsigned-plugin allowlist in `grafana.grafana.ini`:
+   ```yaml
+   grafana:
+     grafana.ini:
+       plugins:
+         allow_loading_unsigned_plugins: arpnetworking-kairosdb-datasource
+   ```
+3. Data source provisioning in `grafana.datasources`:
+   ```yaml
+   grafana:
+     datasources:
+       datasources.yaml:
+         apiVersion: 1
+         datasources:
+           - name: kairosdb
+             type: arpnetworking-kairosdb-datasource
+             uid: examon-kairosdb
+             url: http://examon-kairosdb:8083
+             access: proxy
+             isDefault: true
+   ```
+
+**Verification:**
+
+```bash
+kubectl exec -n examon deploy/examon-grafana -c grafana -- \
+  curl -s -u admin:<password> http://localhost:3000/api/datasources \
+  | jq '.[] | {name, type, uid}'
+```
+
+Expect `type: arpnetworking-kairosdb-datasource` and `uid: examon-kairosdb`.
+If you see `grafana-kairosdb-datasource` instead, you are still on the
+legacy plugin: re-run `helm upgrade` against the v0.5.0 chart and
+restart the Grafana pod so the plugin install init container re-runs.
+
+**Note for legacy Docker Compose v0.4.0:** the Docker Compose stack still
+runs Grafana 7.3.10 with the AngularJS plugin and keeps working. The
+matching v0.4.0 snapshot of the test dashboard is preserved under
+`dashboards/legacy/`.
 
 ---
 

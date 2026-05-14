@@ -13,6 +13,7 @@ All ExaMon Helm chart configuration is managed through values files. This docume
 | `mqtt2kairosdb.enabled` | Deploy MQTT-to-KairosDB bridge | `true` |
 | `random-pub.enabled` | Deploy random test publisher | `true` |
 | `examon-server.enabled` | Deploy ExaMon REST API server | `true` |
+| `bundledDashboards.enabled` | Ship the chart's bundled Grafana dashboards (in `deploy/helm/examon/dashboards/`) as `grafana_dashboard=1` ConfigMaps for the Grafana sidecar to load. Set to `false` to skip the bundled test dashboard. | `true` |
 
 ## Cassandra (K8ssandra)
 
@@ -30,6 +31,8 @@ All ExaMon Helm chart configuration is managed through values files. This docume
 | `cassandra.datacenters.dc1.podAntiAffinity` | Enable pod anti-affinity | `false` |
 | `cassandra.datacenters.dc1.racks` | Rack definitions with zone labels | `[]` |
 | `cassandra.reaper.enabled` | Enable Reaper for repairs | `false` |
+| `cassandra.telemetry.prometheus.enabled` | Let K8ssandra emit a `ServiceMonitor` for Cassandra metrics. Requires the `ServiceMonitor` CRD (kube-prometheus-stack or equivalent) in the cluster. | `false` |
+| `cassandra.telemetry.prometheus.commonLabels` | Labels attached to every Cassandra metric. Use to match a `ServiceMonitor` selector (e.g. `release: kube-prometheus-stack`). | `{}` |
 
 ## KairosDB
 
@@ -52,9 +55,18 @@ Grafana uses the [official Grafana Helm chart](https://github.com/grafana/helm-c
 |-----------|-------------|---------|
 | `grafana.adminPassword` | Admin password | `Password` |
 | `grafana.plugins` | Grafana plugins to install | See `values.yaml` |
+| `grafana.datasources` | Datasource provisioning (KairosDB pre-configured with `uid: examon-kairosdb`, type `arpnetworking-kairosdb-datasource`) | See `values.yaml` |
+| `grafana.sidecar.dashboards.enabled` | Auto-load dashboards from ConfigMaps labeled `grafana_dashboard=1` (cluster-wide; `searchNamespace: ALL`). See [Grafana Dashboards](kubernetes.md#grafana-dashboards) in the K8s guide for the recipe to add custom dashboards without editing the chart. | `true` |
 | `grafana.persistence.enabled` | Enable persistent storage | `false` |
 | `grafana.persistence.size` | PVC size | `10Gi` |
 | `grafana.ingress.enabled` | Enable ingress | `false` |
+
+The KairosDB datasource ships as the React-based
+[ArpNetworking fork](https://github.com/ArpNetworking/kairosdb-datasource)
+(`arpnetworking-kairosdb-datasource`). The legacy AngularJS
+`grafana-kairosdb-datasource` is not compatible with Grafana 11+ and is
+not used by this chart. The plugin is installed from its GitHub release
+URL and allowed via `grafana.ini.plugins.allow_loading_unsigned_plugins`.
 
 ## Mosquitto
 
