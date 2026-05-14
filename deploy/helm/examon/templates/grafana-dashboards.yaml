@@ -15,7 +15,7 @@ metadata:
     app.kubernetes.io/instance: {{ $.Release.Name }}
     app.kubernetes.io/managed-by: {{ $.Release.Service }}
 data:
-  {{ base $path | quote }}: |-
+  {{ printf "%s.json" $name | quote }}: |-
 {{ $.Files.Get $path | indent 4 }}
 {{- end }}
 {{- end }}
