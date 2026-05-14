@@ -67,6 +67,38 @@ else
   fail "Grafana did not return 302 redirect"
 fi
 
+# --- Test 2b: Grafana KairosDB datasource provisioned with ArpNetworking type ---
+echo "--- Test: Grafana KairosDB datasource provisioning ---"
+GF_ADMIN_PASS="${GF_ADMIN_PASS:-admin}"
+DS_JSON=$(curl -s -u "admin:${GF_ADMIN_PASS}" "http://localhost:${GF_PORT}/api/datasources/name/kairosdb" 2>/dev/null || echo "{}")
+DS_TYPE=$(echo "$DS_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('type',''))" 2>/dev/null || echo "")
+DS_UID=$(echo "$DS_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('uid',''))" 2>/dev/null || echo "")
+if [[ "$DS_TYPE" == "arpnetworking-kairosdb-datasource" && "$DS_UID" == "examon-kairosdb" ]]; then
+  pass "KairosDB datasource is provisioned (type=$DS_TYPE, uid=$DS_UID)"
+else
+  fail "KairosDB datasource not provisioned correctly (type=$DS_TYPE, uid=$DS_UID)"
+fi
+
+# --- Test 2c: Bundled test dashboard auto-provisioned via sidecar ---
+echo "--- Test: Bundled dashboard auto-provisioning ---"
+if kubectl get configmap -n "$NAMESPACE" -l grafana_dashboard=1 -o name 2>/dev/null | grep -q "examon-dashboard"; then
+  pass "Dashboard ConfigMap labeled grafana_dashboard=1 is present"
+else
+  fail "No dashboard ConfigMap with label grafana_dashboard=1 found"
+fi
+DASH_FOUND=""
+for _ in $(seq 1 20); do
+  DASH_FOUND=$(curl -s -u "admin:${GF_ADMIN_PASS}" "http://localhost:${GF_PORT}/api/search?query=Random%20Sensor" 2>/dev/null \
+    | python3 -c "import sys,json; r=json.load(sys.stdin); print(next((d['title'] for d in r if 'Random Sensor' in d.get('title','')), ''))" 2>/dev/null || echo "")
+  [[ -n "$DASH_FOUND" ]] && break
+  sleep 3
+done
+if [[ -n "$DASH_FOUND" ]]; then
+  pass "Dashboard '$DASH_FOUND' is loaded in Grafana"
+else
+  fail "Random Sensor dashboard not found in Grafana via API"
+fi
+
 # --- Test 3: ExaMon API server ---
 echo "--- Test: ExaMon API server ---"
 STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${ES_PORT}/" 2>/dev/null || echo "000")
