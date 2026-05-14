@@ -3,7 +3,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -13,433 +13,111 @@
     ]
   },
   "editable": true,
-  "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
   "links": [],
   "panels": [
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
+      "datasource": {
+        "type": "arpnetworking-kairosdb-datasource",
+        "uid": "examon-kairosdb"
+      },
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "pointSize": 5,
+            "showPoints": "never"
+          }
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 14,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "hiddenSeries": false,
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 0 },
       "id": 2,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
       },
-      "percentage": false,
-      "pluginVersion": "7.3.10",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
+          "refId": "A",
           "query": {
+            "metricName": "random_sensor",
+            "alias": "$_tag_group_id",
+            "tags": {
+              "org": ["examon"],
+              "plugin": ["random_pub"]
+            },
+            "groupBy": {
+              "tags": ["id"]
+            },
             "aggregators": [
               {
-                "$$hashKey": "object:137",
-                "autoValueSwitch": {
-                  "dependentParameters": [
-                    {
-                      "name": "value",
-                      "text": "every",
-                      "type": "sampling",
-                      "value": "1h"
-                    }
-                  ],
-                  "enabled": true
-                },
                 "name": "avg",
-                "parameters": [
-                  {
-                    "$$hashKey": "object:839",
-                    "allowedValues": {
-                      "0": "NONE",
-                      "1": "START_TIME",
-                      "2": "SAMPLING"
-                    },
-                    "name": "sampling",
-                    "text": "align by",
-                    "type": "alignment",
-                    "value": "NONE"
-                  },
-                  {
-                    "name": "value",
-                    "text": "every",
-                    "type": "sampling",
-                    "value": "1h"
-                  }
-                ]
+                "parameters": [],
+                "visible": true
               }
             ],
-            "groupBy": {
-              "tags": [
-                "id"
-              ],
-              "time": [],
-              "value": []
-            },
-            "metricName": "random_sensor",
-            "tags": {
-              "chnl": [],
-              "id": [],
-              "org": [
-                "examon"
-              ],
-              "plugin": [
-                "random_pub"
-              ]
-            }
-          },
-          "refId": "A"
+            "overrideScalar": false
+          }
         }
       ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "ExaMon Test - Random Sensor",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:235",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:236",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "title": "Random Sensor - Time Series",
+      "type": "timeseries"
     },
     {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
+      "datasource": {
+        "type": "arpnetworking-kairosdb-datasource",
+        "uid": "examon-kairosdb"
+      },
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": { "color": { "mode": "palette-classic" } },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 13,
-        "w": 12,
-        "x": 0,
-        "y": 14
-      },
-      "hiddenSeries": false,
-      "id": 3,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "7.3.10",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "query": {
-            "aggregators": [
-              {
-                "$$hashKey": "object:137",
-                "autoValueSwitch": {
-                  "dependentParameters": [
-                    {
-                      "name": "value",
-                      "text": "every",
-                      "type": "sampling",
-                      "value": "1h"
-                    }
-                  ],
-                  "enabled": true
-                },
-                "name": "avg",
-                "parameters": [
-                  {
-                    "$$hashKey": "object:664",
-                    "allowedValues": {
-                      "0": "NONE",
-                      "1": "START_TIME",
-                      "2": "SAMPLING"
-                    },
-                    "name": "sampling",
-                    "text": "align by",
-                    "type": "alignment",
-                    "value": "NONE"
-                  },
-                  {
-                    "name": "value",
-                    "text": "every",
-                    "type": "sampling",
-                    "value": "1h"
-                  }
-                ]
-              }
-            ],
-            "groupBy": {
-              "tags": [
-                "id"
-              ],
-              "time": [],
-              "value": []
-            },
-            "metricName": "random_sensor",
-            "tags": {
-              "chnl": [],
-              "id": [],
-              "org": [
-                "examon"
-              ],
-              "plugin": [
-                "random_pub"
-              ]
-            }
-          },
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "ExaMon Test - Random Sensor",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": 50,
-        "min": null,
-        "mode": "histogram",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:235",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:236",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "breakPoint": "50%",
-      "cacheTimeout": null,
-      "combine": {
-        "label": "Others",
-        "threshold": 0
-      },
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fontSize": "70%",
-      "format": "short",
-      "gridPos": {
-        "h": 13,
-        "w": 12,
-        "x": 12,
-        "y": 14
-      },
+      "gridPos": { "h": 13, "w": 24, "x": 0, "y": 14 },
       "id": 4,
-      "interval": null,
-      "legend": {
-        "percentage": false,
-        "show": true,
-        "values": true
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "values": ["percent"] },
+        "pieType": "donut",
+        "tooltip": { "mode": "single" }
       },
-      "legendType": "On graph",
-      "links": [],
-      "nullPointMode": "connected",
-      "pieType": "donut",
-      "pluginVersion": "7.3.10",
-      "strokeWidth": 1,
       "targets": [
         {
+          "refId": "A",
           "query": {
+            "metricName": "random_sensor",
+            "alias": "",
+            "tags": {
+              "org": ["examon"],
+              "plugin": ["random_pub"]
+            },
+            "groupBy": {
+              "tags": ["id"]
+            },
             "aggregators": [
               {
-                "$$hashKey": "object:137",
-                "autoValueSwitch": {
-                  "dependentParameters": [
-                    {
-                      "name": "value",
-                      "text": "every",
-                      "type": "sampling",
-                      "value": "1h"
-                    }
-                  ],
-                  "enabled": true
-                },
                 "name": "avg",
-                "parameters": [
-                  {
-                    "$$hashKey": "object:664",
-                    "allowedValues": {
-                      "0": "NONE",
-                      "1": "START_TIME",
-                      "2": "SAMPLING"
-                    },
-                    "name": "sampling",
-                    "text": "align by",
-                    "type": "alignment",
-                    "value": "NONE"
-                  },
-                  {
-                    "name": "value",
-                    "text": "every",
-                    "type": "sampling",
-                    "value": "1h"
-                  }
-                ]
+                "parameters": [],
+                "visible": true
               }
             ],
-            "groupBy": {
-              "tags": [
-                "id"
-              ],
-              "time": [],
-              "value": []
-            },
-            "metricName": "random_sensor",
-            "tags": {
-              "chnl": [],
-              "id": [],
-              "org": [
-                "examon"
-              ],
-              "plugin": [
-                "random_pub"
-              ]
-            }
-          },
-          "refId": "A"
+            "overrideScalar": false
+          }
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "ExaMon Test - Random Sensor",
-      "type": "grafana-piechart-panel",
-      "valueName": "avg"
+      "title": "Random Sensor - Distribution",
+      "type": "piechart"
     }
   ],
   "refresh": "1m",
-  "schemaVersion": 26,
-  "style": "dark",
-  "tags": [],
-  "templating": {
-    "list": []
-  },
-  "time": {
-    "from": "now-30m",
-    "to": "now"
-  },
+  "schemaVersion": 39,
+  "tags": ["examon"],
+  "time": { "from": "now-30m", "to": "now" },
   "timepicker": {},
   "timezone": "",
   "title": "Examon Test - Random Sensor",
-  "uid": "mnBblLFHk",
-  "version": 8
+  "uid": "examon-random-sensor",
+  "version": 1
 }
