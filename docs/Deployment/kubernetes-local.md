@@ -200,6 +200,29 @@ If the graph shows data, the entire pipeline is working end-to-end:
 is consuming it and writing to KairosDB, and KairosDB is persisting it in
 Cassandra.
 
+**Verify via Grafana (auto-provisioned).** Unlike the v0.4.0 docker-compose
+stack, no manual datasource or dashboard setup is required:
+
+1. Open [http://localhost:3000](http://localhost:3000) and log in as
+   `admin` with the password set via `--set grafana.adminPassword=...`
+   (default: `admin` for `values-local.yaml`).
+2. Under **Connections → Data sources**, the `kairosdb` data source
+   (type `arpnetworking-kairosdb-datasource`, `uid: examon-kairosdb`) is
+   already configured. Clicking **Test** returns *"Data source is
+   working"*.
+3. Under **Dashboards**, open **Examon Test - Random Sensor**. It is
+   loaded automatically by the Grafana dashboard sidecar from a
+   chart-bundled ConfigMap labeled `grafana_dashboard=1`. The dashboard
+   should render live data from `random_pub`.
+
+If the dashboard is missing, give the sidecar ~30s to pick it up after
+the initial install, then check:
+
+```bash
+kubectl get configmap -n examon -l grafana_dashboard=1
+kubectl logs -l app.kubernetes.io/name=grafana -c grafana-sc-dashboard -n examon
+```
+
 ## Accessing Services
 
 All user-facing services are exposed directly on the host via the K3d load

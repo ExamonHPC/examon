@@ -661,6 +661,73 @@ start before Cassandra is ready and fail their initial connection attempts.
 
 ---
 
+### 18. Grafana: KairosDB Data Source Fails or Dashboards Show "No Data"
+
+**Symptom:** On a freshly installed v0.5.0 chart, the Grafana KairosDB
+data source either does not appear, fails the **Test** action, or panels
+show "No data" / `Datasource not found` errors. The browser console
+typically reports a plugin loading or AngularJS-related failure.
+
+**Root cause:** The original `grafana-kairosdb-datasource` plugin is
+AngularJS-based and is no longer compatible with Grafana 11+ (AngularJS
+support has been removed). The v0.5.0 chart switches to the React-based
+[ArpNetworking
+fork](https://github.com/ArpNetworking/kairosdb-datasource), which is
+unsigned and must be explicitly whitelisted in the Grafana config. The
+auto-provisioned data source must also reference the plugin by its new
+`type`. This is tracked as [Issue #25](https://github.com/ExamonHPC/examon/issues/25).
+
+**Resolution.** Re-`helm upgrade` with the chart's defaults — they
+already encode all three pieces:
+
+1. Plugin install in `grafana.plugins`:
+   ```yaml
+   grafana:
+     plugins:
+       - https://github.com/ArpNetworking/kairosdb-datasource/releases/download/v1.4.0/arpnetworking-kairosdb-datasource-1.4.0.zip;arpnetworking-kairosdb-datasource
+   ```
+2. Unsigned-plugin allowlist in `grafana.grafana.ini`:
+   ```yaml
+   grafana:
+     grafana.ini:
+       plugins:
+         allow_loading_unsigned_plugins: arpnetworking-kairosdb-datasource
+   ```
+3. Data source provisioning in `grafana.datasources`:
+   ```yaml
+   grafana:
+     datasources:
+       datasources.yaml:
+         apiVersion: 1
+         datasources:
+           - name: kairosdb
+             type: arpnetworking-kairosdb-datasource
+             uid: examon-kairosdb
+             url: http://examon-kairosdb:8083
+             access: proxy
+             isDefault: true
+   ```
+
+**Verification:**
+
+```bash
+kubectl exec -n examon deploy/examon-grafana -c grafana -- \
+  curl -s -u admin:<password> http://localhost:3000/api/datasources \
+  | jq '.[] | {name, type, uid}'
+```
+
+Expect `type: arpnetworking-kairosdb-datasource` and `uid: examon-kairosdb`.
+If you see `grafana-kairosdb-datasource` instead, you are still on the
+legacy plugin — re-run `helm upgrade` against the v0.5.0 chart and
+restart the Grafana pod so the plugin install init container re-runs.
+
+**Note for legacy Docker Compose v0.4.0:** the Docker Compose stack still
+runs Grafana 7.3.10 with the AngularJS plugin and keeps working. The
+matching v0.4.0 snapshot of the test dashboard is preserved under
+`dashboards/legacy/`.
+
+---
+
 ## General Debugging Commands
 
 ```bash

@@ -315,13 +315,30 @@ Create DNS records pointing to the services:
 
 ### Configure Grafana Data Source
 
-The data source is auto-provisioned via `values-production.yaml`. If you
-need to add it manually:
+The KairosDB data source is **fully auto-provisioned** by the chart on
+every deploy — no manual setup is required. The umbrella chart:
 
-- **Type:** KairosDB
-- **Name:** kairosdb
-- **URL:** `http://examon-kairosdb:8083`
-- **Access:** Server
+1. Installs the React-based [ArpNetworking
+   KairosDB data source plugin](https://github.com/ArpNetworking/kairosdb-datasource)
+   from its GitHub release URL via `grafana.plugins`.
+2. Whitelists the unsigned plugin via
+   `grafana.grafana.ini.plugins.allow_loading_unsigned_plugins`.
+3. Provisions the data source as `type: arpnetworking-kairosdb-datasource`
+   with `uid: examon-kairosdb`, pointing at `http://examon-kairosdb:8083`
+   in `accesss: proxy` mode.
+4. Auto-loads the bundled "Examon Test - Random Sensor" dashboard via the
+   Grafana dashboard sidecar (ConfigMaps labeled `grafana_dashboard=1`).
+
+After `helm upgrade`, open Grafana and you should already see the data
+source listed (test connection returns OK) and the dashboard available
+under Dashboards. The legacy `grafana-kairosdb-datasource` plugin is
+AngularJS-only and is **not** compatible with Grafana 11+; do not
+provision it manually.
+
+The relevant Helm values are documented in
+[configuration.md](configuration.md): `grafana.plugins`,
+`grafana.datasources`, `grafana.sidecar.dashboards.enabled`, and the
+top-level `bundledDashboards.enabled` toggle.
 
 ### Backups
 
@@ -330,8 +347,45 @@ backup storage (S3, GCS, Azure Blob, Ceph/S3) in the K8ssandraCluster CR.
 
 ### Monitoring
 
-Install Prometheus and ServiceMonitors for all components to monitor the
-ExaMon infrastructure itself.
+Production deployments should run a cluster-side Prometheus operator
+(typically [`kube-prometheus-stack`](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack))
+both to monitor ExaMon itself and to scrape Cassandra.
+
+**Cassandra metrics (K8ssandra-native):** the umbrella chart exposes
+`cassandra.telemetry.prometheus.*`, which is wired straight into the
+K8ssandra `CassandraDatacenter` CR. When enabled, K8ssandra creates a
+`ServiceMonitor` for the Cassandra metric endpoint — no extra manifest to
+maintain. Requires the `ServiceMonitor` CRD (shipped by
+`kube-prometheus-stack`):
+
+```yaml
+# values-production.yaml
+cassandra:
+  telemetry:
+    prometheus:
+      enabled: true
+      commonLabels:
+        # Match the kube-prometheus-stack default ServiceMonitor selector
+        release: kube-prometheus-stack
+```
+
+Or via `--set` at deploy time:
+
+```bash
+helm upgrade examon ./deploy/helm/examon \
+  -f ./deploy/helm/examon/values-production.yaml \
+  --set cassandra.telemetry.prometheus.enabled=true \
+  --set cassandra.telemetry.prometheus.commonLabels.release=kube-prometheus-stack \
+  -n examon
+```
+
+If your Prometheus operator uses a different `ServiceMonitor` selector,
+adjust `commonLabels` accordingly. See
+[configuration.md](configuration.md) for the full key reference.
+
+**Other ExaMon components** (KairosDB, examon-server, mqtt2kairosdb,
+Mosquitto) do not yet ship their own `ServiceMonitor` manifests; if you
+need them, define your own pointing at the existing Services for now.
 
 ## Scaling
 

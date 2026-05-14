@@ -13,6 +13,8 @@ This guide covers migrating from the Docker Compose deployment (v0.4.0) to the K
 | Cassandra | Docker container (3.0.19) | K8ssandra operator (4.0+) |
 | KairosDB | Docker container (1.2.2) | Deployment (1.3.0) |
 | Grafana | Docker container (7.3.10) | Helm subchart (latest) |
+| Grafana KairosDB plugin | `grafana-kairosdb-datasource` (AngularJS) | `arpnetworking-kairosdb-datasource` (React fork, Grafana 11+ compatible) |
+| Grafana dashboards | Manual import via UI/API | Auto-provisioned via Grafana sidecar (ConfigMaps labeled `grafana_dashboard=1`) |
 | Configuration | Environment variables + sed | ConfigMaps + Secrets |
 | Scaling | Manual (add more containers) | `kubectl scale` / HPA |
 | HA | Not supported | Built-in (anti-affinity, replicas) |
@@ -61,7 +63,41 @@ Follow one of the deployment guides:
 
 For Cassandra data migration from 3.0.19 to 4.0+, consult the [Apache Cassandra upgrade documentation](https://cassandra.apache.org/doc/latest/cassandra/operating/upgrading.html).
 
-Re-import Grafana dashboards through the Grafana UI or API.
+**Grafana dashboards.** Behaviour differs between bundled and
+user-created dashboards:
+
+- **Bundled "Examon Test - Random Sensor" dashboard:** no action
+  required. The Helm chart ships the Grafana 10+/11+ compatible version
+  inside the chart and auto-provisions it via the Grafana dashboard
+  sidecar.
+- **User-created dashboards exported from v0.4.0:** these still need to
+  be imported manually, but the v0.5.0 Grafana uses a different KairosDB
+  data source plugin
+  (`arpnetworking-kairosdb-datasource`, the React fork required for
+  Grafana 11+). Every panel and the dashboard root reference the data
+  source by `type` and `uid`, so the exported JSON must be rewritten
+  before import. The chart provisions the data source as:
+
+  ```json
+  { "type": "arpnetworking-kairosdb-datasource", "uid": "examon-kairosdb" }
+  ```
+
+  Quick rewrite with `jq` (point at each exported `*.json`):
+
+  ```bash
+  jq '
+    walk(
+      if type == "object" and .type == "grafana-kairosdb-datasource"
+      then .type = "arpnetworking-kairosdb-datasource"
+         | .uid = "examon-kairosdb"
+      else . end)
+  ' dashboard.json > dashboard-v0.5.0.json
+  ```
+
+  Then import the rewritten JSON via the Grafana UI or API. Alternatively
+  drop the rewritten JSON into a ConfigMap labeled
+  `grafana_dashboard: "1"` in the `examon` namespace; the sidecar will
+  load it automatically alongside the bundled dashboard.
 
 ### Step 5: Update Publishers
 

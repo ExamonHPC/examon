@@ -13,6 +13,7 @@ All ExaMon Helm chart configuration is managed through values files. This docume
 | `mqtt2kairosdb.enabled` | Deploy MQTT-to-KairosDB bridge | `true` |
 | `random-pub.enabled` | Deploy random test publisher | `true` |
 | `examon-server.enabled` | Deploy ExaMon REST API server | `true` |
+| `bundledDashboards.enabled` | Ship the chart's bundled Grafana dashboards (in `deploy/helm/examon/dashboards/`) as `grafana_dashboard=1` ConfigMaps for the Grafana sidecar to load. Set to `false` to skip the bundled test dashboard. | `true` |
 
 ## Cassandra (K8ssandra)
 
