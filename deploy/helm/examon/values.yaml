@@ -31,6 +31,11 @@ random-pub:
 examon-server:
   enabled: true
 
+# -- Bundled dashboards loaded via the Grafana sidecar (ConfigMaps labeled
+# grafana_dashboard=1). Disable to skip shipping the test dashboard.
+bundledDashboards:
+  enabled: true
+
 # -- Cassandra configuration (via K8ssandra Operator)
 cassandra:
   enabled: true
@@ -78,6 +83,12 @@ grafana:
   sidecar:
     datasources:
       enabled: true
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      folder: /tmp/dashboards
+      searchNamespace: ALL
   datasources:
     datasources.yaml:
       apiVersion: 1

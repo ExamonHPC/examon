@@ -1,0 +1,21 @@
+{{- if and .Values.grafana.enabled .Values.bundledDashboards.enabled -}}
+{{- range $path, $bytes := .Files.Glob "dashboards/*.json" }}
+{{- $stem := trimSuffix ".json" (base $path) }}
+{{- $sanitized := regexReplaceAll "[^A-Za-z0-9-]" $stem "-" }}
+{{- $name := regexReplaceAll "-+" $sanitized "-" | trimAll "-" | lower }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "examon-dashboard-%s" $name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/name: examon
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+data:
+  {{ base $path | quote }}: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}
+{{- end }}
