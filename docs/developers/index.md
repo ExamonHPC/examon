@@ -1,9 +1,9 @@
 # Developers
 
-!!! warning "Status: Spec — section under construction"
-    The Developers landing is being authored. The SDK v3 quickstart, reference, and worked examples land in subsequent slices; for now, the contributing guide is reachable from the section nav.
+!!! warning "Status: Spec — section under development"
+    Implementation tasks are listed at the bottom. The Contributing page is already reachable from the section navigation.
 
-> The Developers guide is for anyone extending ExaMon: writing a new publisher with SDK v3, building a custom Grafana panel, adding a tool to ExaMon AI, or contributing to the core repos. It assumes Python familiarity and basic ETL patterns.
+> The Developers guide is for anyone extending ExaMon: writing a new publisher with SDK v3, building a custom Grafana panel, adding a tool to ExaMon AI, or contributing to the core repositories. It assumes Python familiarity and basic ETL patterns.
 
 ## In this section
 
@@ -12,6 +12,6 @@
 
 ---
 
-## Source
+## Derived tasks
 
-- IA defined in `Design_by_Documentation_Method_May_2026.md` §6.3.
+- [ ] Rewrite this landing page once the SDK v3 sub-pages exist so it acts as a real entry point.

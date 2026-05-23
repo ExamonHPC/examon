@@ -1,12 +1,16 @@
 # Releases
 
-!!! warning "Status: Spec — section under construction"
-    The Releases landing is being authored. The v0.5.0 release notes and the v0.5.0 / v0.5.1 release plans already exist with their content moved into them; this landing page is rewritten in a later slice to summarize the release cadence and link to GitHub releases.
+!!! warning "Status: Spec — section under development"
+    Implementation tasks are listed at the bottom. The v0.5.0 release notes and release plan below already carry their content; this landing page is the missing piece.
 
 > The Releases sub-section holds the release notes for each shipped ExaMon version and the planning documents written ahead of each release. The authoritative release source is the GitHub Releases page on the `ExamonHPC/examon` repository; these pages mirror that material in a form that links into the rest of the documentation.
 
+## In this section
+
+- **v0.5.0** — release notes and release plan.
+
 ---
 
-## Source
+## Derived tasks
 
-- IA defined in `Design_by_Documentation_Method_May_2026.md` §6.3.
+- [ ] Rewrite this landing page as a chronological release index linking to GitHub Releases for each tagged version.

@@ -1,7 +1,7 @@
 # Administrators
 
-!!! warning "Status: Spec — section under construction"
-    The Administrators landing is being authored. The deployment, publisher, and operations sub-sections below already exist with the v0.5.0 content moved into them; this landing page is rewritten in a later slice as a real "pick your scale" decision tree.
+!!! warning "Status: Spec — section under development"
+    Implementation tasks are listed at the bottom. The Deploy, Publishers, and Operations sub-sections below already carry the v0.5.0 content; this landing page is the missing piece.
 
 > The Administrators guide is for anyone making ExaMon run somewhere: DevOps engineers deploying core on a Kubernetes cluster, sysadmins installing publishers on individual nodes, fleet operators deploying across an inventory with Ansible. It covers deployment, publisher installation, and day-to-day operations.
 
@@ -13,6 +13,6 @@
 
 ---
 
-## Source
+## Derived tasks
 
-- IA defined in `Design_by_Documentation_Method_May_2026.md` §6.3.
+- [ ] Rewrite this landing page as a "pick your scale" decision tree pointing readers at the right sub-section based on whether they are deploying to a single host, a cluster, or a fleet.

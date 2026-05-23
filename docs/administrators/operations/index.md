@@ -1,12 +1,22 @@
 # Operations
 
-!!! warning "Status: Spec — section under construction"
-    The Operations landing is being authored. The configuration, troubleshooting, and change-propagation pages already exist with the v0.5.0 content moved into them; this landing page is rewritten in a later slice.
+!!! warning "Status: Spec — section under development"
+    Implementation tasks are listed at the bottom. The Configure, Troubleshoot, and Change propagation pages below already carry the v0.5.0 content; this landing page is the missing piece.
 
-> The Operations sub-section covers running ExaMon day to day: configuring the deployment, propagating changes across a fleet, troubleshooting common failures, monitoring ExaMon itself, and backing up data. It assumes the deployment is already up (`administrators/deploy/`) and the publishers are installed (`administrators/publishers/`).
+> The Operations sub-section covers running ExaMon day to day: configuring the deployment, propagating changes across a fleet, troubleshooting common failures, monitoring ExaMon itself, and backing up data. It assumes the deployment is already up (see the Deploy sub-section) and the publishers are installed (see the Publishers sub-section).
+
+## In this section
+
+- **Configure** — change configuration after install.
+- **Troubleshoot** — diagnose common failures.
+- **Change propagation** — push configuration changes across a running deployment.
+- **Monitor ExaMon** — meta-monitoring of the ExaMon services themselves.
+- **Back up and restore** — protect time-series data and configuration.
 
 ---
 
-## Source
+## Derived tasks
 
-- IA defined in `Design_by_Documentation_Method_May_2026.md` §6.3.
+- [ ] Rewrite this landing page as an entry point to the operations sub-pages.
+- [ ] Write `administrators/operations/monitor-examon.md` documenting the Prometheus metrics ExaMon emits about itself.
+- [ ] Write `administrators/operations/back-up-and-restore.md` documenting backup of KairosDB, Cassandra, and Grafana state.
