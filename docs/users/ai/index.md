@@ -1,7 +1,7 @@
 # AI
 
-!!! info "Status: Beta — public pip install pending"
-    ExaMon AI is in internal beta on a reference HPC deployment. The architecture, runbook + tool model, and example outputs below are stable. The public pip-installable package and the canonical install URL are still being prepared; until then, deployment requires direct access to the development repository. Reach the team through [Community → Contact](../../community/contact.md) for evaluation access.
+!!! info "Status: Beta — public release pending"
+    ExaMon AI is in beta on a reference HPC deployment. The architecture, runbook + tool model, and example outputs below are stable. The pip-installable package and the canonical install URL are not yet publicly distributed; until then, deployment requires direct access to the development repository. Reach the team through [Community → Contact](../../community/contact.md) for evaluation access.
 
 > ExaMon AI is a locally-hosted operations agent that turns natural-language questions into SQL-backed answers against an ExaMon deployment. It is built on [HolmesGPT](https://github.com/HolmesGPT/holmesgpt) as the LLM reasoning loop and on the [Trino federation layer](../analyze/index.md) as the single point of data access. It discovers what data exists at runtime, builds the right queries, and interprets the results without prior knowledge of the metrics, schema, or infrastructure topology of the deployment it is pointed at.
 
@@ -327,13 +327,12 @@ Custom tool scripts can import from the pip-installed library:
 - **LLM quality bounds the agent.** Small models (≤ 7B parameters) commonly fail at SQL discipline (incorrect quoting, missing `CAST`, malformed `WHERE`). The current reference deployment uses `gpt-oss:120b` (Q4); 20B and smaller models are usable for simple discovery questions but struggle on complex cross-store analyses.
 - **Discovery costs tokens.** The discovery-first design means every non-trivial question issues multiple tool calls before composing the final query. Complex questions can run 10–15K tokens.
 - **Read-only.** The agent does not write back to ExaMon. No alert creation, no Slurm job submission, no infrastructure change.
-- **Beta**. Documentation and packaging are still being prepared. The architecture and the example outputs above are stable; the install URL is the part that will change.
+- **Beta — public release pending**. Packaging and the canonical install URL are still being prepared. The architecture and the example outputs above are stable; the install URL is the part that will change.
 
 ---
 
 ## Source
 
-- ExaMon AI architecture documentation: in-development.
 - HolmesGPT: [HolmesGPT/holmesgpt](https://github.com/HolmesGPT/holmesgpt) (the underlying LLM reasoning loop).
 - Trino query surface used by every tool: [Trino](https://trino.io/).
 - Local LLM hosting: [Ollama](https://ollama.com/), [vLLM](https://github.com/vllm-project/vllm).

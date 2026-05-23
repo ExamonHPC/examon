@@ -1,7 +1,7 @@
 # Users
 
 !!! info "Status: Live (reproduced 2026-05-23)"
-    Verified against examon-core v0.5.0. Individual sub-sections carry their own status: Dashboards (Live for core Grafana, Beta for the 3D Digital Twin plugin), Analyze (Beta — Trino connector is shipped publicly but not bundled into the local chart), AI (Beta — public pip install pending).
+    Verified against examon-core v0.5.0. Individual sub-sections carry their own status: Dashboards (Live for core Grafana, Beta — public release pending for the 3D Digital Twin plugin), Analyze (Beta — Trino connector is shipped publicly but not bundled into the local chart), AI (Beta — public release pending).
 
 > The Users guide is for anyone extracting value from a running ExaMon deployment: data scientists running SQL or pandas analyses, facility managers monitoring the data center through dashboards (including the 3D digital twin in Grafana), on-call engineers investigating incidents through the AI agent. It assumes ExaMon is already deployed and emitting data — for the deployment path, see the [Administrators](../administrators/index.md) guide.
 
@@ -34,6 +34,6 @@ The same data backs all three: Cassandra holds the source-of-truth, KairosDB ser
 ## Source
 
 - ExaMon source repository: [ExamonHPC/examon](https://github.com/ExamonHPC/examon) (release/v0.5.0).
-- ExaMon AI repository: not yet public; published pip install path is pending.
+- ExaMon AI: public release pending.
 - Trino-KairosDB connector: [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector).
-- 3D Digital Twin Grafana plugin (`examon-dt-panel`): private repository pending Grafana plugin marketplace submission.
+- 3D Digital Twin Grafana plugin (`examon-dt-panel`): public release pending.

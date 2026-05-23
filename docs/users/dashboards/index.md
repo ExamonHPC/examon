@@ -1,7 +1,7 @@
 # Dashboards
 
-!!! info "Status: Live (Grafana core); Beta (3D Digital Twin plugin)"
-    Grafana access, the auto-provisioned KairosDB datasource, the bundled test dashboard, and custom dashboard provisioning via ConfigMaps are all verified against examon-core v0.5.0. The 3D Digital Twin Grafana plugin (`examon-dt-panel`) is in customer-delivery phase and not yet on the Grafana plugin marketplace.
+!!! info "Status: Live (Grafana core); Beta — public release pending (3D Digital Twin plugin)"
+    Grafana access, the auto-provisioned KairosDB datasource, the bundled test dashboard, and custom dashboard provisioning via ConfigMaps are all verified against examon-core v0.5.0. The 3D Digital Twin Grafana plugin (`examon-dt-panel`) is not yet publicly distributed and not yet listed on the Grafana plugin marketplace.
 
 > Dashboards are the primary entry point for users consuming ExaMon data visually rather than through queries. ExaMon ships Grafana as part of the umbrella Helm chart with the KairosDB datasource pre-provisioned and a test dashboard auto-loaded. Adding custom dashboards is a one-step ConfigMap operation that requires no chart edit and no `helm upgrade`.
 
@@ -110,9 +110,9 @@ The ExaMon 3D Digital Twin Grafana plugin (`examon-dt-panel`) renders a 3D model
 
 The original proof-of-concept was used as the visualization layer for a data-driven cooling-optimization study on a production HPC facility; the measured outcome was approximately an 8% PUE reduction compared to historical operating conditions, by exposing cooling-efficiency curves (COP versus heat load and outdoor temperature) directly to operators and letting them adjust individual cooling-device setpoints.
 
-**Status.** The plugin is currently in the customer-delivery phase. The PoC is being ported to the Grafana panel SDK (Grafana v10+) and lives in a private repository. The target architecture is parametric: the ExaMon inventory schema drives model selection, data-to-mesh binding, and 3D widget placement, so adding a new site requires only a glTF/glB model and matching inventory entries — no custom 3D modeling work per site.
+**Status.** Beta — public release pending. The proof-of-concept is being ported to the Grafana panel SDK (Grafana v10+). The target architecture is parametric: the ExaMon inventory schema drives model selection, data-to-mesh binding, and 3D widget placement, so adding a new site requires only a glTF/glB model and matching inventory entries, with no custom 3D modeling work per site.
 
-**Availability.** Grafana plugin marketplace submission is planned after the customer delivery stabilizes. Until then, the plugin is not pip- or `grafana-cli`-installable. Interested integrators should reach the team through [Community → Contact](../../community/contact.md).
+**Availability.** Source is not yet public and the plugin is not yet listed on the Grafana plugin marketplace, so it is not `grafana-cli`-installable today. Interested integrators should reach the team through [Community → Contact](../../community/contact.md).
 
 The architecture of the plugin and its relationship to the inventory schema is covered in [Concepts → Architecture](../../concepts/architecture.md).
 

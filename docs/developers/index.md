@@ -25,8 +25,8 @@ Before writing any new component, it is useful to know that ExaMon is a federati
 | Reference SDK v3 publisher (Prometheus) | [E4-Computer-Engineering/prometheus_pub](https://github.com/E4-Computer-Engineering/prometheus_pub) |
 | Other SDK v3 publishers (`ipmi_pub`, `nvml_pub`, `pmu_pub`, `slurm_pub`) | One repository each under [E4-Computer-Engineering](https://github.com/E4-Computer-Engineering) |
 | Trino-KairosDB connector | [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector) |
-| ExaMon AI agent | Not yet public; published pip install pending |
-| 3D Digital Twin Grafana plugin (`examon-dt-panel`) | Private repository; Grafana plugin marketplace submission planned |
+| ExaMon AI agent | Public release pending |
+| 3D Digital Twin Grafana plugin (`examon-dt-panel`) | Public release pending |
 
 The full inventory and current status of every component is in [Reference → Component catalog](../reference/component-catalog.md).
 

@@ -157,4 +157,4 @@ Refer to each tool's upstream documentation for its full CLI surface. The ExaMon
 
 - Operator scripts: [`scripts/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/scripts) in the core repository.
 - SDK v3 CLI implementation: `ExamonApp.parse_args()` in [`examon-base-plugin`](https://github.com/E4-Computer-Engineering/examon-base-plugin).
-- ExaMon AI CLI: `examon-ai/cli.py` in the in-development ExaMon AI package.
+- ExaMon AI CLI: `examon-ai/cli.py` in the ExaMon AI package (public release pending).

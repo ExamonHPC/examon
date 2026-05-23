@@ -346,7 +346,7 @@ A few configuration surfaces that exist outside the umbrella chart and the SDK v
 
 - **Trino server configuration.** ExaMon does not ship Trino in the Helm chart. The Trino server is configured per the upstream documentation; ExaMon adds the [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) as a plugin (drop the JAR under `<trino>/plugin/kairosdb/`, add a catalog properties file, restart). The connector's own configuration (split sizes, lookback windows, timestamp formats) is documented in the connector README.
 - **ExaMon AI configuration.** The agent configuration lives at `~/.config/examon-ai/` and is created by `examon-ai init`. The full key reference is in [Users → AI → Configure](../users/ai/index.md#configure).
-- **3D Digital Twin (`examon-dt-panel`) configuration.** Grafana plugin settings (driven by the inventory schema). The plugin is in the customer-delivery phase; settings are documented inside the plugin repository.
+- **3D Digital Twin (`examon-dt-panel`) configuration.** Grafana plugin settings, driven by the inventory schema. Public release pending; settings are documented inside the plugin repository.
 
 ---
 

@@ -139,7 +139,7 @@ ExaMon AI (`pip install examon-ai`) is a discovery-driven analytics agent built 
 
 The LLM is deployed locally. HPC operational data does not leave the site. The agent is model-agnostic (any OpenAI-compatible endpoint works: Ollama, vLLM, LiteLLM, cloud APIs) and infrastructure-agnostic (the same agent runs on any ExaMon deployment by editing environment variables that point at the local catalog and schema names).
 
-The system is in internal beta on a production cluster. Demonstrated capabilities include cross-metric time-series comparison, job-failure root-cause analysis, and deep GPU health analysis that has surfaced hardware errors not visible in any existing dashboard.
+The system is in beta and runs on a production cluster. Demonstrated capabilities include cross-metric time-series comparison, job-failure root-cause analysis, and deep GPU health analysis that has surfaced hardware errors not visible in any existing dashboard.
 
 A separate causal-inference path connects ExaMon's data to the pyWhy library for causal discovery (which variables influence which others, in what direction). The causal path is a proof-of-concept today.
 
