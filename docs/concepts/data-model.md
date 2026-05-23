@@ -86,7 +86,7 @@ ORDER BY start_time DESC
 LIMIT 100;
 ```
 
-The structured store and the time-series store share the same Cassandra cluster — KairosDB writes to its own keyspace, and the direct-Cassandra tables live in their own keyspaces. The federation layer (Trino) connects to one Cassandra cluster and one KairosDB, and `JOIN`s across them as needed.
+The structured store and the time-series store share the same Cassandra cluster: KairosDB writes to its own keyspace, and the direct-Cassandra tables live in their own keyspaces. The federation layer (Trino) connects to one Cassandra cluster and one KairosDB, and `JOIN`s across them as needed.
 
 ## The MQTT topic anatomy
 
@@ -120,8 +120,8 @@ The base library (`examon-base-plugin`) emits this format from `MQTTPublisher`; 
 
 Two `global.examon` settings affect the topic shape:
 
-- `topic_prefix` — a static prefix prepended to every topic. Useful when one MQTT broker carries data for multiple ExaMon deployments.
-- `sanitize_topic` (default `true`) — URL-encode reserved MQTT characters (`+`, `#`, `/`) when they appear in tag values. Without this, a metric name containing a `/` would break the topic hierarchy.
+- `topic_prefix`: a static prefix prepended to every topic. Useful when one MQTT broker carries data for multiple ExaMon deployments.
+- `sanitize_topic` (default `true`): URL-encode reserved MQTT characters (`+`, `#`, `/`) when they appear in tag values. Without this, a metric name containing a `/` would break the topic hierarchy.
 
 ## Discovery
 
@@ -140,10 +140,10 @@ The data model on the wire is unchanged from the v0.4.0 era. What changed in v0.
 
 ## Related reading
 
-- [Concepts → Architecture](architecture.md) — where the data model fits inside the full stack.
-- [Concepts → Plugin model](plugin-model.md) — the producer side: how SDK v3 publishers shape and ship samples.
-- [Users → Analyze](../users/analyze/index.md) — the consumer side: what the model looks like through Trino SQL.
-- [Reference → Configuration](../reference/configuration.md) — the parameter surface for tags, MQTT topic shape, and the bridge.
+- [Concepts → Architecture](architecture.md): where the data model fits inside the full stack.
+- [Concepts → Plugin model](plugin-model.md): the producer side, covering how SDK v3 publishers shape and ship samples.
+- [Users → Analyze](../users/analyze/index.md): the consumer side, covering what the model looks like through Trino SQL.
+- [Reference → Configuration](../reference/configuration.md): the parameter surface for tags, MQTT topic shape, and the bridge.
 
 ---
 

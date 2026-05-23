@@ -1,7 +1,7 @@
 # Developers
 
 !!! info "Status: Live (reproduced 2026-05-23)"
-    Verified against SDK v3 (examon-base-plugin) and the v0.5.0 repository structure. Sub-sections carry their own status: SDK v3 (Live), Contributing (Beta — the open-source contribution flow is still maturing).
+    Verified against SDK v3 (examon-base-plugin) and the v0.5.0 repository structure. Sub-sections carry their own status: SDK v3 (Live), Contributing (Beta (the open-source contribution flow is still maturing)).
 
 > The Developers guide is for anyone extending ExaMon: writing a new publisher with SDK v3, adding a custom tool or runbook to ExaMon AI, building a custom Grafana panel, or contributing patches and pull requests to the core repositories. It assumes Python familiarity and basic ETL patterns; no prior ExaMon knowledge is required.
 
@@ -41,8 +41,8 @@ A patch to the Helm chart goes to `ExamonHPC/examon`. A new publisher gets its o
 
 ## In this section
 
-- [**SDK v3**](sdk-v3/index.md) — write a publisher in a few lines of Python. The framework supplies workers (extractors, transformers, loaders), a lifecycle, restart backoff, MQTT and Cassandra connection handling, job replication, and the configuration model. The page covers the architectural shape; for full install + run, see [Publishers](../administrators/publishers/index.md).
-- [**Contributing**](contributing.md) — issue tracker pointers, the pull-request process, the release flow (`release/*` branches), and the commit-message convention.
+- [**SDK v3**](sdk-v3/index.md): write a publisher in a few lines of Python. The framework supplies workers (extractors, transformers, loaders), a lifecycle, restart backoff, MQTT and Cassandra connection handling, job replication, and the configuration model. The page covers the architectural shape; for full install + run, see [Publishers](../administrators/publishers/index.md).
+- [**Contributing**](contributing.md): issue tracker pointers, the pull-request process, the release flow (`release/*` branches), and the commit-message convention.
 
 ---
 

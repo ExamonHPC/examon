@@ -314,7 +314,7 @@ A non-exhaustive list of the parameters the built-in workers expect; per-source 
 | `KairosDBTransformer` | `metric_name` (string), `tags` (dict). |
 | `NumberMultiplierTransformer` | `multiplier` (int). |
 | `QueueLoader` | `target_jobs` (list of job names to fan out to). |
-| `MQTTLoader` | `inherit_mqtt` (bool, default `true` — pull broker config from `global.mqtt`). |
+| `MQTTLoader` | `inherit_mqtt` (bool, default `true`: pull broker config from `global.mqtt`). |
 | `CassandraLoader` | `inherit_cassandra` (bool, default `true`), `table` (string), `schema_file` (string, optional schema definition), `update_field` (string, field to update). |
 | `MQTTSubscriber` | (uses `global.mqtt` via `inherit_mqtt`). |
 

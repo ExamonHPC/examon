@@ -1,6 +1,6 @@
 # AI
 
-!!! info "Status: Beta — public release pending"
+!!! info "Status: Beta (public release pending)"
     ExaMon AI is in beta on a reference HPC deployment. The architecture, runbook + tool model, and example outputs below are stable. The pip-installable package and the canonical install URL are not yet publicly distributed; until then, deployment requires direct access to the development repository. Reach the team through [Community → Contact](../../community/contact.md) for evaluation access.
 
 > ExaMon AI is a locally-hosted operations agent that turns natural-language questions into SQL-backed answers against an ExaMon deployment. It is built on [HolmesGPT](https://github.com/HolmesGPT/holmesgpt) as the LLM reasoning loop and on the [Trino federation layer](../analyze/index.md) as the single point of data access. It discovers what data exists at runtime, builds the right queries, and interprets the results without prior knowledge of the metrics, schema, or infrastructure topology of the deployment it is pointed at.
@@ -16,7 +16,7 @@ Typical questions it handles end to end:
 - *"Look for failed jobs in the last 30 days and probable root cause."*
 - *"Do a complete GPU data analysis for node `cn01` over the last 90 days."*
 
-For each question the agent decides which runbook to follow, calls the appropriate tools (schema exploration, metric discovery, time-series querying, job analysis), executes Trino queries, and presents structured results — typically as tables with summaries and follow-up suggestions. Example outputs are in the [demonstrated capabilities](#demonstrated-capabilities) section below.
+For each question the agent decides which runbook to follow, calls the appropriate tools (schema exploration, metric discovery, time-series querying, job analysis), executes Trino queries, and presents structured results, typically as tables with summaries and follow-up suggestions. Example outputs are in the [demonstrated capabilities](#demonstrated-capabilities) section below.
 
 ## Architecture
 
@@ -51,7 +51,7 @@ ExaMon AI agent
        └──► Trino Cassandra connector ────────────────► Cassandra (job accounting, metadata)
 ```
 
-Everything ExaMon AI sees, the [Analyze](../analyze/index.md) section sees too — the agent is a different presentation of the same data. The agent has no privileged data path and no separate store.
+Everything ExaMon AI sees, the [Analyze](../analyze/index.md) section sees too: the agent is a different presentation of the same data. The agent has no privileged data path and no separate store.
 
 ## Prerequisites
 
@@ -155,7 +155,7 @@ holmes ask \
 
 Three escalating tests validate any new model and deployment:
 
-### Level 1 — Simple query (0 tool calls expected)
+### Level 1: Simple query (0 tool calls expected)
 
 ```
 what can you do?
@@ -163,7 +163,7 @@ what can you do?
 
 Pass criteria: direct natural-language answer, no tool calls.
 
-### Level 2 — Metric discovery (3–6 tool calls expected)
+### Level 2: Metric discovery (3–6 tool calls expected)
 
 ```
 What metrics are available for node acnode04?
@@ -171,7 +171,7 @@ What metrics are available for node acnode04?
 
 Pass criteria: fetches the metric-discovery runbook, calls `metric_info`, presents a structured summary grouped by plugin.
 
-### Level 3 — Time-series analysis (5–10 tool calls expected)
+### Level 3: Time-series analysis (5–10 tool calls expected)
 
 ```
 Compare CPU1 temperature and FAN2 speed on acnode03 over the last hour
@@ -183,7 +183,7 @@ A new model that passes all three is ready to take real questions.
 
 ## Demonstrated capabilities
 
-The outputs below are produced by the reference deployment (`e4red` cluster) running ExaMon AI against a locally deployed LLM (`minimax-m2.5` on vLLM + AMD MI300X). They are presented here as a calibration aid — what to expect from a working install, not a feature list.
+The outputs below are produced by the reference deployment (`e4red` cluster) running ExaMon AI against a locally deployed LLM (`minimax-m2.5` on vLLM + AMD MI300X). They are presented here as a calibration aid: what to expect from a working install, not a feature list.
 
 ### Overview answer (no tool calls)
 
@@ -197,14 +197,14 @@ The agent answers directly with a list of capability groups: HPC / Slurm operati
 
 The agent fetches the metric-discovery runbook, calls `metric_info` three times (one per discovery stage), and returns a structured per-plugin breakdown:
 
-- `ipmi_pub`: 46 metrics — CPU and VRM temperatures, voltages (BMC, MB, CPU rails), fan RPMs (FAN2/4/6/8), DIMM temperatures, AOC temperatures.
-- `gpu_pub`: 20 metrics — power draw and limit, GPU temperature, current and max clocks, memory (total/used/free), utilization, `clocks_event_reasons` (hardware slowdown flags), ECC error counters, P-state.
+- `ipmi_pub`: 46 metrics covering CPU and VRM temperatures, voltages (BMC, MB, CPU rails), fan RPMs (FAN2/4/6/8), DIMM temperatures, AOC temperatures.
+- `gpu_pub`: 20 metrics covering power draw and limit, GPU temperature, current and max clocks, memory (total/used/free), utilization, `clocks_event_reasons` (hardware slowdown flags), ECC error counters, P-state.
 
 ### Time-series query with pushdown aggregation
 
 **Question:** *Compare CPU1 temperature and FAN2 speed on `acnode03` over the last hour.*
 
-The agent fetches the timeseries runbook, validates both metrics with `metric_info`, then executes a single Trino query that uses `sampling_aggregator` pushdown to KairosDB. The result is a time-aligned table of CPU temperature and fan RPM, plus a narrative summary: *"CPU temp rose from 50°C to 58°C then stabilized around 57°C. FAN2 remained constant at 13,440 RPM throughout the hour — no dynamic fan response to temperature change observed."*
+The agent fetches the timeseries runbook, validates both metrics with `metric_info`, then executes a single Trino query that uses `sampling_aggregator` pushdown to KairosDB. The result is a time-aligned table of CPU temperature and fan RPM, plus a narrative summary: *"CPU temp rose from 50°C to 58°C then stabilized around 57°C. FAN2 remained constant at 13,440 RPM throughout the hour; no dynamic fan response to temperature change observed."*
 
 ### Job failure root-cause analysis
 
@@ -233,7 +233,7 @@ The XID flag is the kind of cross-domain signal that motivates the whole archite
 
 ## Customize
 
-After `examon-ai init`, everything under `~/.config/examon-ai/` is editable. Changes take effect immediately — no reinstall, no rebuild.
+After `examon-ai init`, everything under `~/.config/examon-ai/` is editable. Changes take effect immediately: no reinstall, no rebuild.
 
 ### Add a new tool
 
@@ -241,7 +241,7 @@ Create a Python script under `~/.config/examon-ai/toolsets/`:
 
 ```python
 #!/usr/bin/env python3
-"""My custom tool — describe what it does."""
+"""My custom tool: describe what it does."""
 
 import sys
 from examon_ai.trino_client import run_query
@@ -327,7 +327,7 @@ Custom tool scripts can import from the pip-installed library:
 - **LLM quality bounds the agent.** Small models (≤ 7B parameters) commonly fail at SQL discipline (incorrect quoting, missing `CAST`, malformed `WHERE`). The current reference deployment uses `gpt-oss:120b` (Q4); 20B and smaller models are usable for simple discovery questions but struggle on complex cross-store analyses.
 - **Discovery costs tokens.** The discovery-first design means every non-trivial question issues multiple tool calls before composing the final query. Complex questions can run 10–15K tokens.
 - **Read-only.** The agent does not write back to ExaMon. No alert creation, no Slurm job submission, no infrastructure change.
-- **Beta — public release pending**. Packaging and the canonical install URL are still being prepared. The architecture and the example outputs above are stable; the install URL is the part that will change.
+- **Beta (public release pending)**. Packaging and the canonical install URL are still being prepared. The architecture and the example outputs above are stable; the install URL is the part that will change.
 
 ---
 

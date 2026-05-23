@@ -45,9 +45,9 @@ Out of scope on these pages (covered elsewhere):
 
 ## In this section
 
-- [**Configure**](configure.md) — the parameter surface of the running deployment, indexed by component (Cassandra, KairosDB, Grafana, Mosquitto, mqtt2kairosdb, random-pub, examon-server).
-- [**Change propagation**](change-propagation.md) — the propagation chain from values to container; what to do after each kind of change.
-- [**Troubleshoot**](troubleshoot.md) — systematic debugging methodology and a cookbook of known failure signatures.
+- [**Configure**](configure.md): the parameter surface of the running deployment, indexed by component (Cassandra, KairosDB, Grafana, Mosquitto, mqtt2kairosdb, random-pub, examon-server).
+- [**Change propagation**](change-propagation.md): the propagation chain from values to container; what to do after each kind of change.
+- [**Troubleshoot**](troubleshoot.md): systematic debugging methodology and a cookbook of known failure signatures.
 
 ---
 

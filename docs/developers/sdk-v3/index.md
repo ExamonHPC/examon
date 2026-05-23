@@ -18,7 +18,7 @@ if __name__ == '__main__':
     app.run()
 ```
 
-The shape of the publisher — what it scrapes, how it transforms, where it sends the result — is defined entirely in the YAML configuration. Switching a publisher from "scrape Prometheus and write to KairosDB" to "scrape Prometheus and publish over MQTT" is a one-block edit, no Python change.
+The shape of the publisher (what it scrapes, how it transforms, where it sends the result) is defined entirely in the YAML configuration. Switching a publisher from "scrape Prometheus and write to KairosDB" to "scrape Prometheus and publish over MQTT" is a one-block edit, no Python change.
 
 ## Install
 
@@ -199,15 +199,15 @@ The status notes (`TBD`, "test example") match the current state of the upstream
 
 The repository ships a Jupyter notebook walking through the construction of a working publisher end to end:
 
-- [`examon_pub.ipynb`](examples/examon_pub.ipynb) — a step-by-step build that exercises the ExamonApp entry point, the configuration loader, the worker types, and the queue model.
+- [`examon_pub.ipynb`](examples/examon_pub.ipynb): a step-by-step build that exercises the ExamonApp entry point, the configuration loader, the worker types, and the queue model.
 
 The reference per-publisher example with full install instructions is the [Prometheus publisher](../../administrators/publishers/prometheus-pub.md): a complete SDK v3 publisher with its own repository, the same shape every new publisher should follow.
 
 ## Related reading
 
-- [Publishers (overview)](../../administrators/publishers/index.md) — the install pattern shared across every SDK v3 publisher, plus fleet rollout considerations.
-- [Concepts → Plugin model](../../concepts/plugin-model.md) — the architectural background on workers, queues, restart semantics, and the relationship between SDK v3 and the legacy `examon-common` predecessor.
-- [Reference → Configuration](../../reference/configuration.md) — the full publisher YAML schema, key by key.
+- [Publishers (overview)](../../administrators/publishers/index.md): the install pattern shared across every SDK v3 publisher, plus fleet rollout considerations.
+- [Concepts → Plugin model](../../concepts/plugin-model.md): the architectural background on workers, queues, restart semantics, and the relationship between SDK v3 and the legacy `examon-common` predecessor.
+- [Reference → Configuration](../../reference/configuration.md): the full publisher YAML schema, key by key.
 
 ---
 

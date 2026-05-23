@@ -42,9 +42,9 @@
 
 | Component | Status | Source | Notes |
 |---|---|---|---|
-| SDK v3 framework (`examon-base-plugin`) | Beta — public release pending | Public release pending. | The publisher framework: extract / transform / load worker model, declarative YAML configuration, daemon mode, exponential-backoff restart. MIT license. |
-| `prometheus_pub` | Beta — public release pending | Public release pending (tracked in the SDK v3 release). | SDK v3 reference implementation for the *collection* side. Ingests from any Prometheus-compatible endpoint. Two scraping methods (Query API, direct `/metrics` endpoint), regex metric filtering, dynamic tag extraction, multi-server fan-out. |
-| `mqtt2kairosdb-v3` | Beta — public release pending | Public release pending (tracked in the SDK v3 release). | SDK v3 reference implementation for the *ingestion* side. The MQTT-to-storage bridge that runs inside core. Ships with both `KairosDBBatchLoader` and `TDengineBatchLoader` Load workers, proving the backend abstraction. |
+| SDK v3 framework (`examon-base-plugin`) | Beta (public release pending) | Public release pending. | The publisher framework: extract / transform / load worker model, declarative YAML configuration, daemon mode, exponential-backoff restart. MIT license. |
+| `prometheus_pub` | Beta (public release pending) | Public release pending (tracked in the SDK v3 release). | SDK v3 reference implementation for the *collection* side. Ingests from any Prometheus-compatible endpoint. Two scraping methods (Query API, direct `/metrics` endpoint), regex metric filtering, dynamic tag extraction, multi-server fan-out. |
+| `mqtt2kairosdb-v3` | Beta (public release pending) | Public release pending (tracked in the SDK v3 release). | SDK v3 reference implementation for the *ingestion* side. The MQTT-to-storage bridge that runs inside core. Ships with both `KairosDBBatchLoader` and `TDengineBatchLoader` Load workers, proving the backend abstraction. |
 | `ipmi_pub` | Stable (legacy framework) | Public release pending. | BMC / IPMI out-of-band sensor collector. Migration to SDK v3 planned. |
 | `nvml_pub` | Stable (legacy framework) | Public release pending. | NVIDIA GPU telemetry collector via NVML. Migration to SDK v3 planned. |
 | `pmu_pub` | Stable (legacy framework, native C) | Public release pending. | CPU PMU counter collector via Linux `perf` and MSR. |
@@ -56,7 +56,7 @@
 |---|---|---|---|
 | Grafana (upstream) | Stable | [grafana/grafana](https://github.com/grafana/grafana) | Shipped inside the ExaMon core deployment. The chart auto-provisions the KairosDB datasource and a bundled test dashboard. |
 | KairosDB datasource for Grafana (ArpNetworking) | Stable (upstream) | [grafana/arpnetworking-kairosdb-datasource](https://github.com/grafana/arpnetworking-kairosdb-datasource) | Grafana plugin that talks to KairosDB. Provisioned automatically by the core chart. |
-| 3D Digital Twin Grafana plugin (`examon-dt-panel`) | Beta — public release pending | Public release pending. | Custom Grafana panel plugin rendering glTF / glB 3D models with metric-driven colouring. Babylon.js. The proof-of-concept measured an approximately 8% PUE reduction at a production site through cooling-set-point optimization. |
+| 3D Digital Twin Grafana plugin (`examon-dt-panel`) | Beta (public release pending) | Public release pending. | Custom Grafana panel plugin rendering glTF / glB 3D models with metric-driven colouring. Babylon.js. The proof-of-concept measured an approximately 8% PUE reduction at a production site through cooling-set-point optimization. |
 | Apache Superset (upstream) | Stable (upstream) | [apache/superset](https://github.com/apache/superset) | Connects to Trino via JDBC for ad-hoc analytical SQL. Deployed externally; ExaMon ships no Superset chart. |
 | Power BI (commercial) | Supported | upstream commercial product | Connects to Trino via the official Trino connector. No ExaMon-specific integration. |
 | Jupyter (upstream) | Stable (upstream) | [jupyter/jupyter](https://github.com/jupyter/jupyter) | The reference notebooks are the [`Demo_ExamonQL`](../users/analyze/Demo_ExamonQL.ipynb) walkthrough and the [Monte Cimone notebook](../community/clusters/montecimone-notebook.ipynb). |
@@ -65,7 +65,7 @@
 
 | Component | Status | Source | Notes |
 |---|---|---|---|
-| ExaMon AI (`examon-ai`) | Beta — public release pending | Public release pending. | Discovery-driven analytics agent: HolmesGPT + Trino + runbooks. Locally deployed LLM (Ollama, vLLM, or any OpenAI-compatible endpoint). Tool-call architecture rather than text-to-SQL generation. |
+| ExaMon AI (`examon-ai`) | Beta (public release pending) | Public release pending. | Discovery-driven analytics agent: HolmesGPT + Trino + runbooks. Locally deployed LLM (Ollama, vLLM, or any OpenAI-compatible endpoint). Tool-call architecture rather than text-to-SQL generation. |
 | HolmesGPT (upstream) | Stable (upstream) | [robusta-dev/holmesgpt](https://github.com/robusta-dev/holmesgpt) | The agent framework used by ExaMon AI. CNCF Sandbox project. |
 | pyWhy (causal inference, upstream) | Used in PoC | [py-why](https://github.com/py-why) | Used by ExaMon's causal-analysis CLI for causal discovery on operational time series. |
 
@@ -101,6 +101,6 @@ Cross-component compatibility is tracked in two places: each component repositor
 
 ## Source
 
-- [ExamonHPC GitHub organization](https://github.com/ExamonHPC) — the public source of truth for component repositories and releases.
+- [ExamonHPC GitHub organization](https://github.com/ExamonHPC): the public source of truth for component repositories and releases.
 - ExaMon core repository: [ExamonHPC/examon](https://github.com/ExamonHPC/examon) (release/v0.5.0).
 - Trino-KairosDB connector: [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector).

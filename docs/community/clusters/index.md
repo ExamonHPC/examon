@@ -6,8 +6,8 @@
 
 ## In this section
 
-- [Marconi 100](marconi100.md) — the CINECA Tier-1 deployment.
-- [Monte Cimone](montecimone.md) — the RISC-V testbed at the University of Bologna.
+- [Marconi 100](marconi100.md): the CINECA Tier-1 deployment.
+- [Monte Cimone](montecimone.md): the RISC-V testbed at the University of Bologna.
 
 ---
 

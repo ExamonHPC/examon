@@ -52,9 +52,9 @@ Facility cooling                        +                                  ExaMo
 | KairosDB on Cassandra (3-node K8ssandra StatefulSet on Kubernetes) | Stable |
 | Trino federation with the public [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) | Available as an Apache-2.0 release on GitHub |
 | Grafana dashboards (auto-provisioned KairosDB datasource + bundled test dashboard) | Stable |
-| SDK v3 collector framework (`prometheus_pub`, `mqtt2kairosdb-v3` reference implementations) | Beta — public release pending |
-| 3D Digital Twin Grafana plugin | Beta — public release pending |
-| ExaMon AI (natural-language analytics agent) | Beta — public release pending |
+| SDK v3 collector framework (`prometheus_pub`, `mqtt2kairosdb-v3` reference implementations) | Beta (public release pending) |
+| 3D Digital Twin Grafana plugin | Beta (public release pending) |
+| ExaMon AI (natural-language analytics agent) | Beta (public release pending) |
 
 ## Who ExaMon is for
 
@@ -72,9 +72,9 @@ ExaMon is developed at the [DEI Department of Electrical, Electronic, and Inform
 
 ## Where next
 
-- [Quickstart](quickstart.md) — 15-minute local install on Kubernetes (K3d).
-- [Core concepts](core-concepts.md) — the five things to know before going deeper.
-- [Architecture](../concepts/architecture.md) — the long-form explanation of the stack.
+- [Quickstart](quickstart.md): 15-minute local install on Kubernetes (K3d).
+- [Core concepts](core-concepts.md): the five things to know before going deeper.
+- [Architecture](../concepts/architecture.md): the long-form explanation of the stack.
 
 ---
 

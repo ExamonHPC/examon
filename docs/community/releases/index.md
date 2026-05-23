@@ -6,8 +6,8 @@
 
 ## In this section
 
-- [v0.5.0 release notes](v0.5.0.md) — what shipped in v0.5.0.
-- [v0.5.0 release plan](v0.5.0-plan.md) — the planning document written ahead of the v0.5.0 cut.
+- [v0.5.0 release notes](v0.5.0.md): what shipped in v0.5.0.
+- [v0.5.0 release plan](v0.5.0-plan.md): the planning document written ahead of the v0.5.0 cut.
 
 ---
 

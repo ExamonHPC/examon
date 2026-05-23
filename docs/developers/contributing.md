@@ -1,6 +1,6 @@
 # Contributing
 
-!!! info "Status: Beta — the open-source contribution flow is still maturing"
+!!! info "Status: Beta (the open-source contribution flow is still maturing)"
     The flow described below is the one currently used for [ExamonHPC/examon](https://github.com/ExamonHPC/examon) and is the model the other ExaMon-org repositories are converging on. The E4-Computer-Engineering repositories (SDK v3 publishers and base library) currently use a similar but slightly different release cadence; the differences are noted where relevant.
 
 > ExaMon is a federation of independent repositories. A contribution typically targets one repository; the contribution flow below applies per-repository. The core repository ([`ExamonHPC/examon`](https://github.com/ExamonHPC/examon)) is the most active one and the best entry point for first-time contributors.
@@ -13,7 +13,7 @@
 | SDK v3 base library (`examon-base-plugin`) | [E4-Computer-Engineering/examon-base-plugin](https://github.com/E4-Computer-Engineering/examon-base-plugin) |
 | A specific publisher (`prometheus_pub`, `ipmi_pub`, `nvml_pub`, `pmu_pub`, `slurm_pub`) | One repository each under [E4-Computer-Engineering](https://github.com/E4-Computer-Engineering) |
 | Trino-KairosDB connector | [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector) |
-| Documentation (this site) | [ExamonHPC/examon](https://github.com/ExamonHPC/examon) — the `docs/` directory and `mkdocs.yml` |
+| Documentation (this site) | [ExamonHPC/examon](https://github.com/ExamonHPC/examon): the `docs/` directory and `mkdocs.yml` |
 
 The full inventory is in [Reference → Component catalog](../reference/component-catalog.md).
 
@@ -35,7 +35,7 @@ A useful bug report includes:
 - The exact steps that reproduce the problem.
 - The observed behavior, what was expected instead, and the difference between them.
 - Versions: ExaMon component versions (Helm chart, base library, publisher), upstream versions (Kubernetes, Cassandra, KairosDB, Trino as relevant), and host OS / Python version when relevant.
-- Logs, kubectl output, screenshots — whatever shortens the maintainer's reproduction time.
+- Logs, kubectl output, screenshots: whatever shortens the maintainer's reproduction time.
 
 ### Enhancement proposals
 

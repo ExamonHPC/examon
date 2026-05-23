@@ -51,23 +51,23 @@ The pages below cover each deployment path end to end.
 
 ### Setup
 
-- [Prerequisites](prerequisites.md) — Docker, K3d, kubectl, Helm; hardware and network requirements.
-- [Deployment topology](topology.md) — the concrete shape of the v0.4.0 Docker Compose stack and the v0.5.0 Kubernetes stack, side by side.
+- [Prerequisites](prerequisites.md): Docker, K3d, kubectl, Helm; hardware and network requirements.
+- [Deployment topology](topology.md): the concrete shape of the v0.4.0 Docker Compose stack and the v0.5.0 Kubernetes stack, side by side.
 
 ### Kubernetes
 
-- [On Kubernetes](on-kubernetes.md) — the conceptual install path: chart structure, value overlays, secrets, and the day-1 install sequence.
-- [Local development](local-development.md) — full K3d-on-laptop walkthrough, both automated and manual.
-- [Staging](staging.md) — multi-node HA on a single VM using K3d.
-- [Harden for production](harden-for-production.md) — TLS, secret handling, NetworkPolicies, anti-affinity, and the production hardening posture.
+- [On Kubernetes](on-kubernetes.md): the conceptual install path, covering chart structure, value overlays, secrets, and the day-1 install sequence.
+- [Local development](local-development.md): full K3d-on-laptop walkthrough, both automated and manual.
+- [Staging](staging.md): multi-node HA on a single VM using K3d.
+- [Harden for production](harden-for-production.md): TLS, secret handling, NetworkPolicies, anti-affinity, and the production hardening posture.
 
 ### Docker Compose
 
-- [With Docker Compose](with-docker-compose.md) — the legacy single-machine path inherited from v0.4.0.
+- [With Docker Compose](with-docker-compose.md): the legacy single-machine path inherited from v0.4.0.
 
 ### Migration
 
-- [Upgrade](upgrade.md) — migration from v0.4.0 Docker Compose to v0.5.0 Kubernetes.
+- [Upgrade](upgrade.md): migration from v0.4.0 Docker Compose to v0.5.0 Kubernetes.
 
 ## Related sections
 

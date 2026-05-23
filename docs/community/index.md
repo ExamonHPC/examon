@@ -6,12 +6,12 @@
 
 ## In this section
 
-- [About](about.md) — what ExaMon is and where it comes from.
-- [Credits](credits.md) — the people, institutions, and funded projects behind ExaMon.
-- [Publications](publications.md) — academic papers describing ExaMon and its use.
-- [Contact](contact.md) — how to reach the maintainers.
-- [Clusters](clusters/index.md) — case studies of ExaMon deployments at production HPC sites (Marconi 100, Monte Cimone).
-- [Releases](releases/index.md) — release notes and release plans.
+- [About](about.md): what ExaMon is and where it comes from.
+- [Credits](credits.md): the people, institutions, and funded projects behind ExaMon.
+- [Publications](publications.md): academic papers describing ExaMon and its use.
+- [Contact](contact.md): how to reach the maintainers.
+- [Clusters](clusters/index.md): case studies of ExaMon deployments at production HPC sites (Marconi 100, Monte Cimone).
+- [Releases](releases/index.md): release notes and release plans.
 
 ---
 

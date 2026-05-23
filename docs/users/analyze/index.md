@@ -3,7 +3,7 @@
 !!! info "Status: Beta (Trino-KairosDB connector available, not bundled into the local chart)"
     The [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) is published publicly as v3.0.0-rc1 (Apache-2.0, May 2026). It plugs into an existing Trino installation per the standard Trino plugin install path; the local-development Helm chart does not bundle Trino. For the connector install path, follow the connector README. The schema layout and example queries below are stable.
 
-> The Analyze section is for data scientists, analysts, and ML engineers running queries against ExaMon. ExaMon exposes its data through a Trino SQL surface so any tool that speaks Trino — Jupyter, Superset, Power BI, DBeaver, raw `trino-cli` — can connect with the same SQL. This page covers the surface itself: what catalogs exist, what schemas live inside each, what tags become columns, and how to walk from a question to a query.
+> The Analyze section is for data scientists, analysts, and ML engineers running queries against ExaMon. ExaMon exposes its data through a Trino SQL surface, so any tool that speaks Trino (Jupyter, Superset, Power BI, DBeaver, raw `trino-cli`) can connect with the same SQL. This page covers the surface itself: what catalogs exist, what schemas live inside each, what tags become columns, and how to walk from a question to a query.
 
 ## The federation model
 
@@ -114,13 +114,13 @@ ORDER BY avg_gpu_temp DESC;
 
 The repository ships an executable notebook that walks the analyst's path end to end against a reference deployment: connecting to Trino, exploring the schema, querying time-series with aggregation pushdown, and assembling cross-store joins.
 
-- [`Demo_ExamonQL.ipynb`](Demo_ExamonQL.ipynb) — the ExamonQL demo notebook (Jupyter).
+- [`Demo_ExamonQL.ipynb`](Demo_ExamonQL.ipynb): the ExamonQL demo notebook (Jupyter).
 
 Open it in JupyterLab or VS Code and run cell by cell. The notebook assumes the Trino endpoint is reachable; for a local deployment, see the connector README for the local install path.
 
 ## Connect from common tools
 
-The Trino client surface is the same regardless of caller — JDBC, ODBC, REST, and the Python `trino` package all hit the same endpoint. The minimum information needed:
+The Trino client surface is the same regardless of caller: JDBC, ODBC, REST, and the Python `trino` package all hit the same endpoint. The minimum information needed:
 
 | Setting | Value (reference) |
 |---|---|

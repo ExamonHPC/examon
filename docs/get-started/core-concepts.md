@@ -43,8 +43,8 @@ ExaMon is not a single deployable. Core (broker, bridge, time-series store, Cass
 
 ## Where next
 
-- [Architecture](../concepts/architecture.md) — the long-form walk through the same stack, layer by layer.
-- [Quickstart](quickstart.md) — if you have not yet brought the stack up, this is the 15-minute path.
+- [Architecture](../concepts/architecture.md): the long-form walk through the same stack, layer by layer.
+- [Quickstart](quickstart.md): if you have not yet brought the stack up, this is the 15-minute path.
 
 ---
 

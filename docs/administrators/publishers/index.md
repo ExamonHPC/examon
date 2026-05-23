@@ -56,9 +56,9 @@ cp config/plugin.yaml config/my_config.yaml
 
 The configuration has two top-level sections that every SDK v3 publisher shares:
 
-- `global.daemon` — process lifecycle (log file, PID file, log level, restart backoff, monitor interval).
-- `global.examon.tags` — the identifying tags attached to every emitted metric (`org`, `cluster`, `node`, `plugin`, `chnl`).
-- One or more `jobs[]` entries — each job defines an `extract` / `transform` / `load` pipeline with its own worker pool.
+- `global.daemon`: process lifecycle (log file, PID file, log level, restart backoff, monitor interval).
+- `global.examon.tags`: the identifying tags attached to every emitted metric (`org`, `cluster`, `node`, `plugin`, `chnl`).
+- One or more `jobs[]` entries, each defining an `extract` / `transform` / `load` pipeline with its own worker pool.
 
 The `load` stage targets either KairosDB directly (HTTP write) or MQTT (for shipping into core via the broker). For a publisher running on a remote node, the MQTT loader is the standard choice; the in-cluster `mqtt2kairosdb` bridge handles the broker-to-store hop.
 
@@ -140,7 +140,7 @@ The publishers below are tracked in the [Component catalog](../../reference/comp
 
 ## In this section
 
-- [**Prometheus publisher**](prometheus-pub.md) — the reference SDK v3 publisher install. Read this first to see the end-to-end install path concretely; other SDK v3 publishers follow the same shape.
+- [**Prometheus publisher**](prometheus-pub.md): the reference SDK v3 publisher install. Read this first to see the end-to-end install path concretely; other SDK v3 publishers follow the same shape.
 
 The remaining publishers above use the same install pattern documented here and detailed in the Prometheus page. Per-publisher pages will land in later cycles; the publisher repositories themselves are the authoritative install reference today.
 

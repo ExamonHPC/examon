@@ -159,9 +159,9 @@ Additional components (the connector, the 3D plugin, the AI agent, the power con
 
 ## Where next
 
-- [Deployment topology](../administrators/deploy/topology.md) — the v0.4.0-to-v0.5.0 deployment shapes with concrete diagrams.
-- [Quickstart](../get-started/quickstart.md) — bring the stack up locally to see the architecture concretely.
-- [Component catalog](../reference/component-catalog.md) — every component with status and source repository in one table.
+- [Deployment topology](../administrators/deploy/topology.md): the v0.4.0-to-v0.5.0 deployment shapes with concrete diagrams.
+- [Quickstart](../get-started/quickstart.md): bring the stack up locally to see the architecture concretely.
+- [Component catalog](../reference/component-catalog.md): every component with status and source repository in one table.
 
 ---
 

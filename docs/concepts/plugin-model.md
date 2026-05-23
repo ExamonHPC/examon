@@ -7,7 +7,7 @@
 
 ## Why a plugin model
 
-Every publisher in ExaMon does the same three things: read data from a source, reshape it into the canonical [tagged time-series form](data-model.md#the-time-series-model), and ship it to a target (the MQTT broker, KairosDB, or both). The differences between publishers are local to the source: Prometheus is HTTP/JSON, IPMI is BMC sensors over the network, NVML is a C library, Slurm accounting is database polling. The shared 90% — worker scheduling, restart on failure, MQTT or KairosDB connection handling, graceful shutdown, configuration parsing — has no business being re-implemented per publisher.
+Every publisher in ExaMon does the same three things: read data from a source, reshape it into the canonical [tagged time-series form](data-model.md#the-time-series-model), and ship it to a target (the MQTT broker, KairosDB, or both). The differences between publishers are local to the source: Prometheus is HTTP/JSON, IPMI is BMC sensors over the network, NVML is a C library, Slurm accounting is database polling. The shared 90% (worker scheduling, restart on failure, MQTT or KairosDB connection handling, graceful shutdown, configuration parsing) has no business being re-implemented per publisher.
 
 The SDK v3 plugin framework is the answer to that observation. It supplies the shared 90% as a library (`examon-base-plugin`) and constrains the publisher to plug into three well-defined extension points: `Extract`, `Transform`, `Load`. A new publisher is the three extension classes (or one, if it reuses two built-ins) and a YAML configuration file. The publisher does not implement its own worker pool, its own restart logic, or its own configuration parser.
 
@@ -51,7 +51,7 @@ A worker that throws an unhandled exception is logged, terminated, and restarted
 | `max` | 60 seconds | The cap on the backoff growth. |
 | `reset_alive` | 30 seconds | If the restarted worker stays alive for at least this long, the backoff resets. |
 
-The shape matters for the common failure case of an intermittently flaky upstream. The first failure restarts immediately (2s); a tight crash loop backs off to 60s and stays there until the upstream recovers; once the worker stays up for 30s, the backoff resets so the next isolated failure restarts quickly again. The publisher does not need its own retry logic — the framework provides it uniformly.
+The shape matters for the common failure case of an intermittently flaky upstream. The first failure restarts immediately (2s); a tight crash loop backs off to 60s and stays there until the upstream recovers; once the worker stays up for 30s, the backoff resets so the next isolated failure restarts quickly again. The publisher does not need its own retry logic: the framework provides it uniformly.
 
 The deliberate non-feature is that a permanently broken worker is allowed to keep retrying forever. ExaMon assumes the upstream will eventually come back; it does not fail-fast a publisher because that would silently lose data when the operator is not looking.
 
@@ -133,10 +133,10 @@ The intent is that `examon-common` is deprecated when every legacy publisher has
 
 ## Related reading
 
-- [Developers → SDK v3](../developers/sdk-v3/index.md) — how to write a publisher in practice, with the built-in worker catalog.
-- [Administrators → Publishers](../administrators/publishers/index.md) — the install pattern and fleet rollout considerations.
-- [Concepts → Data model](data-model.md) — what the framework's output looks like on the wire and in storage.
-- [Reference → Configuration](../reference/configuration.md) — the full publisher YAML schema.
+- [Developers → SDK v3](../developers/sdk-v3/index.md): how to write a publisher in practice, with the built-in worker catalog.
+- [Administrators → Publishers](../administrators/publishers/index.md): the install pattern and fleet rollout considerations.
+- [Concepts → Data model](data-model.md): what the framework's output looks like on the wire and in storage.
+- [Reference → Configuration](../reference/configuration.md): the full publisher YAML schema.
 
 ---
 
