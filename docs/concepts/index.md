@@ -7,16 +7,13 @@
 
 ## In this section
 
-- **Architecture** — the stack and the data pipeline.
-- **Composable deployment** — the two shapes (Deploy and Plug-in) and why.
-- **Data model** — schema-less time series, tags, structured data.
-- **Plugin model** — how SDK v3 thinks about ETL.
+- [**Architecture**](architecture.md) — the stack and the data pipeline, layer by layer.
+- **Data model** — schema-less time series, tags, structured data. *(planned)*
+- **Plugin model** — how SDK v3 thinks about ETL. *(planned)*
 
 ---
 
 ## Derived tasks
 
-- [ ] Write `concepts/architecture.md` describing the ExaMon stack and the data pipeline.
-- [ ] Write `concepts/composable-deployment.md` documenting the Deploy and Plug-in shapes.
 - [ ] Write `concepts/data-model.md` describing the schema-less time-series model with tags and structured data.
 - [ ] Write `concepts/plugin-model.md` documenting how SDK v3 thinks about ETL.

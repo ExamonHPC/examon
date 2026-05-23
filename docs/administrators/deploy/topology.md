@@ -1,6 +1,8 @@
-# Architecture
+# Deployment Topology
 
-## Current Architecture (Docker Compose)
+This page is the topology reference for the two deployment shapes ExaMon ships today. It shows what processes run, how they are packaged, and how they are wired together on Docker Compose (v0.4.0) and on Kubernetes (v0.5.0). For the architectural rationale (what each layer does and why), see [Concepts → Architecture](../../concepts/architecture.md).
+
+## Current Topology (Docker Compose)
 
 The v0.4.0 architecture uses Docker Compose with a monolithic "examon" container running multiple services via supervisord:
 
@@ -30,7 +32,7 @@ flowchart LR
     ExamonServer -->|"auth"| Grafana
 ```
 
-## Kubernetes Architecture (v0.5.0)
+## Kubernetes Topology (v0.5.0)
 
 In v0.5.0, each process is decomposed into its own Kubernetes workload:
 

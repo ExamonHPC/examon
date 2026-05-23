@@ -66,18 +66,22 @@ nav:
     - Home: index.md
     - Get Started:
         - get-started/index.md
+        - get-started/what-is-examon.md
+        - get-started/quickstart.md
+        - get-started/core-concepts.md
+        - get-started/where-next.md
     - Administrators:
         - administrators/index.md
         - Deploy:
             - administrators/deploy/index.md
             - administrators/deploy/prerequisites.md
+            - administrators/deploy/topology.md
             - administrators/deploy/on-kubernetes.md
             - administrators/deploy/local-development.md
             - administrators/deploy/staging.md
             - administrators/deploy/harden-for-production.md
             - administrators/deploy/with-docker-compose.md
             - administrators/deploy/upgrade.md
-            - administrators/deploy/kubernetes-hardening-backlog.md
         - Publishers:
             - administrators/publishers/index.md
         - Operations:
@@ -103,9 +107,10 @@ nav:
         - developers/contributing.md
     - Concepts:
         - concepts/index.md
-        - concepts/architecture-deployment.md
+        - concepts/architecture.md
     - Reference:
         - reference/index.md
+        - reference/component-catalog.md
     - Community:
         - community/index.md
         - community/about.md
