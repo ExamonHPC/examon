@@ -1,5 +1,6 @@
 # Publications
 
+!!! info "Status: Live (reproduced 2026-05-23)"
 
 Bartolini, A., Beneventi, F., Borghesi, A., Cesarini, D., Libri, A., Benini, L., & Cavazzoni, C. (2019). Paving the way toward energy-aware and automated datacentre. *Workshop Proceedings of the 48th International Conference on Parallel Processing*, 1–8. (1)
 { .annotate }

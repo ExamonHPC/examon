@@ -1,7 +1,9 @@
 # Monte Cimone - UniBO
 
+!!! info "Status: Live (reproduced 2026-05-23)"
+
 <figure markdown>
-  ![](../images/monte-cimone.jpg){ width="300" }
+  ![](../../images/monte-cimone.jpg){ width="300" }
 </figure>
 
 ## Configuration of the Monte Cimone RISC-V cluster:
@@ -54,3 +56,9 @@
 | total_cpu_usage.sys   | CPU system time                      | percentage          |
 | total_cpu_usage.usr   | CPU user time                        | percentage          |
 | total_cpu_usage.wai   | CPU wait time                        | percentage          |
+
+---
+
+## Source
+
+- Monte Cimone RISC-V cluster (UniBO): <https://eupilot.eu/monte-cimone/>

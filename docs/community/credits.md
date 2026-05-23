@@ -1,5 +1,7 @@
 # Credits
 
+!!! info "Status: Live (reproduced 2026-05-23)"
+
 This work is supported by the EU FETHPC projects:
 
 - [MULTITHERMAN (g.a. 291125)](https://cordis.europa.eu/project/id/291125)

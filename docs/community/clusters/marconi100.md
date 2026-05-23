@@ -1,8 +1,9 @@
 # Marconi 100 - CINECA
 
+!!! info "Status: Live (reproduced 2026-05-23)"
 
 <figure markdown>
-  ![](../images/Marconi100.jpg){ width="300" }
+  ![](../../images/Marconi100.jpg){ width="300" }
 </figure>
 
 
@@ -48,7 +49,7 @@ The following table describes the metrics collected by the ipmi_pub plugin.
 
 ## Ganglia 
 
-The following table describes the metrics collected by the ganglia_pub plugin. The data are extracted from a Ganglia^([\[6\]](#ftnt6)) instance that CINECA runs on Marconi100.
+The following table describes the metrics collected by the ganglia_pub plugin. The data are extracted from a Ganglia instance that CINECA runs on Marconi100.
 
 |                                  |           |             |                                                                                                                                                                                                                                |
 |----------------------------------|-----------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -187,7 +188,7 @@ The following table describes the metrics collected by the ganglia_pub plugin. T
 
 ## Nagios 
 
-This is a description of the metrics collected by the ExaMon "nagios_pub" plugin. The data reflect those monitored by the Nagios^([\[7\]](#ftnt7)) tool that currently runs in the CINECA clusters. Specifically, the plugin interfaces with a Nagios extension developed by CINECA called "Hnagios"^([\[8\]](#ftnt8)). Although the monitored services and metrics are similar between all clusters, here we will specifically discuss those of Marconi100.
+This is a description of the metrics collected by the ExaMon "nagios_pub" plugin. The data reflect those monitored by the Nagios tool that currently runs in the CINECA clusters. Specifically, the plugin interfaces with a Nagios extension developed by CINECA called "Hnagios". Although the monitored services and metrics are similar between all clusters, here we will specifically discuss those of Marconi100.
 
 ### Metrics
 
@@ -432,3 +433,10 @@ This is a description of the data currently stored (where available) for each ex
 | wait4switch           | Maximum time to wait for minimum switches                                            |
 | wckey                 | wckey for job                                                                        |
 | work_dir              | pathname of working directory                                                        |
+
+---
+
+## Source
+
+- CINECA Marconi 100 system description: <https://www.hpc.cineca.it/>
+- Slurm accounting field reference: <https://slurm.schedmd.com/sacct.html>
