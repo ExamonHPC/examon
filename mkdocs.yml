@@ -63,41 +63,66 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 nav:
-    - Home: "index.md"
-    - Introduction: "Introduction.md"
-    - Getting started: "getting_started.md"
-    - Deployment:
-      - Overview: Deployment/index.md
-      - Prerequisites: Deployment/prerequisites.md
-      - Architecture: Deployment/architecture.md
-      - Kubernetes:
-        - Helm Chart Guide: Deployment/kubernetes.md
-        - Local Development: Deployment/kubernetes-local.md
-        - Staging: Deployment/kubernetes-staging.md
-        - Production: Deployment/kubernetes-production.md
-      - Docker Compose: Deployment/docker-compose.md
-      - Configuration Reference: Deployment/configuration.md
-      - Troubleshooting: Deployment/troubleshooting.md
-      - Upgrading from v0.4.0: Deployment/upgrading.md
+    - Home: index.md
+    - Get Started:
+        - get-started/index.md
     - Administrators:
-      - Getting started: Administrators/Getting_started.md
+        - administrators/index.md
+        - Deploy:
+            - administrators/deploy/index.md
+            - administrators/deploy/prerequisites.md
+            - administrators/deploy/on-kubernetes.md
+            - administrators/deploy/local-development.md
+            - administrators/deploy/staging.md
+            - administrators/deploy/harden-for-production.md
+            - administrators/deploy/with-docker-compose.md
+            - administrators/deploy/upgrade.md
+            - administrators/deploy/kubernetes-hardening-backlog.md
+        - Publishers:
+            - administrators/publishers/index.md
+        - Operations:
+            - administrators/operations/index.md
+            - administrators/operations/configure.md
+            - administrators/operations/troubleshoot.md
+            - administrators/operations/change-propagation.md
     - Users:
-      - Getting started: Users/Getting_started.md
-    - Plugins:
-      - Example plugin: 'Plugins/examon_pub.ipynb'
-    - Clusters:
-      - Marconi 100: "Marconi100/Metrics_reference.md"
-      - MonteCimone:
-        - Introduction: "MonteCimone/MonteCimone.md"
-        - Notebooks:
-          - Getting started: "MonteCimone/Examon_Monte_Cimone.ipynb" 
-    - About: "About.md"
-    - Credits: "credits.md"
-    - Contact Us: "contactus.md"
-    - Publications: "publications.md"
-    - Contributing: "contributing.md"
+        - users/index.md
+        - Dashboards:
+            - users/dashboards/index.md
+        - Analyze:
+            - users/analyze/index.md
+            - users/analyze/Demo_ExamonQL.ipynb
+        - AI:
+            - users/ai/index.md
+    - Developers:
+        - developers/index.md
+        - SDK v3:
+            - developers/sdk-v3/index.md
+            - Examples:
+                - developers/sdk-v3/examples/examon_pub.ipynb
+        - developers/contributing.md
+    - Concepts:
+        - concepts/index.md
+        - concepts/architecture-deployment.md
+    - Reference:
+        - reference/index.md
+    - Community:
+        - community/index.md
+        - community/about.md
+        - community/credits.md
+        - community/publications.md
+        - community/contact.md
+        - Clusters:
+            - community/clusters/index.md
+            - community/clusters/marconi100.md
+            - community/clusters/montecimone.md
+            - community/clusters/montecimone-notebook.ipynb
+        - Releases:
+            - community/releases/index.md
+            - community/releases/v0.5.0.md
+            - community/releases/v0.5.0-plan.md
     - Blog:
-      - blog/index.md
+        - blog/index.md
 
 extra:
   version:
