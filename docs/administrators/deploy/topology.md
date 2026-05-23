@@ -1,5 +1,8 @@
 # Deployment Topology
 
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
+
 This page is the topology reference for the two deployment shapes ExaMon ships today. It shows what processes run, how they are packaged, and how they are wired together on Docker Compose (v0.4.0) and on Kubernetes (v0.5.0). For the architectural rationale (what each layer does and why), see [Concepts → Architecture](../../concepts/architecture.md).
 
 ## Current Topology (Docker Compose)
@@ -115,3 +118,11 @@ deploy/helm/examon/
         random-pub/         # Custom publisher chart
         examon-server/      # Custom API server chart
 ```
+
+---
+
+## Source
+
+- Docker Compose file: [`docker-compose.yml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/docker-compose.yml).
+- Helm umbrella chart: [`deploy/helm/examon/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon).
+- Architectural rationale: [Concepts → Architecture](../../concepts/architecture.md).

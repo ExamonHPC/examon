@@ -1,9 +1,12 @@
-# Docker Compose Deployment (Legacy)
+# With Docker Compose (Legacy)
+
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0. Kept as a compatibility path; the Kubernetes path is the recommended target for new installations.
 
 The Docker Compose deployment is the original v0.4.0 deployment method. It runs all services on a single machine.
 
 !!! note
-    For new deployments, the [Kubernetes deployment](kubernetes.md) is recommended. Docker Compose remains supported for quick testing and backward compatibility.
+    For new deployments, the [Kubernetes deployment](on-kubernetes.md) is recommended. Docker Compose remains supported for quick testing and backward compatibility.
 
 ## Prerequisites
 
@@ -62,4 +65,11 @@ Two Docker volumes are created:
 
 ## Migration to Kubernetes
 
-See the [Upgrade Guide](upgrading.md) for migrating from Docker Compose to Kubernetes.
+See the [Upgrade Guide](upgrade.md) for migrating from Docker Compose to Kubernetes.
+
+---
+
+## Source
+
+- Docker Compose file: [`docker-compose.yml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/docker-compose.yml).
+- Legacy v0.4.0 dashboard: [`dashboards/legacy/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/dashboards/legacy).

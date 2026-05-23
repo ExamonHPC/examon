@@ -1,5 +1,8 @@
 # Upgrading from v0.4.0 to v0.5.0
 
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
+
 This guide covers migrating from the Docker Compose deployment (v0.4.0) to the Kubernetes Helm deployment (v0.5.0).
 
 ## What Changed
@@ -55,9 +58,9 @@ Note your current configuration from:
 
 Follow one of the deployment guides:
 
-- [Local Development](kubernetes-local.md)
-- [Staging](kubernetes-staging.md)
-- [Production](kubernetes-production.md)
+- [Local Development](local-development.md)
+- [Staging](staging.md)
+- [Harden for production](harden-for-production.md)
 
 ### Step 4: Restore Data
 
@@ -99,8 +102,8 @@ user-created dashboards:
   labeled ConfigMap and let the Grafana sidecar load it automatically.
   The full recipe (single dashboard, directory of dashboards, YAML
   manifest variant) lives in
-  [Grafana Dashboards](kubernetes.md#grafana-dashboards) in the K8s
-  guide; this guide only covers the v0.4.0 → v0.5.0 JSON rewrite.
+  [Grafana Dashboards](on-kubernetes.md#grafana-dashboards) in the K8s
+  guide; this guide only covers the v0.4.0 to v0.5.0 JSON rewrite.
 
 ### Step 5: Update Publishers
 
@@ -112,3 +115,11 @@ External publishers need to update their MQTT broker connection to point to the 
 ## Keeping Docker Compose
 
 The Docker Compose deployment remains functional in v0.5.0. Both deployment methods can coexist. The `docker-compose.yml` file is unchanged and continues to work as before.
+
+---
+
+## Source
+
+- v0.4.0 source: [`docker-compose.yml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/docker-compose.yml) on the release branch.
+- v0.5.0 Helm chart: [`deploy/helm/examon/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon).
+- Apache Cassandra upgrade procedure: [Cassandra upgrade documentation](https://cassandra.apache.org/doc/latest/cassandra/operating/upgrading.html).

@@ -1,4 +1,7 @@
-# Change Propagation Guide
+# Change Propagation
+
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
 
 This document explains **how configuration flows** through the ExaMon
 deployment stack and **what you need to do** when you modify something at
@@ -83,7 +86,7 @@ umbrella file, which wins over the subchart default.
 □ Updated values-staging.yaml (if staging needs a specific override)
 □ Updated values-production.yaml (if production needs a specific override)
 □ Verified subchart values.yaml is consistent (for documentation)
-□ Updated docs/Deployment/configuration.md (if a parameter changed)
+□ Updated docs/administrators/operations/configure.md (if a parameter changed)
 ```
 
 **Deploy:**
@@ -272,7 +275,7 @@ helm get manifest examon -n examon | grep CASSANDRA_TIMEOUT
 ```
 
 **Step 7: Documentation.**
-Update `docs/Deployment/configuration.md` with the new parameter.
+Update `docs/administrators/operations/configure.md` with the new parameter.
 
 ---
 
@@ -548,3 +551,12 @@ deploy/helm/examon/
     values.yaml                         # Umbrella defaults
     values-{local,staging,production}.yaml
 ```
+
+---
+
+## Source
+
+- Helm umbrella chart: [`deploy/helm/examon/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon).
+- Subchart sources: [`deploy/helm/examon/subcharts/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon/subcharts).
+- Container build sources: [`deploy/docker/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/docker).
+- Upstream Helm subchart inheritance behavior: [Helm subcharts and global values](https://helm.sh/docs/chart_template_guide/subcharts_and_globals/).

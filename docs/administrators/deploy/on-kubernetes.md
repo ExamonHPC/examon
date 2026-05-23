@@ -1,6 +1,9 @@
-# Kubernetes Deployment Guide
+# On Kubernetes
 
-This guide covers the Helm chart structure, image building, and common operations for all environments.
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
+
+This guide covers the Helm chart structure, image building, secrets handling, dashboard provisioning, and operations common to every Kubernetes environment (local, staging, production). For the environment-specific bring-up paths, see [Local development](local-development.md), [Staging](staging.md), and [Harden for production](harden-for-production.md).
 
 ## Building Container Images
 
@@ -39,7 +42,7 @@ For production (GitHub Container Registry):
 During development, you typically modify and rebuild a single service
 rather than all images. The recommended inner-loop workflow (build, push
 to the local registry, restart the pod) is documented in detail in the
-[Local Development Workflow](kubernetes-local.md#local-development-workflow)
+[Local Development Workflow](local-development.md#local-development-workflow)
 section. That section also covers K3d image caching behavior, the
 `pullPolicy: Always` setting, and alternatives like `k3d image import`
 and unique tags.
@@ -409,8 +412,8 @@ uses a **LoadBalancer** service (TCP L4) since MQTT is not an HTTP protocol:
 | MQTT | LoadBalancer (TCP) | `mqtt.examon.example.com:1883` |
 
 This works on OpenStack (with Octavia), RKE2, cloud providers, and bare
-metal (with MetalLB). See the [Production guide](kubernetes-production.md)
-for platform-specific details.
+metal (with MetalLB). See the [Harden for production](harden-for-production.md)
+guide for platform-specific details.
 
 ## Grafana Dashboards
 
@@ -428,7 +431,7 @@ loaded by the chart.
 ### How dashboard auto-provisioning works
 
 The chart enables the [Grafana dashboard sidecar](https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards)
-with the following defaults (see [`deploy/helm/examon/values.yaml`](../../deploy/helm/examon/values.yaml)):
+with the following defaults (see [`deploy/helm/examon/values.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/values.yaml)):
 
 ```yaml
 grafana:
@@ -445,7 +448,7 @@ The sidecar watches **any namespace** for `ConfigMap`s carrying the label
 field is loaded into Grafana as a dashboard, hot-reloaded within ~30s,
 and removed when the ConfigMap is deleted. The umbrella chart uses the
 same mechanism for its bundled dashboard via
-[`templates/grafana-dashboards.yaml`](../../deploy/helm/examon/templates/grafana-dashboards.yaml),
+[`templates/grafana-dashboards.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/templates/grafana-dashboards.yaml),
 which globs `dashboards/*.json` and emits one ConfigMap per file.
 
 Two equivalent ways to ship custom dashboards are described next:
@@ -513,7 +516,7 @@ If you maintain a fork of the umbrella chart and want dashboards shipped
 inside the chart artifact:
 
 1. Drop additional `*.json` files into
-   [`deploy/helm/examon/dashboards/`](../../deploy/helm/examon/dashboards/).
+   [`deploy/helm/examon/dashboards/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon/dashboards).
 2. Run `helm upgrade examon ./deploy/helm/examon -n examon`.
 
 The existing template iterates every `*.json` in that folder and emits
@@ -533,7 +536,7 @@ time without removing the files.
   Dashboards exported from Grafana 7.x (v0.4.0 docker-compose stack)
   still reference the legacy `grafana-kairosdb-datasource` plugin and
   must be rewritten before import. See the `jq` snippet in
-  [upgrading.md](upgrading.md#step-4-restore-data).
+  [upgrade.md](upgrade.md#step-4-restore-data).
 - **ConfigMap size limit.** Kubernetes caps each ConfigMap at 1 MiB. One
   ConfigMap per dashboard keeps you safely under it.
 - **Grafana folder grouping (optional).** The Grafana sidecar can place
@@ -577,3 +580,13 @@ kubectl logs -l app.kubernetes.io/name=cassandra -n examon -f
 # View all ExaMon logs
 kubectl logs -l app.kubernetes.io/part-of=examon -n examon -f
 ```
+
+---
+
+## Source
+
+- Helm umbrella chart: [`deploy/helm/examon/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon).
+- Subchart sources: [`deploy/helm/examon/subcharts/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon/subcharts).
+- Container build sources: [`deploy/docker/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/docker).
+- Image build/push helper: [`scripts/build-and-push-images.sh`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/scripts/build-and-push-images.sh).
+- Upstream: [K8ssandra operator](https://docs.k8ssandra.io/), [cert-manager](https://cert-manager.io/), [Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana).

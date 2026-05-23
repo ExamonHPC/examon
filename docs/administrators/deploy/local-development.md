@@ -1,5 +1,8 @@
 # Local Development (K3d)
 
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
+
 Set up a complete ExaMon stack on your laptop or desktop using K3d.
 
 ## Prerequisites
@@ -190,10 +193,8 @@ kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon
 ```
 
 Open [http://localhost:8083](http://localhost:8083), select the `random_sensor`
-metric, set the time range to the last 1 hour, and click **Graph**. You
-should see data points like this:
-
-![KairosDB random_sensor query](../images/kairosdb-random-sensor-query.png)
+metric, set the time range to the last 1 hour, and click **Graph**. A live
+chart of synthetic sensor values confirms the pipeline is wired correctly.
 
 If the graph shows data, the entire pipeline is working end-to-end:
 `random_pub` is publishing synthetic sensor data over MQTT, `mqtt2kairosdb`
@@ -465,3 +466,12 @@ development tasks.
 ```bash
 k3d cluster delete examon-local
 ```
+
+---
+
+## Source
+
+- Local-development bring-up script: [`scripts/k8s-local-setup.sh`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/scripts/k8s-local-setup.sh).
+- K3d cluster spec: [`deploy/k3d/local-cluster.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/k3d/local-cluster.yaml).
+- Local values overlay: [`deploy/helm/examon/values-local.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/values-local.yaml).
+- Smoke test: [`scripts/k8s-smoke-test.sh`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/scripts/k8s-smoke-test.sh).

@@ -1,5 +1,8 @@
 # Prerequisites
 
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
+
 All Kubernetes deployment environments (local, staging, production) require the following tools.
 
 ## Required Tools
@@ -78,3 +81,10 @@ The following ports are used by ExaMon:
 | 5000 | ExaMon REST API | HTTP |
 | 8083 | KairosDB API | HTTP |
 | 9042 | Cassandra CQL | TCP |
+
+---
+
+## Source
+
+- Upstream install docs: [Docker](https://docs.docker.com/engine/install/), [K3d](https://k3d.io/), [kubectl](https://kubernetes.io/docs/tasks/tools/), [Helm](https://helm.sh/docs/intro/install/).
+- Local-development helper script: [`scripts/k8s-local-setup.sh`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/scripts/k8s-local-setup.sh).

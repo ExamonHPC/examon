@@ -1,4 +1,7 @@
-# Troubleshooting
+# Troubleshoot
+
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
 
 This guide covers the systematic debugging approach for ExaMon Kubernetes
 deployments, followed by specific issues encountered and their solutions.
@@ -467,7 +470,7 @@ with the same tag.
 **Prevention:** `values-local.yaml` now sets `pullPolicy: Always` for all
 custom images. With this setting, the standard build-push-restart workflow
 works correctly because containerd re-pulls from the registry every time.
-See the [Local Development Workflow](kubernetes-local.md#local-development-workflow)
+See the [Local Development Workflow](../deploy/local-development.md#local-development-workflow)
 for the full recommended cycle.
 
 **Fix (if `pullPolicy` is `IfNotPresent`):** Use `k3d image import` to
@@ -628,7 +631,7 @@ echo "127.0.0.1 examon-registry" | sudo tee -a /etc/hosts
 ```
 
 The automated setup script handles this automatically. See the
-[local deployment guide](kubernetes-local.md#step-2-register-the-k3d-registry-hostname).
+[local deployment guide](../deploy/local-development.md#step-2-register-the-k3d-registry-hostname).
 
 ---
 
@@ -775,3 +778,12 @@ k3d cluster delete examon-local
 k3d cluster delete examon-staging
 k3d cluster create --config deploy/k3d/staging-cluster.yaml
 ```
+
+---
+
+## Source
+
+- Helm umbrella chart and subcharts: [`deploy/helm/examon/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon).
+- Container build sources: [`deploy/docker/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/docker).
+- Related repository issue tracker: [ExamonHPC/examon issues](https://github.com/ExamonHPC/examon/issues).
+- Upstream tooling: [K8ssandra operator](https://docs.k8ssandra.io/), [Helm](https://helm.sh/), [K3d](https://k3d.io/).

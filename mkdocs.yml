@@ -84,6 +84,7 @@ nav:
             - administrators/deploy/upgrade.md
         - Publishers:
             - administrators/publishers/index.md
+            - administrators/publishers/prometheus-pub.md
         - Operations:
             - administrators/operations/index.md
             - administrators/operations/configure.md

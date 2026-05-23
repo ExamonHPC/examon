@@ -1,7 +1,13 @@
-# Production Deployment
+# Harden for production
+
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
 
 Production targets a real Kubernetes cluster: on-premises (OpenStack,
-RKE2, kubeadm) or cloud-managed (EKS, GKE, AKS).
+RKE2, kubeadm) or cloud-managed (EKS, GKE, AKS). This page covers the
+hardening posture (TLS, secrets, NetworkPolicies, anti-affinity,
+backups, monitoring) that separates a production install from the
+local-development bring-up.
 
 ## Service Exposure Architecture
 
@@ -93,7 +99,7 @@ global:
     - name: ghcr-cred
 ```
 
-See the [Private Container Registries](kubernetes.md#private-container-registries)
+See the [Private Container Registries](on-kubernetes.md#private-container-registries)
 section for per-subchart overrides and further details.
 
 ## Step 2: Install cert-manager
@@ -336,7 +342,7 @@ AngularJS-only and is **not** compatible with Grafana 11+; do not
 provision it manually.
 
 The relevant Helm values are documented in
-[configuration.md](configuration.md): `grafana.plugins`,
+[Reference → Configuration](../../reference/configuration.md): `grafana.plugins`,
 `grafana.datasources`, `grafana.sidecar.dashboards.enabled`, and the
 top-level `bundledDashboards.enabled` toggle.
 
@@ -381,7 +387,7 @@ helm upgrade examon ./deploy/helm/examon \
 
 If your Prometheus operator uses a different `ServiceMonitor` selector,
 adjust `commonLabels` accordingly. See
-[configuration.md](configuration.md) for the full key reference.
+[Reference → Configuration](../../reference/configuration.md) for the full key reference.
 
 **Other ExaMon components** (KairosDB, examon-server, mqtt2kairosdb,
 Mosquitto) do not yet ship their own `ServiceMonitor` manifests; if you
@@ -422,3 +428,11 @@ datacenter `size` in `values-production.yaml` and run `helm upgrade`.
   On cloud VMs, the cloud provider's LB integration applies
 - **Storage**: Longhorn (bundled with Rancher) or local-path provisioner for
   development; production should use a distributed storage backend
+
+---
+
+## Source
+
+- Production values overlay: [`deploy/helm/examon/values-production.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/values-production.yaml).
+- Helm umbrella chart: [`deploy/helm/examon/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon).
+- Upstream: [cert-manager](https://cert-manager.io/), [NGINX Ingress](https://kubernetes.github.io/ingress-nginx/), [K8ssandra operator](https://docs.k8ssandra.io/), [ArpNetworking KairosDB plugin](https://github.com/ArpNetworking/kairosdb-datasource), [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack).

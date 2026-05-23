@@ -1,5 +1,8 @@
 # Staging Environment (K3d Multi-Node on VM)
 
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0.
+
 The staging environment runs a **full HA topology** on a single VM using K3d, mirroring production's replica counts, pod anti-affinity, NetworkPolicies, and TLS -- but with minimal resources.
 
 ## Why Staging?
@@ -114,7 +117,7 @@ helm install examon ./deploy/helm/examon \
 !!! important
     After editing any subchart template, run `helm dependency update` in
     `deploy/helm/examon/` before upgrading. See the
-    [local deployment guide](kubernetes-local.md) for details.
+    [local deployment guide](local-development.md) for details.
 
 ### Step 7: Configure Cassandra Authentication
 
@@ -134,11 +137,11 @@ helm upgrade examon ./deploy/helm/examon \
 
 !!! warning
     **Never hardcode real passwords** in values files. See the
-    [Secrets Management](kubernetes.md#secrets-management) guide for all
+    [Secrets Management](on-kubernetes.md#secrets-management) guide for all
     available methods.
 
 For more details on service names, Grafana ports, and KairosDB configuration,
-see the [Important Configuration Details](kubernetes-local.md#important-configuration-details) section.
+see the [Important Configuration Details](local-development.md#important-configuration-details) section.
 
 ### Step 8: Validate HA
 
@@ -189,3 +192,11 @@ Cluster           K3d on single VM          Real K8s cluster
 ```bash
 k3d cluster delete examon-staging
 ```
+
+---
+
+## Source
+
+- Staging values overlay: [`deploy/helm/examon/values-staging.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/values-staging.yaml).
+- K3d cluster spec: [`deploy/k3d/staging-cluster.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/k3d/staging-cluster.yaml).
+- Image build/push helper: [`scripts/build-and-push-images.sh`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/scripts/build-and-push-images.sh).

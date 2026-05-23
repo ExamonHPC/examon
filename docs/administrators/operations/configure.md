@@ -1,6 +1,9 @@
-# Configuration Reference
+# Configure
 
-All ExaMon Helm chart configuration is managed through values files. This document lists every configurable parameter.
+!!! info "Status: Live (reproduced 2026-05-23)"
+    Verified against examon-core v0.5.0. The cross-component parameter dictionary, including the SDK v3 publisher YAML schema and external surfaces, lives in [Reference → Configuration](../../reference/configuration.md). This page is the day-to-day operator's index of Helm chart parameters.
+
+All ExaMon Helm chart configuration is managed through values files. This page lists every configurable parameter exposed by the umbrella chart.
 
 ## Global Toggles
 
@@ -56,7 +59,7 @@ Grafana uses the [official Grafana Helm chart](https://github.com/grafana/helm-c
 | `grafana.adminPassword` | Admin password | `Password` |
 | `grafana.plugins` | Grafana plugins to install | See `values.yaml` |
 | `grafana.datasources` | Datasource provisioning (KairosDB pre-configured with `uid: examon-kairosdb`, type `arpnetworking-kairosdb-datasource`) | See `values.yaml` |
-| `grafana.sidecar.dashboards.enabled` | Auto-load dashboards from ConfigMaps labeled `grafana_dashboard=1` (cluster-wide; `searchNamespace: ALL`). See [Grafana Dashboards](kubernetes.md#grafana-dashboards) in the K8s guide for the recipe to add custom dashboards without editing the chart. | `true` |
+| `grafana.sidecar.dashboards.enabled` | Auto-load dashboards from ConfigMaps labeled `grafana_dashboard=1` (cluster-wide; `searchNamespace: ALL`). See [Grafana Dashboards](../deploy/on-kubernetes.md#grafana-dashboards) in the K8s guide for the recipe to add custom dashboards without editing the chart. | `true` |
 | `grafana.persistence.enabled` | Enable persistent storage | `false` |
 | `grafana.persistence.size` | PVC size | `10Gi` |
 | `grafana.ingress.enabled` | Enable ingress | `false` |
@@ -127,3 +130,12 @@ URL and allowed via `grafana.ini.plugins.allow_loading_unsigned_plugins`.
 | `examon-server.config.schedulerType` | HPC scheduler type | `SLURM` |
 | `examon-server.config.cacheType` | Cache backend | `simple` |
 | `examon-server.config.cacheTimeout` | Cache TTL (seconds) | `18000` |
+
+---
+
+## Source
+
+- Helm umbrella chart values: [`deploy/helm/examon/values.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/values.yaml).
+- Per-environment overlays: [`values-local.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/values-local.yaml), [`values-staging.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/values-staging.yaml), [`values-production.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/helm/examon/values-production.yaml).
+- Subchart defaults: [`deploy/helm/examon/subcharts/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/helm/examon/subcharts).
+- Upstream Grafana chart values: [`grafana/helm-charts/charts/grafana`](https://github.com/grafana/helm-charts/tree/main/charts/grafana).
