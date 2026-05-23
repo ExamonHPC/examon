@@ -109,9 +109,15 @@ nav:
     - Concepts:
         - concepts/index.md
         - concepts/architecture.md
+        - concepts/data-model.md
+        - concepts/plugin-model.md
     - Reference:
         - reference/index.md
         - reference/component-catalog.md
+        - reference/glossary.md
+        - reference/configuration.md
+        - reference/cli.md
+        - reference/api.md
     - Community:
         - community/index.md
         - community/about.md
