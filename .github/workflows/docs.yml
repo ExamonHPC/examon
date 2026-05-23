@@ -1,0 +1,58 @@
+name: Docs
+
+# Publishes the MkDocs site to GitHub Pages via `mike` (versioned docs).
+#
+# Aliases on gh-pages:
+#   - release/*  push   -> mike deploy dev                          (in-development tip)
+#   - v*         tag    -> mike deploy <version> latest             (stable release)
+#
+# Local doc work happens on disposable `doc` branches and is previewed with
+# `mkdocs serve` only; nothing publishes from those branches. To promote, merge
+# the doc branch into release/* and this workflow updates the `dev` site.
+
+on:
+  push:
+    branches:
+      - 'release/*'
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure git for mike
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy dev (release/* branches)
+        if: startsWith(github.ref, 'refs/heads/release/')
+        run: mike deploy --push dev
+
+      - name: Deploy versioned + latest (v* tags)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          mike deploy --push --update-aliases "$VERSION" latest
+          mike set-default --push latest
