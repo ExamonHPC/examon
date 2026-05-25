@@ -7,7 +7,7 @@
 
 ## Why a plugin model
 
-Every publisher in ExaMon does the same three things: read data from a source, reshape it into the canonical [tagged time-series form](data-model.md#the-time-series-model), and ship it to a target (the MQTT broker, KairosDB, or both). The differences between publishers are local to the source: Prometheus is HTTP/JSON, IPMI is BMC sensors over the network, NVML is a C library, Slurm accounting is database polling. The shared 90% (worker scheduling, restart on failure, MQTT or KairosDB connection handling, graceful shutdown, configuration parsing) has no business being re-implemented per publisher.
+Every publisher in ExaMon does the same three things: read data from a source, reshape it into the canonical [tagged time-series form](data-model.md#core-entities), and ship it to a target (the MQTT broker, KairosDB, or both). The differences between publishers are local to the source: Prometheus is HTTP/JSON, IPMI is BMC sensors over the network, NVML is a C library, Slurm accounting is database polling. The shared 90% (worker scheduling, restart on failure, MQTT or KairosDB connection handling, graceful shutdown, configuration parsing) has no business being re-implemented per publisher.
 
 The SDK v3 plugin framework is the answer to that observation. It supplies the shared 90% as a library (`examon-base-plugin`) and constrains the publisher to plug into three well-defined extension points: `Extract`, `Transform`, `Load`. A new publisher is the three extension classes (or one, if it reuses two built-ins) and a YAML configuration file. The publisher does not implement its own worker pool, its own restart logic, or its own configuration parser.
 

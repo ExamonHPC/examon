@@ -39,7 +39,7 @@ NVIDIA Data Center GPU Manager. The vendor library for GPU telemetry on NVIDIA h
 
 ### ETL
 
-Extract, Transform, Load. The three-stage pipeline shape used by every SDK v3 publisher: a stage that reads from a source, a stage that reshapes into the canonical [tag-set form](../concepts/data-model.md#canonical-tag-set), and a stage that writes to a target (MQTT broker, KairosDB, Cassandra, debug log). See [Concepts → Plugin model](../concepts/plugin-model.md).
+Extract, Transform, Load. The three-stage pipeline shape used by every SDK v3 publisher: a stage that reads from a source, a stage that reshapes into the canonical [tag-set form](../concepts/data-model.md#the-tag-hierarchy-and-sensor-identity), and a stage that writes to a target (MQTT broker, KairosDB, Cassandra, debug log). See [Concepts → Plugin model](../concepts/plugin-model.md).
 
 ### `examon-base-plugin`
 
@@ -107,7 +107,7 @@ Message Queuing Telemetry Transport. The lightweight pub/sub messaging protocol 
 
 ### MQTT topic
 
-The hierarchical name under which an MQTT message is published. ExaMon's topic convention is `<org>/<cluster>/<plugin>/<node>/<metric_name>`. See [Concepts → Data model → MQTT topic anatomy](../concepts/data-model.md#the-mqtt-topic-anatomy).
+The hierarchical name under which an MQTT message is published. ExaMon's topic convention is a sequence of alternating `key/value` segments mirroring the tag hierarchy, with a mandatory `plugin/<plugin_name>/chnl/<data|cmd>` block and the metric name as the last segment, for example `org/cineca/cluster/marconi100/node/r255n18/plugin/ipmi_pub/chnl/data/p0_power`. See [Concepts → Data model → Transport](../concepts/data-model.md#transport-mqtt-topics-and-payloads).
 
 ### Mosquitto
 
@@ -167,7 +167,7 @@ A POSIX process manager. The v0.4.0 Docker Compose stack runs Mosquitto, the ran
 
 ### Tag
 
-A key/value pair attached to a [time-series sample](../concepts/data-model.md#a-sample). Tags are first-class: consumers query by tag (`WHERE node = 'cn01' AND gpu = '0'`), the Trino connector lifts tags into virtual table columns, and the MQTT topic shape is derived from the canonical tag set.
+A key/value pair attached to a [time-series sample](../concepts/data-model.md#core-entities). Tags are first-class: consumers query by tag (`WHERE node = 'cn01' AND gpu = '0'`), the Trino connector lifts tags into virtual table columns, and the MQTT topic shape is derived from the canonical tag set.
 
 ### Trino
 

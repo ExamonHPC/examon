@@ -123,7 +123,7 @@ The full client reference is upstream: [Trino client documentation](https://trin
 
 ### The KairosDB virtual schema (ExaMon-specific)
 
-The `trino-kairosdb-connector` exposes each KairosDB metric as a virtual table inside its catalog. Tags become columns; the connector is the layer that turns ExaMon's [tag-and-value time-series model](../concepts/data-model.md#a-sample) into idiomatic SQL.
+The `trino-kairosdb-connector` exposes each KairosDB metric as a virtual table inside its catalog. Tags become columns; the connector is the layer that turns ExaMon's [tag-and-value time-series model](../concepts/data-model.md#core-entities) into idiomatic SQL.
 
 Column shape:
 

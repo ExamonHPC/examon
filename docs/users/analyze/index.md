@@ -112,11 +112,13 @@ ORDER BY avg_gpu_temp DESC;
 
 ## Walk through an end-to-end example
 
-The repository ships an executable notebook that walks the analyst's path end to end against a reference deployment: connecting to Trino, exploring the schema, querying time-series with aggregation pushdown, and assembling cross-store joins.
+The repository ships an executable notebook that walks the analyst's path end to end against a reference deployment, covering schema exploration, time-series queries with tag filters, and combining sensor data with Slurm job records.
 
 - [`Demo_ExamonQL.ipynb`](Demo_ExamonQL.ipynb): the ExamonQL demo notebook (Jupyter).
 
-Open it in JupyterLab or VS Code and run cell by cell. The notebook assumes the Trino endpoint is reachable; for a local deployment, see the connector README for the local install path.
+The notebook does not use the Trino federation path described above; it uses the legacy `examon-client` Python package, which queries KairosDB and Cassandra directly. See [Legacy Python client](#legacy-python-client) below for context. The SQL-like DSL the notebook demonstrates (`sq.SELECT(...).FROM(...).WHERE(...)`) is the pre-Trino interface; the underlying tag-and-metric data model is the same as the one Trino exposes, so the notebook remains a useful introduction to the data model even for deployments that have adopted Trino.
+
+A native Trino notebook walkthrough is planned for a future release.
 
 ## Connect from common tools
 
@@ -131,6 +133,25 @@ The Trino client surface is the same regardless of caller: JDBC, ODBC, REST, and
 | Schema | The metric keyspace (`kairosdb`) or the Slurm schema (`e4_slurm`) |
 
 Per-tool connection guides (Jupyter, Superset, Power BI, DBeaver, raw `trino-cli`, the Python `trino` package) follow the upstream connector documentation; for the Trino client surface itself, see the [Trino client documentation](https://trino.io/docs/current/client.html). Per-tool ExaMon-specific walkthroughs are planned but not yet shipped.
+
+## Legacy Python client
+
+For deployments that do not run Trino, the [`examon-client`](https://github.com/fbeneventi/examon-client) Python package queries KairosDB and Cassandra directly using a SQL-like DSL inherited from the pre-Trino era:
+
+```python
+from examon.examon import Client, ExamonQL
+
+sq = ExamonQL(Client(...))
+data = (sq.SELECT('*')
+          .FROM('p0_power')
+          .WHERE(cluster='marconi100', node='r255n18')
+          .TSTART(10, 'minutes')
+          .execute())
+```
+
+`examon-client` is the surface the bundled notebooks (`Demo_ExamonQL.ipynb`, the [Monte Cimone notebook](../../community/clusters/montecimone-notebook.ipynb)) currently use. It is suitable for analyses that hit a single store at a time and that do not require cross-store joins. New analytical work that needs to combine time-series and Slurm job records, or that targets a non-Python consumer (Superset, Power BI, DBeaver), should use Trino as described above.
+
+The full API reference is in the [`examon-client` repository](https://github.com/fbeneventi/examon-client). The package will receive a refresh in a future release; the existing API is stable for v0.5.0 consumers.
 
 ---
 
