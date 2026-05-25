@@ -254,11 +254,14 @@ annotations:
 
 ### MQTT TLS
 
-To enable TLS on the MQTT broker, set `mqtt.tls.enabled=true` in
-`values-production.yaml` and provide a Kubernetes TLS secret named
-`mosquitto-tls` containing the broker certificate and key. The secret
-must live in the `examon` namespace and use the standard `tls.crt` /
-`tls.key` / `ca.crt` keys.
+To enable TLS on the MQTT broker, set `mosquitto.tls.enabled=true` in
+`values-production.yaml` and provide a Kubernetes Secret named
+`mosquitto-tls` containing the broker certificate, the private key,
+and the issuing CA bundle. The secret must live in the `examon`
+namespace and expose all three files under the standard keys
+`tls.crt`, `tls.key`, and `ca.crt`; the mosquitto subchart mounts a
+single Secret at `/mosquitto/certs` and the bundled `mosquitto.conf`
+expects every file to live there.
 
 There are two common ways to create the secret.
 
@@ -293,16 +296,16 @@ cert-manager populates the `mosquitto-tls` Secret with the issued
 certificate and rotates it automatically before expiry.
 
 **Option B: manual secret.** If you already have a certificate (for
-example, issued by an internal CA outside the cluster), create the
-secret directly:
+example, issued by an internal CA outside the cluster), create a
+single generic Secret containing all three files. `kubectl create
+secret tls` cannot be used here because it accepts only `tls.crt`
+and `tls.key`, but the broker also needs the CA bundle in the same
+mount:
 
 ```bash
-kubectl create secret tls mosquitto-tls \
-  --cert=path/to/mqtt.crt \
-  --key=path/to/mqtt.key \
-  -n examon
-# Add the CA bundle so MQTT clients can verify the chain:
-kubectl create secret generic mosquitto-tls-ca \
+kubectl create secret generic mosquitto-tls \
+  --from-file=tls.crt=path/to/mqtt.crt \
+  --from-file=tls.key=path/to/mqtt.key \
   --from-file=ca.crt=path/to/ca.crt \
   -n examon
 ```
@@ -310,7 +313,7 @@ kubectl create secret generic mosquitto-tls-ca \
 Then enable TLS in your values:
 
 ```yaml
-mqtt:
+mosquitto:
   tls:
     enabled: true
     secretName: mosquitto-tls
@@ -390,7 +393,7 @@ MQTT_IP=$(kubectl get svc examon-mosquitto -n examon \
 # Plaintext listener (always exposed in v0.5.0; see Known gaps)
 mosquitto_sub -h "$MQTT_IP" -p 1883 -t '#' -v -C 3
 
-# TLS listener (only if mqtt.tls.enabled=true)
+# TLS listener (only if mosquitto.tls.enabled=true)
 kubectl get secret mosquitto-tls -n examon \
   -o jsonpath='{.data.ca\.crt}' | base64 -d > /tmp/ca.crt
 mosquitto_sub -h "$MQTT_IP" -p 8883 --cafile /tmp/ca.crt -t '#' -v -C 3
@@ -575,8 +578,8 @@ the umbrella chart. Each item below is tracked as a GitHub issue;
 this section will shrink as those issues close.
 
 **MQTT plaintext listener stays open when TLS is enabled.** Setting
-`mqtt.tls.enabled=true` adds an 8883 listener but does not remove the
-1883 listener. Operators who require TLS-only must restrict 1883 at
+`mosquitto.tls.enabled=true` adds an 8883 listener but does not remove
+the 1883 listener. Operators who require TLS-only must restrict 1883 at
 the LoadBalancer service or at a NetworkPolicy applied externally.
 Tracked in a follow-up issue (link added before promotion).
 

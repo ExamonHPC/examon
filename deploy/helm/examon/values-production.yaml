@@ -1,5 +1,5 @@
 # ExaMon Production Values
-# Full HA, production resources, TLS, Medusa backups.
+# Full HA, production resources, TLS.
 # Targets a real Kubernetes cluster: on-prem (OpenStack, RKE2, kubeadm)
 # or cloud-managed (EKS, GKE, AKS).
 #
