@@ -65,7 +65,7 @@ The Compose stack ships an optional Trino overlay that brings a single-node Trin
 docker compose -f docker-compose.yml -f compose.trino.yml up -d
 ```
 
-The full walkthrough, including the first SQL query, is in the [Trino Quickstart](../../users/analyze/local-trino-quickstart.md).
+The install walkthrough is in [Add-ons → Trino](../add-ons/trino.md); the first SQL query is in [Users → Analyze → Query with Trino](../../users/analyze/query-with-trino.md).
 
 ## Moving to Kubernetes
 

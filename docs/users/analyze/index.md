@@ -1,12 +1,12 @@
 # Analyze
 
-!!! info "Status: Beta (Trino-KairosDB connector v3.0.0-rc1 available; fresh-install and existing-release paths shipped, see Trino Quickstart below)"
-    The [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) is publicly available and plugs into an existing Trino installation per the standard Trino plugin install path. ExaMon does not bundle Trino in its umbrella chart, but ships a single tested values overlay for the upstream Trino Helm chart, [`values-examon.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/values-examon.yaml), that adds the connector and the `examon_ts_timestamps` catalog to either a fresh laptop install or an existing release; see the [Trino Quickstart](local-trino-quickstart.md). The schema layout and example queries below are stable.
+!!! info "Status: Beta (Trino-KairosDB connector v3.0.0-rc1 available; both deployment shapes shipped)"
+    The [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) is publicly available and plugs into an existing Trino installation per the standard Trino plugin install path. ExaMon does not bundle Trino in its core, but ships small wiring overlays for both deployment shapes; see [Administrators → Add-ons → Trino](../../administrators/add-ons/trino.md) for the install path and [Query with Trino](query-with-trino.md) for the first SQL query. The schema layout and example queries below are stable.
 
 > The Analyze section is for data scientists, analysts, and ML engineers running queries against ExaMon. ExaMon exposes its data through a Trino SQL surface, so any tool that speaks Trino (Jupyter, Superset, Power BI, DBeaver, raw `trino-cli`) can connect with the same SQL. This page covers the surface itself: what catalogs exist, what schemas live inside each, what tags become columns, and how to walk from a question to a query.
 
 !!! tip "Install or wire Trino"
-    The [Trino Quickstart](local-trino-quickstart.md) covers both paths: a laptop-sized fresh install for the local ExaMon, and adding the connector and catalog to an existing `trino/trino` Helm release. Both paths use the same wiring overlay, paired with whatever sizing values your Trino needs. The sections below describe the full SQL surface.
+    Install is an administrator task: see [Add-ons → Trino](../../administrators/add-ons/trino.md), which covers both the Docker Compose overlay and the Kubernetes wiring (fresh install and existing-release paths). Once Trino is up, [Query with Trino](query-with-trino.md) walks the first SQL query. The sections below describe the full SQL surface.
 
 ## The federation model
 

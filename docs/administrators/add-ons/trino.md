@@ -1,15 +1,14 @@
-# Trino Quickstart
+# Trino
 
 !!! info "Status: Live (reproduced 2026-05-25)"
     Verified against examon-core v0.5.0 and [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) v3.0.0-rc1 on Trino 476. The Kubernetes path was tested end to end on K3d; the Docker Compose path uses the same connector and image pin.
 
-> This page wires a Trino SQL surface to an ExaMon installation. Trino is kept outside the ExaMon core on purpose: its lifecycle (upgrades, scaling, JVM tuning, authentication) belongs with the operator, not with ExaMon. ExaMon ships only its contract with Trino, not Trino itself.
+> This page installs a Trino SQL surface alongside an existing ExaMon installation. Trino stays outside the ExaMon core on purpose: its lifecycle (upgrades, scaling, JVM tuning, authentication) belongs with the operator, not with ExaMon. ExaMon ships only its contract with Trino — the connector and the ExaMon-owned catalog — not Trino itself.
 >
-> Pick the section that matches your deployment target. Both land on the same first SQL query.
+> Pick the section that matches your ExaMon deployment shape. When done, jump to [Users → Analyze → Query with Trino](../../users/analyze/query-with-trino.md) for the first SQL query and the Python client.
 
 ## Before you start
 
-- A `trino` client, either the [Docker image](https://hub.docker.com/r/trinodb/trino) or the [native CLI](https://trino.io/docs/current/client/cli.html). The examples below use the Docker image.
 - The core ExaMon stack is already running (the [Get Started Quickstart](../../get-started/quickstart.md) is done) and `random_pub` is publishing into KairosDB.
 - About 2 GB of free RAM on top of the existing ExaMon stack.
 
@@ -38,18 +37,7 @@ docker run --rm -it --network host trinodb/trino:476 \
 
 `examon_ts_timestamps` should appear alongside the Trino defaults `system`, `tpch`, and `tpcds`.
 
-### Step 3. Open a Trino session
-
-```bash
-docker run --rm -it --network host trinodb/trino:476 \
-  trino --server http://localhost:8080 \
-        --catalog examon_ts_timestamps \
-        --schema kairosdb
-```
-
-At the `trino>` prompt, paste the query from [First SQL query](#first-sql-query). The result is the most recent samples from the simulated `random_sensor` publisher.
-
-### Step 4. Roll back
+### Step 3. Roll back
 
 To remove only the Trino overlay and keep the core stack:
 
@@ -171,58 +159,14 @@ The Service name is `trino` for the fresh-install path and whatever name your ex
 
     Your operator-side values (image tag, JVM heap, worker count, etc.) come back to whatever they were on that revision. ExaMon's catalog and connector are removed.
 
-## First SQL query
-
-The connector lifts each KairosDB tag to a column and exposes the sample value as `VARCHAR`; cast at query time for numeric metrics. With either path complete, the simulated `random_sensor` metric is available:
-
-```sql
-SELECT timestamp,
-       CAST(value AS DOUBLE) AS sensor_value
-FROM examon_ts_timestamps.kairosdb."random_sensor"
-WHERE timestamp > current_timestamp - INTERVAL '5' MINUTE
-ORDER BY timestamp DESC
-LIMIT 20;
-```
-
-For an existing-release path on Kubernetes, substitute a metric you know is being published into your ExaMon KairosDB; `SHOW TABLES FROM examon_ts_timestamps.kairosdb` lists them.
-
-The result is the most recent samples from the simulated publisher, the same data the [`Random Sensor` Grafana dashboard](../../get-started/quickstart.md#step-3-open-grafana) plots.
-
-## Same query from Python
-
-```python
-import pandas as pd
-from trino.dbapi import connect
-
-with connect(
-    host="localhost",
-    port=8080,
-    user="examon",
-    catalog="examon_ts_timestamps",
-    schema="kairosdb",
-) as conn:
-    df = pd.read_sql(
-        """
-        SELECT timestamp,
-               CAST(value AS DOUBLE) AS sensor_value
-        FROM "random_sensor"
-        WHERE timestamp > current_timestamp - INTERVAL '5' MINUTE
-        ORDER BY timestamp DESC
-        LIMIT 20
-        """,
-        conn,
-    )
-print(df.head())
-```
-
-The dependencies are `pip install trino pandas`. The same connection works from any Trino client: Superset, DBeaver, Power BI, JDBC.
-
 ## What this does and does not do
 
-- **Does**: install or extend a Trino instance with the ExaMon KairosDB connector and the `examon_ts_timestamps` catalog, and prove the federation path with a first SQL query.
+- **Does**: install or extend a Trino instance with the ExaMon KairosDB connector and the `examon_ts_timestamps` catalog, and confirm the catalog is live.
 - **Does not**: provision the Cassandra catalog (no Slurm metadata available on the local stack), enable Trino authentication, persist Trino state across uninstall, or tune the install for production load. Those are the job of the staging and production overlays, planned for v0.5.1.
 
-For the full SQL surface (catalog and schema layout, aggregation pushdown, cross-store joins, per-tool connection guides), see [Users → Analyze](index.md).
+## Next
+
+Once `SHOW CATALOGS` lists `examon_ts_timestamps`, jump to [Users → Analyze → Query with Trino](../../users/analyze/query-with-trino.md) for the first SQL query and the Python client snippet.
 
 ---
 
@@ -232,4 +176,3 @@ For the full SQL surface (catalog and schema layout, aggregation pushdown, cross
 - Kubernetes wiring overlay: [`deploy/trino/values-examon.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/values-examon.yaml), [`deploy/trino/README.md`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/README.md)
 - Upstream Trino Helm chart: [trinodb/charts](https://github.com/trinodb/charts/tree/main/charts/trino)
 - Connector: [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector)
-- Trino Python client: [trinodb/trino-python-client](https://github.com/trinodb/trino-python-client)

@@ -92,13 +92,16 @@ nav:
             - administrators/operations/configure.md
             - administrators/operations/troubleshoot.md
             - administrators/operations/change-propagation.md
+        - Add-ons:
+            - administrators/add-ons/index.md
+            - administrators/add-ons/trino.md
     - Users:
         - users/index.md
         - Dashboards:
             - users/dashboards/index.md
         - Analyze:
             - users/analyze/index.md
-            - users/analyze/local-trino-quickstart.md
+            - users/analyze/query-with-trino.md
             - users/analyze/Demo_ExamonQL.ipynb
         - AI:
             - users/ai/index.md
