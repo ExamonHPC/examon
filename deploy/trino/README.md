@@ -1,4 +1,4 @@
-# ExaMon Trino overlays
+# ExaMon Trino wiring overlay
 
 ExaMon does not bundle [Trino](https://trino.io/). The umbrella Helm
 chart stops at the KairosDB / Cassandra storage layer; the SQL surface
@@ -8,55 +8,96 @@ provided by a separately-installed Trino release plus the
 Keeping Trino outside the umbrella means its lifecycle (upgrades,
 scaling, auth, JVM tuning) stays with the operator, not with ExaMon.
 
-This directory ships ExaMon's "wiring recipe": values overlays for the
+This directory ships one file: ExaMon's "wiring recipe" for the
 upstream [`trino/trino`](https://github.com/trinodb/charts/tree/main/charts/trino)
-Helm chart that wire the connector into ExaMon's storage layer and tune
-the install for a known target.
+Helm chart. It plugs the connector and the `examon_ts_timestamps`
+catalog into a Trino release without touching image tag, JVM heap,
+worker count, auth, networking, or persistence. Pair it with whatever
+sizing values your deployment needs.
 
-## Overlays
+## The overlay
 
-| File | Use case | Sets | Status |
-|---|---|---|---|
-| [`values-examon-local.yaml`](values-examon-local.yaml) | Fresh Trino install on a laptop (K3d, 8 GB host) | Image tag, worker count, JVM heap, query memory, connector init-container, KairosDB catalog | Live in v0.5.0 |
-| [`values-examon-addon.yaml`](values-examon-addon.yaml) | Add ExaMon catalogs and the connector to an **existing** `trino/trino` Helm release | Connector init-container, KairosDB catalog only (no image, heap, workers, auth) | Live in v0.5.0 |
-| `values-examon-staging.yaml` | Single-VM K3d HA | KairosDB + Cassandra (Slurm) | Planned, v0.5.1+ |
-| `values-examon-production.yaml` | Real Kubernetes cluster | KairosDB + Cassandra (Slurm), TLS, persistent storage | Planned, v0.5.1+ |
+| File | Contents |
+|---|---|
+| [`values-examon.yaml`](values-examon.yaml) | Init-container that fetches the connector JAR on coordinator and worker, plugin volume + mount on both pods, and the `examon_ts_timestamps` catalog pointing at the ExaMon KairosDB Service. Nothing else. |
+
+That's it. Sizing, image tag, worker count, auth, networking, and
+persistence all stay in your own values file (or `--set` flags). For
+the most common deployment shapes, see the [Trino Quickstart](../../docs/users/analyze/local-trino-quickstart.md).
 
 ## Usage
 
-See [Users -> Analyze -> Trino Quickstart](../../docs/users/analyze/local-trino-quickstart.md)
-for the operator-facing install procedure. The short forms are:
+### Fresh install (laptop-sized example)
 
-Fresh install (laptop):
+The sizing snippet below targets the 8 GB host documented in the
+ExaMon Quickstart. It is an **example**, not chart-side material:
+operators with different targets supply their own.
 
 ```bash
+cat > /tmp/trino-laptop.yaml <<'EOF'
+image:
+  tag: "476"           # tested with trino-kairosdb-connector 3.0.0-rc1
+
+server:
+  workers: 1
+
+coordinator:
+  jvm: { maxHeapSize: "1G" }
+  config:
+    query: { maxMemoryPerNode: "512MB" }
+
+worker:
+  jvm: { maxHeapSize: "1G" }
+  config:
+    query: { maxMemoryPerNode: "512MB" }
+EOF
+
 helm repo add trino https://trinodb.github.io/charts
 helm repo update
-helm install trino trino/trino \
-  --version 1.42.2 \
-  -f deploy/trino/values-examon-local.yaml \
+
+helm install trino trino/trino --version 1.42.2 \
+  -f /tmp/trino-laptop.yaml \
+  -f deploy/trino/values-examon.yaml \
   -n examon --wait --timeout 5m
 ```
 
-Add to an existing `trino/trino` release:
+### Add ExaMon catalogs to an existing `trino/trino` release
+
+Pass your existing values file as the first `-f`, or `helm upgrade`
+resets unset fields to chart defaults. If you don't have a copy on
+disk, export the current ones first:
 
 ```bash
+helm get values <your-release> -n <your-namespace> -o yaml \
+  > /tmp/current-values.yaml
+
 helm upgrade <your-release> trino/trino \
-  -f <your-current-values>.yaml \
-  -f deploy/trino/values-examon-addon.yaml \
+  -f /tmp/current-values.yaml \
+  -f deploy/trino/values-examon.yaml \
   -n <your-namespace>
 ```
 
-Pass your existing values file (or one exported with `helm get values <your-release> -n <your-namespace> -o yaml`) as the first `-f`, otherwise `helm upgrade` resets unset fields back to chart defaults. Edit `catalogs.examon_ts_timestamps`' `kairosdb.url` first if your Trino and ExaMon live in different namespaces.
+Edit `catalogs.examon_ts_timestamps`' `kairosdb.url` in
+`values-examon.yaml` if Trino and ExaMon live in different namespaces;
+both common shapes are documented in the file's comment.
 
 ## Pin policy
 
-The local overlay pins **both** the upstream chart version (`1.42.2`)
-and the Trino image tag (`476`). The image tag matches the connector's
-documented Trino compatibility line. Operators who want a different
-combination edit the `--version` flag and `image.tag` in the overlay.
+The wiring overlay does not pin chart version or image tag: those
+stay with the operator. Connector 3.0.0-rc1 is tested against Trino
+**476**; the laptop example above sets `image.tag: "476"` so operators
+who paste it land on a tested combination. If your existing release
+runs a much older Trino, rebuild the connector against the matching
+SPI; see the [connector repository](https://github.com/ExamonHPC/trino-kairosdb-connector).
 
-The add-on overlay does not pin chart version or image tag: those stay
-with the operator's own values file. Connector 3.0.0-rc1 is tested
-against Trino 476; if your existing release runs a much older Trino,
-rebuild the connector against the matching SPI.
+## Helm list-merge caveat
+
+Helm merges YAML maps deeply but lists by replacement.
+`initContainers.coordinator`, `initContainers.worker`,
+`coordinator.additionalVolumes`, `coordinator.additionalVolumeMounts`,
+`worker.additionalVolumes`, and `worker.additionalVolumeMounts` are
+lists. If your other values file already defines any of these, the
+overlay will replace your entries rather than append. Inspect with
+`helm get values <release> -a` first; if any are non-empty, paste the
+ExaMon blocks into your own values file (concatenating the lists) and
+skip the second `-f`.

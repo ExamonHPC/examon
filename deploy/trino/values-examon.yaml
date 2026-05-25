@@ -1,25 +1,38 @@
-# ExaMon catalog and connector add-on for an existing trino/trino Helm
-# release.
+# ExaMon's Trino wiring overlay for the upstream `trino/trino` Helm
+# chart. Universal across deployment shapes: laptop, staging,
+# production, existing release.
 #
-# Use this overlay when you already operate Trino with the upstream
-# `trino/trino` Helm chart and you only want to plug ExaMon's
-# trino-kairosdb-connector and catalog into it. It deliberately does
-# NOT set image.tag, server.workers, JVM heap, query memory, auth,
-# networking, or persistence: those stay with your own values file.
+# Ships ExaMon's three contract pieces and nothing else:
+#   1. An init-container on coordinator and worker that fetches
+#      kairosdb-connector-3.0.0-rc1.jar from the connector's GitHub
+#      release into the Trino plugin directory.
+#   2. The plugin volume and mount on both pods.
+#   3. The examon_ts_timestamps catalog pointing at the ExaMon
+#      KairosDB Service.
 #
-# Apply with:
+# Deliberately does NOT set image.tag, server.workers, JVM heap,
+# query memory, auth, networking, or persistence. Those are the
+# operator's call and stay in the operator's own values file. See
+# docs/users/analyze/local-trino-quickstart.md for a laptop-sized
+# sizing snippet you can pair with this file.
 #
-#   helm upgrade <your-release> trino/trino \
-#     -f <your-current-values>.yaml \
-#     -f deploy/trino/values-examon-addon.yaml \
-#     -n <your-namespace>
+# Pair with your own sizing values:
+#
+#   helm install <release> trino/trino --version <chart-version> \
+#     -f <your-sizing-or-current-values>.yaml \
+#     -f deploy/trino/values-examon.yaml \
+#     -n <namespace>
+#
+# For existing releases, use `helm upgrade` instead of `helm install`
+# and pass the current values exported with
+# `helm get values <release> -n <namespace> -o yaml`.
 #
 # Important: Helm merges YAML maps deeply but lists by replacement.
 # initContainers.coordinator, initContainers.worker,
 # coordinator.additionalVolumes, coordinator.additionalVolumeMounts,
 # worker.additionalVolumes, and worker.additionalVolumeMounts are
-# lists. If your own values already define any of these, the overlay
-# will replace your entries rather than appending to them. Paste the
+# lists. If your other values file already defines any of these, the
+# overlay will replace those entries rather than appending. Paste the
 # blocks below into your own values file instead in that case.
 #
 # Trino version compatibility: connector 3.0.0-rc1 was tested against
