@@ -96,6 +96,7 @@ nav:
             - users/dashboards/index.md
         - Analyze:
             - users/analyze/index.md
+            - users/analyze/local-trino-quickstart.md
             - users/analyze/Demo_ExamonQL.ipynb
         - AI:
             - users/ai/index.md

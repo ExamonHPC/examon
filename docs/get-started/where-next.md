@@ -18,7 +18,7 @@ Read the [Administrators guide](../administrators/index.md). It covers three ope
 Read the [Users guide](../users/index.md). It covers three consumption paths:
 
 - **Dashboards**: Grafana for operational dashboards, including the 3D Digital Twin for facility-scale visualization. The [Dashboards section](../users/dashboards/index.md) covers both.
-- **Analyze**: SQL through Trino from any BI tool, notebook, or scripting language, plus a legacy Python client for pre-Trino deployments. The [Analyze section](../users/analyze/index.md) covers the Trino schema, example queries, per-tool connection guides, and the bundled [ExamonQL notebook](../users/analyze/Demo_ExamonQL.ipynb), which uses the legacy `examon-client` interface against the ExaMon REST API.
+- **Analyze**: SQL through Trino from any BI tool, notebook, or scripting language, plus a legacy Python client for pre-Trino deployments. The [Analyze section](../users/analyze/index.md) covers the Trino schema, example queries, per-tool connection guides. The [Local Trino Quickstart](../users/analyze/local-trino-quickstart.md) is the fastest way to a first SQL query against your local stack. The bundled [ExamonQL notebook](../users/analyze/Demo_ExamonQL.ipynb) uses the legacy `examon-client` interface against the ExaMon REST API and remains useful in pre-Trino deployments.
 - **AI**: natural-language questions and runbook-driven investigation through ExaMon AI. The [AI section](../users/ai/index.md) covers the agent's capabilities and current beta status.
 
 ## I extend ExaMon with new code
