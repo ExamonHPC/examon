@@ -1,0 +1,45 @@
+# Optional Trino overlay for the ExaMon Docker Compose stack.
+# Compatibility: trino-kairosdb-connector 3.0.0-rc1, tested with Trino 476.
+# Usage: docker compose -f docker-compose.yml -f compose.trino.yml up -d
+# See deploy/docker/trino/README.md for details.
+
+services:
+  trino-connector-init:
+    image: curlimages/curl:8.10.1
+    command:
+      - sh
+      - -c
+      - |
+        set -eu
+        test -f /plugin/kairosdb-connector.jar || \
+        curl -fsSL -o /plugin/kairosdb-connector.jar \
+          "https://github.com/ExamonHPC/trino-kairosdb-connector/releases/download/3.0.0-rc1/kairosdb-connector-3.0.0-rc1.jar"
+    volumes:
+      - trino_kairosdb_plugin:/plugin
+    networks:
+      - examon_net
+    restart: "no"
+
+  trino:
+    image: trinodb/trino:476
+    depends_on:
+      trino-connector-init:
+        condition: service_completed_successfully
+      kairosdb:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - trino_kairosdb_plugin:/usr/lib/trino/plugin/kairosdb:ro
+      - ./deploy/docker/trino/catalog:/etc/trino/catalog:ro
+    networks:
+      - examon_net
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+volumes:
+  trino_kairosdb_plugin:
