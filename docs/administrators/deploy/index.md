@@ -18,13 +18,13 @@ The architectural difference between the two is documented in [Deployment topolo
 
 ## Kubernetes environments
 
-The Helm chart supports three environment profiles through values files. Each profile defines the storage, replication, TLS, and network-policy posture appropriate for that environment.
+The Helm chart supports three environment profiles through values files. Each profile defines the storage, replication, and TLS posture appropriate for that environment.
 
-| Environment | Target host | Cassandra nodes | KairosDB replicas | TLS | NetworkPolicies |
-|---|---|---|---|---|---|
-| **Local** | Laptop or desktop running K3d | 1 | 1 | None | None |
-| **Staging** | Single VM with K3d multi-node | 3 (soft affinity) | 2 | Self-signed | Yes |
-| **Production** | Real Kubernetes cluster | 3 (hard affinity) | 2 | Let's Encrypt | Yes |
+| Environment | Target host | Cassandra nodes | KairosDB replicas | TLS |
+|---|---|---|---|---|
+| **Local** | Laptop or desktop running K3d | 1 | 1 | None |
+| **Staging** | Single VM with K3d multi-node | 3 (soft affinity) | 2 | Self-signed |
+| **Production** | Real Kubernetes cluster | 3 (hard affinity) | 2 | Let's Encrypt |
 
 Approximate resource requirements:
 
@@ -59,7 +59,7 @@ The pages below cover each deployment path end to end.
 - [On Kubernetes](on-kubernetes.md): the conceptual install path, covering chart structure, value overlays, secrets, and the day-1 install sequence.
 - [Local development](local-development.md): full K3d-on-laptop walkthrough, both automated and manual.
 - [Staging](staging.md): multi-node HA on a single VM using K3d.
-- [Harden for production](harden-for-production.md): TLS, secret handling, NetworkPolicies, anti-affinity, and the production hardening posture.
+- [Harden for production](harden-for-production.md): TLS, secret handling, anti-affinity, backups, and known gaps in the production hardening posture.
 
 ### Docker Compose
 

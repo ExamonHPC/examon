@@ -5,9 +5,9 @@
 
 Production targets a real Kubernetes cluster: on-premises (OpenStack,
 RKE2, kubeadm) or cloud-managed (EKS, GKE, AKS). This page covers the
-hardening posture (TLS, secrets, NetworkPolicies, anti-affinity,
-backups, monitoring) that separates a production install from the
-local-development bring-up.
+hardening posture (TLS, secrets, anti-affinity, backups, monitoring)
+that separates a production install from the local-development
+bring-up, plus the gaps to be aware of in v0.5.0.
 
 ## Service Exposure Architecture
 
@@ -68,7 +68,17 @@ Verify the Ingress controller is running and has an external IP:
 kubectl get svc -n ingress-nginx
 ```
 
-## Step 1: Build and Push Images
+## Step 1: Create the namespace
+
+All ExaMon resources install into a dedicated namespace. Create it
+before anything else so subsequent steps (pull secrets, cert-manager
+issuers, the Helm release itself) have a namespace to target:
+
+```bash
+kubectl create namespace examon
+```
+
+## Step 2: Build and Push Images
 
 Build images and push to your production registry:
 
@@ -102,7 +112,7 @@ global:
 See the [Private Container Registries](on-kubernetes.md#private-container-registries)
 section for per-subchart overrides and further details.
 
-## Step 2: Install cert-manager
+## Step 3: Install cert-manager
 
 ```bash
 helm repo add jetstack https://charts.jetstack.io
@@ -150,7 +160,7 @@ spec:
 kubectl apply -f cluster-issuer.yaml
 ```
 
-## Step 3: Configure Production Values
+## Step 4: Configure Production Values
 
 Edit `values-production.yaml` before deploying. Key settings to customize:
 
@@ -242,7 +252,78 @@ annotations:
   cert-manager.io/cluster-issuer: selfsigned-issuer
 ```
 
-## Step 4: Install K8ssandra Operator
+### MQTT TLS
+
+To enable TLS on the MQTT broker, set `mqtt.tls.enabled=true` in
+`values-production.yaml` and provide a Kubernetes TLS secret named
+`mosquitto-tls` containing the broker certificate and key. The secret
+must live in the `examon` namespace and use the standard `tls.crt` /
+`tls.key` / `ca.crt` keys.
+
+There are two common ways to create the secret.
+
+**Option A: cert-manager Certificate (recommended).** Reuse the
+ClusterIssuer created in Step 3 to mint the broker certificate
+automatically. The DNS name should match the LoadBalancer hostname you
+plan to advertise to publishers:
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mosquitto-tls
+  namespace: examon
+spec:
+  secretName: mosquitto-tls
+  issuerRef:
+    name: letsencrypt-prod        # or selfsigned-issuer
+    kind: ClusterIssuer
+  commonName: mqtt.examon.example.com
+  dnsNames:
+    - mqtt.examon.example.com
+  duration: 2160h                  # 90 days
+  renewBefore: 360h                # 15 days
+```
+
+```bash
+kubectl apply -f mosquitto-tls-cert.yaml
+```
+
+cert-manager populates the `mosquitto-tls` Secret with the issued
+certificate and rotates it automatically before expiry.
+
+**Option B: manual secret.** If you already have a certificate (for
+example, issued by an internal CA outside the cluster), create the
+secret directly:
+
+```bash
+kubectl create secret tls mosquitto-tls \
+  --cert=path/to/mqtt.crt \
+  --key=path/to/mqtt.key \
+  -n examon
+# Add the CA bundle so MQTT clients can verify the chain:
+kubectl create secret generic mosquitto-tls-ca \
+  --from-file=ca.crt=path/to/ca.crt \
+  -n examon
+```
+
+Then enable TLS in your values:
+
+```yaml
+mqtt:
+  tls:
+    enabled: true
+    secretName: mosquitto-tls
+```
+
+!!! warning "v0.5.0 caveat: plaintext listener stays open"
+    In v0.5.0, enabling MQTT TLS adds port 8883 alongside the existing
+    plaintext listener on 1883 rather than replacing it. Operators who
+    require TLS-only must restrict 1883 at the LoadBalancer service or
+    NetworkPolicy layer. See [Known gaps in v0.5.0](#known-gaps-in-v050)
+    for the workaround and tracking issue.
+
+## Step 5: Install K8ssandra Operator
 
 The K8ssandra operator must be installed as a separate Helm release before
 the ExaMon chart. Its validating webhook must be fully running before Helm
@@ -253,12 +334,13 @@ helm repo add k8ssandra https://helm.k8ssandra.io/stable
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
-kubectl create namespace examon 2>/dev/null || true
 helm install k8ssandra-operator k8ssandra/k8ssandra-operator \
   -n examon --wait --timeout 5m
 ```
 
-## Step 5: Deploy ExaMon
+The `examon` namespace was created in Step 1.
+
+## Step 6: Deploy ExaMon
 
 ```bash
 cd deploy/helm/examon
@@ -276,7 +358,7 @@ examon-server read them from the K8ssandra-generated secret
 (`examon-cassandra-superuser`) via `secretKeyRef` environment variables.
 No second `helm upgrade` is needed.
 
-## Step 6: Verify
+## Step 7: Verify
 
 ```bash
 # All pods running
@@ -304,7 +386,14 @@ curl https://api.examon.example.com/
 # MQTT via LoadBalancer
 MQTT_IP=$(kubectl get svc examon-mosquitto -n examon \
   -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+# Plaintext listener (always exposed in v0.5.0; see Known gaps)
 mosquitto_sub -h "$MQTT_IP" -p 1883 -t '#' -v -C 3
+
+# TLS listener (only if mqtt.tls.enabled=true)
+kubectl get secret mosquitto-tls -n examon \
+  -o jsonpath='{.data.ca\.crt}' | base64 -d > /tmp/ca.crt
+mosquitto_sub -h "$MQTT_IP" -p 8883 --cafile /tmp/ca.crt -t '#' -v -C 3
 ```
 
 ## Post-Deployment
@@ -348,8 +437,57 @@ top-level `bundledDashboards.enabled` toggle.
 
 ### Backups
 
-Cassandra backups are handled by Medusa (part of K8ssandra). Configure
-backup storage (S3, GCS, Azure Blob, Ceph/S3) in the K8ssandraCluster CR.
+Cassandra backup and restore is handled by [Medusa](https://github.com/k8ssandra/medusa)
+(part of K8ssandra). **In v0.5.0 the umbrella chart does not configure
+Medusa in the `K8ssandraCluster` template**, so backups are not enabled
+out of the box. Operators who need automated backups must patch the CR
+after `helm install`.
+
+Create a Kubernetes Secret in the `examon` namespace containing the
+credentials for your backup storage backend. For S3-compatible storage
+the secret keys are typically `credentials` (an INI-style file with
+`aws_access_key_id` / `aws_secret_access_key`):
+
+```bash
+kubectl create secret generic medusa-bucket-key \
+  --from-file=credentials=path/to/credentials \
+  -n examon
+```
+
+Then patch the `K8ssandraCluster` resource to add a `spec.medusa` block:
+
+```yaml
+apiVersion: k8ssandra.io/v1alpha1
+kind: K8ssandraCluster
+metadata:
+  name: examon-cassandra
+  namespace: examon
+spec:
+  medusa:
+    storageProperties:
+      storageProvider: s3_compatible
+      bucketName: examon-cassandra-backups
+      host: s3.example.com
+      port: 443
+      secure: true
+      prefix: examon
+      storageSecretRef:
+        name: medusa-bucket-key
+```
+
+```bash
+kubectl patch k8ssandracluster examon-cassandra -n examon \
+  --type merge --patch-file medusa-patch.yaml
+```
+
+K8ssandra schedules backups via the `MedusaBackupSchedule` custom
+resource; see the [Medusa documentation](https://docs.k8ssandra.io/tasks/backup-restore/)
+for the schedule resource definition and restore procedure.
+
+!!! note "v0.5.0 caveat: Medusa not wired in the chart"
+    The post-install patch above is the documented workaround until the
+    chart's `K8ssandraCluster` template gains a `spec.medusa` block. See
+    [Known gaps in v0.5.0](#known-gaps-in-v050) for the tracking issue.
 
 ### Monitoring
 
@@ -428,6 +566,33 @@ datacenter `size` in `values-production.yaml` and run `helm upgrade`.
   On cloud VMs, the cloud provider's LB integration applies
 - **Storage**: Longhorn (bundled with Rancher) or local-path provisioner for
   development; production should use a distributed storage backend
+
+## Known gaps in v0.5.0
+
+A small number of production-hardening features are documented as
+manual workarounds in this page because they are not yet wired into
+the umbrella chart. Each item below is tracked as a GitHub issue;
+this section will shrink as those issues close.
+
+**MQTT plaintext listener stays open when TLS is enabled.** Setting
+`mqtt.tls.enabled=true` adds an 8883 listener but does not remove the
+1883 listener. Operators who require TLS-only must restrict 1883 at
+the LoadBalancer service or at a NetworkPolicy applied externally.
+Tracked in a follow-up issue (link added before promotion).
+
+**NetworkPolicies are not shipped in the chart.** The umbrella chart
+does not currently include `NetworkPolicy` resources for inter-service
+isolation. Operators who need pod-to-pod isolation must author and
+apply their own `NetworkPolicy` manifests against the rendered
+Service labels (`app.kubernetes.io/name=mosquitto`, `=kairosdb`,
+`=examon-server`, `=cassandra`, and so on). Tracked in a follow-up
+issue (link added before promotion).
+
+**Medusa backups are not configured by the chart.** The
+`K8ssandraCluster` template does not include a `spec.medusa` block.
+Automated Cassandra backups require the post-install patch shown in
+the [Backups](#backups) subsection above. Tracked in a follow-up
+issue (link added before promotion).
 
 ---
 

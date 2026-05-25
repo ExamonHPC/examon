@@ -3,7 +3,7 @@
 !!! info "Status: Live (reproduced 2026-05-23)"
     Verified against examon-core v0.5.0.
 
-The staging environment runs a **full HA topology** on a single VM using K3d, mirroring production's replica counts, pod anti-affinity, NetworkPolicies, and TLS -- but with minimal resources.
+The staging environment runs a **full HA topology** on a single VM using K3d, mirroring production's replica counts, pod anti-affinity, and TLS, but with minimal resources.
 
 ## Why Staging?
 
@@ -13,7 +13,6 @@ Staging validates:
 - **Service replication:** 2 KairosDB replicas, 2 examon-server replicas
 - **Full data pipeline:** `random_pub` enabled to exercise MQTT -> KairosDB -> Cassandra
 - **TLS:** Self-signed certificates via cert-manager
-- **NetworkPolicies:** Same isolation rules as production
 
 ## How It Works
 
@@ -183,7 +182,7 @@ Cassandra         3 nodes, 512Mi each       3 nodes, 4Gi each
                   soft anti-affinity         hard anti-affinity
 KairosDB          2 replicas, 256Mi         2 replicas, 2Gi
 TLS               self-signed               Let's Encrypt
-Backups           disabled                  Medusa enabled
+Backups           disabled                  Medusa (manual patch in v0.5.0)
 Cluster           K3d on single VM          Real K8s cluster
 ```
 

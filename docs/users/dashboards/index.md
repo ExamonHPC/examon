@@ -17,7 +17,7 @@ Grafana is exposed on port 3000 in K3d environments (local and staging) and thro
 
 The default admin user is `admin`. The password is whatever was passed at install time via `grafana.adminPassword`. For local development bring-ups via [`scripts/k8s-local-setup.sh`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/scripts/k8s-local-setup.sh), the script prints the password it generated.
 
-For production, the password is the value supplied to the install command; see [Harden for production → Step 5](../../administrators/deploy/harden-for-production.md#step-5-deploy-examon). It is also stored in the `examon-grafana` Kubernetes Secret:
+For production, the password is the value supplied to the install command; see [Harden for production → Step 6](../../administrators/deploy/harden-for-production.md#step-6-deploy-examon). It is also stored in the `examon-grafana` Kubernetes Secret:
 
 ```bash
 kubectl get secret examon-grafana -n examon -o jsonpath='{.data.admin-password}' | base64 -d && echo
