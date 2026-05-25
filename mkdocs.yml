@@ -15,6 +15,7 @@ theme:
     - search.share
     - navigation.footer
     - announce.dismiss
+    - content.code.copy
   palette:
     - scheme: default
       primary: indigo
