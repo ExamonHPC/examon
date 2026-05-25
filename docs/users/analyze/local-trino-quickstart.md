@@ -1,35 +1,77 @@
 # Trino Quickstart
 
 !!! info "Status: Live (reproduced 2026-05-25)"
-    Verified against examon-core v0.5.0, the upstream Trino chart 1.42.2 (Trino image 476), and [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) v3.0.0-rc1. Both paths below were tested end to end against the same K3d cluster.
+    Verified against examon-core v0.5.0 and [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) v3.0.0-rc1 on Trino 476. The Kubernetes path was tested end to end on K3d; the Docker Compose path uses the same connector and image pin.
 
-> This page wires a Trino SQL surface to an ExaMon installation. The procedure is the same for two shapes:
+> This page wires a Trino SQL surface to an ExaMon installation. Trino is kept outside the ExaMon core on purpose: its lifecycle (upgrades, scaling, JVM tuning, authentication) belongs with the operator, not with ExaMon. ExaMon ships only its contract with Trino, not Trino itself.
 >
-> - **Fresh install**: you have no Trino in your cluster yet and want one sized for a laptop-scale ExaMon (the [Get Started Quickstart](../../get-started/quickstart.md) profile). You install Trino alongside ExaMon in the `examon` namespace.
-> - **Existing release**: you already operate Trino with the upstream [`trino/trino`](https://github.com/trinodb/charts/tree/main/charts/trino) Helm chart and want to add ExaMon's catalog and connector to it without disturbing your image tag, JVM heap, worker count, auth, or networking.
->
-> Both paths use the **same** ExaMon wiring overlay, [`deploy/trino/values-examon.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/values-examon.yaml). It ships only ExaMon's contract: the connector init-container, the plugin volume + mount, and the `examon_ts_timestamps` catalog. Sizing, image tag, auth, and everything else stay with your own values file. Steps 2 and 6 fork on the helm verb (`install` vs `upgrade`) and the sizing file you bring; the rest is identical.
->
-> Trino is kept outside the ExaMon umbrella chart on purpose: its lifecycle (upgrades, scaling, JVM tuning, authentication) belongs with the operator, not with ExaMon. ExaMon ships only its contract with Trino, not Trino itself.
+> Pick the section that matches your deployment target. Both land on the same first SQL query.
 
 ## Before you start
 
-- `helm` v3.x and `kubectl` configured against the target cluster.
 - A `trino` client, either the [Docker image](https://hub.docker.com/r/trinodb/trino) or the [native CLI](https://trino.io/docs/current/client/cli.html). The examples below use the Docker image.
-- For the **fresh install** path: the [Get Started Quickstart](../../get-started/quickstart.md) is done (K3d cluster `examon-local`, healthy `examon` namespace, `random_pub` publishing into KairosDB) and you have about 2 GB of free RAM on top of the existing ExaMon stack.
-- For the **existing release** path: your Trino was installed with the upstream `trino/trino` chart (the procedure below does not apply to manually-managed Trino, custom images, operator-managed deployments, or Starburst). You also need network reachability from your Trino pods to your ExaMon KairosDB Service.
-- If Trino and ExaMon live in different namespaces, edit `catalogs.examon_ts_timestamps`' `kairosdb.url` in [`deploy/trino/values-examon.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/values-examon.yaml) before applying. Both common shapes are documented in the file's comment.
+- The core ExaMon stack is already running (the [Get Started Quickstart](../../get-started/quickstart.md) is done) and `random_pub` is publishing into KairosDB.
+- About 2 GB of free RAM on top of the existing ExaMon stack.
 
-## Step 1. Add the Trino Helm repository
+## On Docker Compose
+
+The Compose stack ships an optional Trino overlay, [`compose.trino.yml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/compose.trino.yml). It adds a single-node Trino plus a one-shot init service that fetches the KairosDB connector into a named volume, and mounts the ExaMon-owned catalog from [`deploy/docker/trino/catalog/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/docker/trino/catalog).
+
+### Step 1. Apply the overlay
+
+From the repository root, with the core stack already up:
+
+```bash
+docker compose -f docker-compose.yml -f compose.trino.yml up -d
+```
+
+The init service downloads the connector once and caches it in the `trino_kairosdb_plugin` volume. Trino is reachable on `http://localhost:8080`.
+
+### Step 2. Verify the install
+
+```bash
+docker compose -f docker-compose.yml -f compose.trino.yml ps trino
+docker run --rm -it --network host trinodb/trino:476 \
+  trino --server http://localhost:8080 \
+        --execute 'SHOW CATALOGS'
+```
+
+`examon_ts_timestamps` should appear alongside the Trino defaults `system`, `tpch`, and `tpcds`.
+
+### Step 3. Open a Trino session
+
+```bash
+docker run --rm -it --network host trinodb/trino:476 \
+  trino --server http://localhost:8080 \
+        --catalog examon_ts_timestamps \
+        --schema kairosdb
+```
+
+At the `trino>` prompt, paste the query from [First SQL query](#first-sql-query). The result is the most recent samples from the simulated `random_sensor` publisher.
+
+### Step 4. Roll back
+
+To remove only the Trino overlay and keep the core stack:
+
+```bash
+docker compose -f docker-compose.yml -f compose.trino.yml stop trino trino-connector-init
+docker compose -f docker-compose.yml -f compose.trino.yml rm -f trino trino-connector-init
+```
+
+## On Kubernetes
+
+Trino is installed as a separate Helm release alongside the ExaMon release. ExaMon ships only the wiring overlay, [`deploy/trino/values-examon.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/values-examon.yaml): the connector init-container, the plugin volume + mount, and the `examon_ts_timestamps` catalog. Sizing, image tag, auth, and everything else stay with your own values file.
+
+This section forks on whether you already operate a `trino/trino` Helm release. The wiring overlay is the same in both cases; only the helm verb (`install` vs `upgrade`) and the sizing file you pair with it change.
+
+### Step 1. Add the Trino Helm repository
 
 ```bash
 helm repo add trino https://trinodb.github.io/charts
 helm repo update
 ```
 
-## Step 2. Pair a sizing file with the ExaMon wiring overlay
-
-The ExaMon wiring overlay sets only the connector and catalog. You pair it with a sizing file: a fresh laptop install brings a paste-this snippet, an existing release brings its own current values.
+### Step 2. Pair a sizing file with the ExaMon wiring overlay
 
 === "Fresh install (laptop, no Trino yet)"
 
@@ -87,7 +129,7 @@ The ExaMon wiring overlay sets only the connector and catalog. You pair it with 
     !!! note "Trino version compatibility"
         Connector 3.0.0-rc1 was tested against Trino 476. If your existing release runs a much older Trino, rebuild the connector against the matching SPI before upgrading; see the [connector repository](https://github.com/ExamonHPC/trino-kairosdb-connector).
 
-## Step 3. Verify the install
+### Step 3. Verify the install
 
 ```bash
 kubectl get pods -n <namespace> -l 'app.kubernetes.io/name=trino'
@@ -106,9 +148,32 @@ docker run --rm -it --network host trinodb/trino:476 \
 
 The Service name is `trino` for the fresh-install path and whatever name your existing release uses (typically `<release>-trino`) for the existing-release path. The output lists `examon_ts_timestamps` alongside the chart defaults `system`, `tpch`, and `tpcds`, plus any catalogs your existing release already had.
 
-## Step 4. Run your first query
+### Step 4. Roll back
 
-The connector lifts each KairosDB tag to a column and exposes the sample value as `VARCHAR`; cast at query time for numeric metrics. The fresh-install path has the simulated `random_sensor` metric available out of the box:
+=== "Fresh install"
+
+    ```bash
+    helm uninstall trino -n examon
+    kill %1   # the kubectl port-forward backgrounded in Step 3
+    ```
+
+    The ExaMon stack itself is untouched: only Trino is removed.
+
+=== "Existing release"
+
+    Roll the release back to the revision before the wiring overlay was applied:
+
+    ```bash
+    helm history <your-release> -n <your-namespace>
+    helm rollback <your-release> <previous-revision> -n <your-namespace> --wait
+    kill %1   # the kubectl port-forward backgrounded in Step 3
+    ```
+
+    Your operator-side values (image tag, JVM heap, worker count, etc.) come back to whatever they were on that revision. ExaMon's catalog and connector are removed.
+
+## First SQL query
+
+The connector lifts each KairosDB tag to a column and exposes the sample value as `VARCHAR`; cast at query time for numeric metrics. With either path complete, the simulated `random_sensor` metric is available:
 
 ```sql
 SELECT timestamp,
@@ -119,20 +184,11 @@ ORDER BY timestamp DESC
 LIMIT 20;
 ```
 
-On the existing-release path, substitute a metric you know is being published into your ExaMon KairosDB; `SHOW TABLES FROM examon_ts_timestamps.kairosdb` lists them.
+For an existing-release path on Kubernetes, substitute a metric you know is being published into your ExaMon KairosDB; `SHOW TABLES FROM examon_ts_timestamps.kairosdb` lists them.
 
-Run it through the same CLI (still using the port-forward from Step 3):
+The result is the most recent samples from the simulated publisher, the same data the [`Random Sensor` Grafana dashboard](../../get-started/quickstart.md#step-3-open-grafana) plots.
 
-```bash
-docker run --rm -it --network host trinodb/trino:476 \
-  trino --server http://localhost:8080 \
-        --catalog examon_ts_timestamps \
-        --schema kairosdb
-```
-
-Paste the query at the `trino>` prompt. On the fresh-install path the result is the most recent samples from the simulated publisher, the same data the [`Random Sensor` Grafana dashboard](../../get-started/quickstart.md#step-3-open-grafana) plots.
-
-## Step 5. Run the same query from Python
+## Same query from Python
 
 ```python
 import pandas as pd
@@ -161,33 +217,10 @@ print(df.head())
 
 The dependencies are `pip install trino pandas`. The same connection works from any Trino client: Superset, DBeaver, Power BI, JDBC.
 
-## Step 6. Roll back
-
-=== "Fresh install"
-
-    ```bash
-    helm uninstall trino -n examon
-    kill %1   # the kubectl port-forward backgrounded in Step 3
-    ```
-
-    The ExaMon stack itself is untouched: only Trino is removed.
-
-=== "Existing release"
-
-    Roll the release back to the revision before the wiring overlay was applied:
-
-    ```bash
-    helm history <your-release> -n <your-namespace>
-    helm rollback <your-release> <previous-revision> -n <your-namespace> --wait
-    kill %1   # the kubectl port-forward backgrounded in Step 3
-    ```
-
-    Your operator-side values (image tag, JVM heap, worker count, etc.) come back to whatever they were on that revision. ExaMon's catalog and connector are removed.
-
 ## What this does and does not do
 
 - **Does**: install or extend a Trino instance with the ExaMon KairosDB connector and the `examon_ts_timestamps` catalog, and prove the federation path with a first SQL query.
-- **Does not**: provision the Cassandra catalog (no Slurm metadata locally on the fresh-install path), enable Trino authentication, persist Trino state across uninstall, or tune the install for production load. Those are the job of the staging and production overlays, planned for v0.5.1.
+- **Does not**: provision the Cassandra catalog (no Slurm metadata available on the local stack), enable Trino authentication, persist Trino state across uninstall, or tune the install for production load. Those are the job of the staging and production overlays, planned for v0.5.1.
 
 For the full SQL surface (catalog and schema layout, aggregation pushdown, cross-store joins, per-tool connection guides), see [Users → Analyze](index.md).
 
@@ -195,8 +228,8 @@ For the full SQL surface (catalog and schema layout, aggregation pushdown, cross
 
 ## Source
 
-- ExaMon wiring overlay: [`deploy/trino/values-examon.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/values-examon.yaml)
-- Overlay README: [`deploy/trino/README.md`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/README.md)
-- Upstream Trino Helm chart: [trinodb/charts (trino 1.42.2)](https://github.com/trinodb/charts/tree/main/charts/trino)
+- Docker Compose overlay: [`compose.trino.yml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/compose.trino.yml), [`deploy/docker/trino/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/deploy/docker/trino)
+- Kubernetes wiring overlay: [`deploy/trino/values-examon.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/values-examon.yaml), [`deploy/trino/README.md`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/README.md)
+- Upstream Trino Helm chart: [trinodb/charts](https://github.com/trinodb/charts/tree/main/charts/trino)
 - Connector: [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector)
 - Trino Python client: [trinodb/trino-python-client](https://github.com/trinodb/trino-python-client)

@@ -47,7 +47,7 @@ Facility cooling                        +                                  ExaMo
 | Capability | Status |
 |---|---|
 | Kubernetes deployment via Helm chart | Stable |
-| Docker Compose deployment | Stable (legacy single-machine path) |
+| Docker Compose deployment | Stable (single-host target) |
 | MQTT publish-subscribe transport (Mosquitto) | Stable |
 | KairosDB on Cassandra (3-node K8ssandra StatefulSet on Kubernetes) | Stable |
 | Trino federation with the public [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector) | Available as an Apache-2.0 release on GitHub |

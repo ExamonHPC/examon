@@ -724,7 +724,7 @@ If you see `grafana-kairosdb-datasource` instead, you are still on the
 legacy plugin: re-run `helm upgrade` against the v0.5.0 chart and
 restart the Grafana pod so the plugin install init container re-runs.
 
-**Note for legacy Docker Compose v0.4.0:** the Docker Compose stack still
+**Note for Docker Compose users:** the Docker Compose stack still
 runs Grafana 7.3.10 with the AngularJS plugin and keeps working. The
 matching v0.4.0 snapshot of the test dashboard is preserved under
 `dashboards/legacy/`.

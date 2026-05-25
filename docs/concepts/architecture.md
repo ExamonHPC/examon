@@ -151,7 +151,7 @@ ExaMon's power management layer is a proof-of-concept controller based on Facebo
 
 ## 11. Deployment and orchestration
 
-ExaMon is a distributed system with stateful and stateless components. Deployment is declarative, reproducible, and environment-aware. The v0.4.0 path was Docker Compose with a monolithic supervisord container; the v0.5.0 path is Kubernetes with one workload per service. Both remain supported today; the Kubernetes path is the recommended target for any new deployment.
+ExaMon is a distributed system with stateful and stateless components. Deployment is declarative, reproducible, and environment-aware. The v0.4.0 path was Docker Compose with a monolithic supervisord container; the v0.5.0 path adds Kubernetes with one workload per service. Both shapes are supported targets in v0.5.0: Docker Compose for single-host deployments where Kubernetes is operational overkill, Kubernetes for multi-node, HA, and lifecycle-separated environments.
 
 The v0.5.0 Helm chart uses an umbrella pattern with subcharts per component and environment-specific value overrides for local, staging, and production. Cassandra runs as a 3-node K8ssandra StatefulSet, KairosDB as a multi-replica Deployment, Mosquitto as a StatefulSet, Grafana as a PVC-backed Deployment, and the stateless bridge services as Deployments. Ingress routes `/grafana` to Grafana and `/api` to the ExaMon API server.
 

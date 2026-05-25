@@ -4,6 +4,8 @@
     Verified against examon-core v0.5.0 using the scripts shipped in the repository.
 
 > This page takes a reader from zero to a running ExaMon stack on a local Kubernetes cluster in about 15 minutes. By the end, Grafana is open in a browser with a live dashboard, the data pipeline is publishing simulated sensor data through MQTT into KairosDB, and the KairosDB REST API plus the Grafana KairosDB datasource are ready for ad-hoc exploration. The Trino SQL path is a separate install; Step 4 explains. The path uses K3d, so a developer laptop is sufficient.
+>
+> Prefer a single-host bring-up without Kubernetes? The [Docker Compose target](../administrators/deploy/with-docker-compose.md) brings up the same core with one `docker compose up -d`. Both paths land on the same Grafana dashboard and the same [Trino Quickstart](../users/analyze/local-trino-quickstart.md).
 
 ## Before you start
 

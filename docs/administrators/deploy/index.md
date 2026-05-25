@@ -3,16 +3,16 @@
 !!! info "Status: Live (reproduced 2026-05-23)"
     Verified against examon-core v0.5.0.
 
-> The Deploy section covers every path that brings ExaMon core up on a host: a developer laptop, a single staging VM, a multi-node Kubernetes cluster, or a legacy single-machine Docker Compose host. It is the entry point for the V1 administrator: an operator who needs to go from "nothing installed" to "ExaMon collecting and serving data" against a defined target environment.
+> The Deploy section covers every path that brings ExaMon core up on a host: a developer laptop, a single staging VM, a multi-node Kubernetes cluster, or a single-machine Docker Compose host. It is the entry point for the V1 administrator: an operator who needs to go from "nothing installed" to "ExaMon collecting and serving data" against a defined target environment.
 
 ## Pick a target
 
-ExaMon ships two deployment shapes today. Kubernetes via Helm is the recommended target for any new installation; Docker Compose is preserved as a single-machine compatibility path from the v0.4.0 line.
+ExaMon ships two deployment shapes. Both target the same component versions and the same data model; pick by operational complexity, not by recency.
 
-| Target | Use case |
+| Target | When to pick it |
 |---|---|
-| **Kubernetes (Helm)** | Recommended for development, staging, and production. The same chart drives all three through environment-specific value overlays. |
-| **Docker Compose** | Single-machine legacy path. Useful for quick demos and for hosts where Kubernetes is not justified. |
+| **Docker Compose** | Single host, one-command bring-up. Developer loops, demos, captive single-tenant lab nodes, edge or HPC login nodes, small deployments where Kubernetes is operational overkill. |
+| **Kubernetes (Helm)** | Multi-node, HA, lifecycle separation. Development, staging, and production with the same chart driven by environment-specific value overlays. |
 
 The architectural difference between the two is documented in [Deployment topology](topology.md).
 
@@ -63,11 +63,11 @@ The pages below cover each deployment path end to end.
 
 ### Docker Compose
 
-- [With Docker Compose](with-docker-compose.md): the legacy single-machine path inherited from v0.4.0.
+- [With Docker Compose](with-docker-compose.md): single-host bring-up of the full ExaMon core, with an optional Trino overlay.
 
 ### Migration
 
-- [Upgrade](upgrade.md): migration from v0.4.0 Docker Compose to v0.5.0 Kubernetes.
+- [Upgrade](upgrade.md): in-place upgrades and the Docker Compose to Kubernetes migration path.
 
 ## Related sections
 

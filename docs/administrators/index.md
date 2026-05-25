@@ -27,7 +27,7 @@ A reader who has not yet seen ExaMon at all should walk [Get Started](../get-sta
 
 ## Scope
 
-The guide covers the v0.5.0 line: Kubernetes via Helm as the recommended production target, Docker Compose as a stable legacy single-machine path, and the supporting publisher and operations surface. Where a capability is shipped but still maturing (3D Digital Twin Grafana plugin, ExaMon AI, the publisher scheduler), the relevant page says so in its Status admonition.
+The guide covers the v0.5.0 line: Kubernetes via Helm for multi-node and production deployments, Docker Compose as a stable single-host target for laptops and small captive deployments, and the supporting publisher and operations surface. Where a capability is shipped but still maturing (3D Digital Twin Grafana plugin, ExaMon AI, the publisher scheduler), the relevant page says so in its Status admonition.
 
 ---
 

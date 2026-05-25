@@ -1,12 +1,11 @@
-# With Docker Compose (Legacy)
+# With Docker Compose
 
 !!! info "Status: Live (reproduced 2026-05-23)"
-    Verified against examon-core v0.5.0. Kept as a compatibility path; the Kubernetes path is the recommended target for new installations.
+    Verified against examon-core v0.5.0. Docker Compose is a first-class deployment target alongside Kubernetes.
 
-The Docker Compose deployment is the original v0.4.0 deployment method. It runs all services on a single machine.
+The Docker Compose target runs the full ExaMon core on a single host with one command. It is the right choice when Kubernetes would be operational overkill: developer loops, demos, captive single-tenant lab nodes, edge or HPC login nodes, and small deployments where lifecycle complexity is not justified.
 
-!!! note
-    For new deployments, the [Kubernetes deployment](on-kubernetes.md) is recommended. Docker Compose remains supported for quick testing and backward compatibility.
+For multi-node, HA, or cluster-managed environments, use the [Kubernetes (Helm) target](on-kubernetes.md) instead. The two paths target the same component versions and the same data model; only the orchestration shape changes.
 
 ## Prerequisites
 
@@ -47,14 +46,9 @@ This will build and start:
 
 ### Test Dashboard
 
-This Docker Compose stack runs Grafana 7.3.10 with the legacy AngularJS
-`grafana-kairosdb-datasource` plugin. Import the v0.4.0-compatible
-snapshot from `dashboards/legacy/Examon Test - Random Sensor.json`.
+The Compose stack runs Grafana 7.3.10 with the AngularJS `grafana-kairosdb-datasource` plugin. Import the Compose-compatible snapshot from `dashboards/legacy/Examon Test - Random Sensor.json`.
 
-The dashboards directly under `dashboards/` target the Kubernetes
-(v0.5.0+) stack instead: they use the React-based
-`arpnetworking-kairosdb-datasource` plugin and are not compatible with
-Grafana 7.x.
+The dashboards directly under `dashboards/` target the Kubernetes stack instead: they use the React-based `arpnetworking-kairosdb-datasource` plugin and are not compatible with Grafana 7.x.
 
 ### Data Persistence
 
@@ -63,13 +57,24 @@ Two Docker volumes are created:
 - `examon_cassandra_volume` -- collected metrics
 - `examon_grafana_volume` -- Grafana dashboards and user data
 
-## Migration to Kubernetes
+## Optional: add Trino
 
-See the [Upgrade Guide](upgrade.md) for migrating from Docker Compose to Kubernetes.
+The Compose stack ships an optional Trino overlay that brings a single-node Trino with the KairosDB connector wired against the same `kairosdb` service. Apply it on top of the core compose file:
+
+```bash
+docker compose -f docker-compose.yml -f compose.trino.yml up -d
+```
+
+The full walkthrough, including the first SQL query, is in the [Trino Quickstart](../../users/analyze/local-trino-quickstart.md).
+
+## Moving to Kubernetes
+
+If a deployment outgrows the single-host shape, the [Upgrade](upgrade.md) page covers migration from a Compose stack to a Kubernetes (Helm) install.
 
 ---
 
 ## Source
 
 - Docker Compose file: [`docker-compose.yml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/docker-compose.yml).
-- Legacy v0.4.0 dashboard: [`dashboards/legacy/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/dashboards/legacy).
+- Trino overlay: [`compose.trino.yml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/compose.trino.yml).
+- Compose-compatible dashboard: [`dashboards/legacy/`](https://github.com/ExamonHPC/examon/tree/release/v0.5.0/dashboards/legacy).
