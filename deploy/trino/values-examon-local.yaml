@@ -1,0 +1,74 @@
+# ExaMon's wiring recipe for the upstream Trino chart, local-development profile.
+#
+# Installs Trino in the same namespace as ExaMon and wires the KairosDB
+# catalog at examon-kairosdb.examon.svc.cluster.local:8083. The Trino
+# image is pinned to 476 to match the trino-kairosdb-connector 3.0.0-rc1
+# compatibility line. The connector JAR is fetched at pod start by an
+# init-container running on both coordinator and worker pods.
+#
+# Resource sizing targets the 8 GB laptop host documented in the ExaMon
+# Quickstart. Cassandra (examon_meta) is intentionally not wired here:
+# the local stack has no Slurm/job metadata to expose, so the catalog
+# would be empty. Staging+ overlays add Cassandra.
+#
+# See docs/users/analyze/local-trino-quickstart.md for the operator
+# install procedure.
+
+image:
+  tag: "476"   # tested with trino-kairosdb-connector 3.0.0-rc1
+
+server:
+  workers: 1   # local: minimise footprint on K3d
+
+# Internal YAML anchors. The upstream Trino chart ignores unknown
+# top-level keys, so _anchors stays inert in the rendered values.
+# This dedupes the init-container + volume + mount across coordinator
+# and worker; bumping the connector version is a one-line edit.
+_anchors:
+  init: &kairosdbInit
+    name: install-kairosdb-connector
+    image: curlimages/curl:8.10.1
+    command: [sh, -c]
+    args:
+      - |
+        set -eu
+        curl -fsSL \
+          -o /plugin/kairosdb-connector.jar \
+          https://github.com/ExamonHPC/trino-kairosdb-connector/releases/download/3.0.0-rc1/kairosdb-connector-3.0.0-rc1.jar
+    volumeMounts:
+      - { name: kairosdb-plugin, mountPath: /plugin }
+  volume: &kairosdbVolume
+    name: kairosdb-plugin
+    emptyDir: {}
+  mount: &kairosdbMount
+    name: kairosdb-plugin
+    mountPath: /usr/lib/trino/plugin/kairosdb
+
+initContainers:
+  coordinator: [*kairosdbInit]
+  worker:      [*kairosdbInit]
+
+coordinator:
+  jvm:
+    maxHeapSize: "1G"
+  config:
+    query:
+      maxMemoryPerNode: "512MB"
+  additionalVolumes:      [*kairosdbVolume]
+  additionalVolumeMounts: [*kairosdbMount]
+
+worker:
+  jvm:
+    maxHeapSize: "1G"
+  config:
+    query:
+      maxMemoryPerNode: "512MB"
+  additionalVolumes:      [*kairosdbVolume]
+  additionalVolumeMounts: [*kairosdbMount]
+
+catalogs:
+  examon_ts_timestamps: |-
+    connector.name=kairosdb
+    kairosdb.url=http://examon-kairosdb.examon.svc.cluster.local:8083
+    kairosdb.timestamp.format=TIMESTAMP_TZ
+    kairosdb.timestamp.default-start-hours=24
