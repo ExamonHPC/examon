@@ -78,8 +78,16 @@ helm upgrade <your-release> trino/trino \
 ```
 
 Edit `catalogs.examon_ts_timestamps`' `kairosdb.url` in
-`values-examon.yaml` if Trino and ExaMon live in different namespaces;
-both common shapes are documented in the file's comment.
+`values-examon.yaml` so it resolves from your Trino pods to your
+ExaMon KairosDB Service. Two common shapes:
+
+- Trino and ExaMon in the same namespace:
+  `http://examon-kairosdb:8083`
+- Trino and ExaMon in different namespaces (same cluster):
+  `http://examon-kairosdb.<examon-namespace>.svc.cluster.local:8083`
+
+For cross-cluster or external KairosDB, point at the exposed endpoint
+(Ingress, LoadBalancer, external DNS) instead.
 
 ## Pin policy
 

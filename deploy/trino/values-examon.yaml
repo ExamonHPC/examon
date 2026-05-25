@@ -1,44 +1,6 @@
-# ExaMon's Trino wiring overlay for the upstream `trino/trino` Helm
-# chart. Universal across deployment shapes: laptop, staging,
-# production, existing release.
-#
-# Ships ExaMon's three contract pieces and nothing else:
-#   1. An init-container on coordinator and worker that fetches
-#      kairosdb-connector-3.0.0-rc1.jar from the connector's GitHub
-#      release into the Trino plugin directory.
-#   2. The plugin volume and mount on both pods.
-#   3. The examon_ts_timestamps catalog pointing at the ExaMon
-#      KairosDB Service.
-#
-# Deliberately does NOT set image.tag, server.workers, JVM heap,
-# query memory, auth, networking, or persistence. Those are the
-# operator's call and stay in the operator's own values file. See
-# docs/users/analyze/local-trino-quickstart.md for a laptop-sized
-# sizing snippet you can pair with this file.
-#
-# Pair with your own sizing values:
-#
-#   helm install <release> trino/trino --version <chart-version> \
-#     -f <your-sizing-or-current-values>.yaml \
-#     -f deploy/trino/values-examon.yaml \
-#     -n <namespace>
-#
-# For existing releases, use `helm upgrade` instead of `helm install`
-# and pass the current values exported with
-# `helm get values <release> -n <namespace> -o yaml`.
-#
-# Important: Helm merges YAML maps deeply but lists by replacement.
-# initContainers.coordinator, initContainers.worker,
-# coordinator.additionalVolumes, coordinator.additionalVolumeMounts,
-# worker.additionalVolumes, and worker.additionalVolumeMounts are
-# lists. If your other values file already defines any of these, the
-# overlay will replace those entries rather than appending. Paste the
-# blocks below into your own values file instead in that case.
-#
-# Trino version compatibility: connector 3.0.0-rc1 was tested against
-# Trino 476. Older Trino instances may need a connector rebuild
-# against the matching SPI; see
-# https://github.com/ExamonHPC/trino-kairosdb-connector.
+# ExaMon catalog overlay for the upstream trino/trino Helm chart.
+# Compatibility: trino-kairosdb-connector 3.0.0-rc1, tested with Trino 476.
+# See deploy/trino/README.md for usage, sizing examples, and caveats.
 
 _anchors:
   init: &kairosdbInit
@@ -48,11 +10,11 @@ _anchors:
     args:
       - |
         set -eu
-        curl -fsSL \
-          -o /plugin/kairosdb-connector.jar \
-          https://github.com/ExamonHPC/trino-kairosdb-connector/releases/download/3.0.0-rc1/kairosdb-connector-3.0.0-rc1.jar
+        curl -fsSL -o /plugin/kairosdb-connector.jar \
+          "https://github.com/ExamonHPC/trino-kairosdb-connector/releases/download/3.0.0-rc1/kairosdb-connector-3.0.0-rc1.jar"
     volumeMounts:
-      - { name: kairosdb-plugin, mountPath: /plugin }
+      - name: kairosdb-plugin
+        mountPath: /plugin
   volume: &kairosdbVolume
     name: kairosdb-plugin
     emptyDir: {}
@@ -73,17 +35,6 @@ worker:
   additionalVolumeMounts: [*kairosdbMount]
 
 catalogs:
-  # Replace kairosdb.url with the endpoint that resolves from your
-  # Trino pods to your ExaMon KairosDB service. Two common shapes:
-  #
-  #   Trino and ExaMon in the same namespace:
-  #     kairosdb.url=http://examon-kairosdb:8083
-  #
-  #   Trino and ExaMon in different namespaces (same cluster):
-  #     kairosdb.url=http://examon-kairosdb.examon.svc.cluster.local:8083
-  #
-  # For cross-cluster or external KairosDB, point at the exposed
-  # endpoint (Ingress, LoadBalancer, external DNS) instead.
   examon_ts_timestamps: |-
     connector.name=kairosdb
     kairosdb.url=http://examon-kairosdb.examon.svc.cluster.local:8083
