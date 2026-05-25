@@ -38,7 +38,7 @@ The ExaMon wiring overlay sets only the connector and catalog. You pair it with 
     ```bash
     cat > /tmp/trino-laptop.yaml <<'EOF'
     image:
-      tag: "476"           # tested with trino-kairosdb-connector 3.0.0-rc1
+      tag: "476"
 
     server:
       workers: 1
@@ -198,5 +198,5 @@ For the full SQL surface (catalog and schema layout, aggregation pushdown, cross
 - ExaMon wiring overlay: [`deploy/trino/values-examon.yaml`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/values-examon.yaml)
 - Overlay README: [`deploy/trino/README.md`](https://github.com/ExamonHPC/examon/blob/release/v0.5.0/deploy/trino/README.md)
 - Upstream Trino Helm chart: [trinodb/charts (trino 1.42.2)](https://github.com/trinodb/charts/tree/main/charts/trino)
-- Connector: [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector) (Apache-2.0, v3.0.0-rc1)
+- Connector: [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector)
 - Trino Python client: [trinodb/trino-python-client](https://github.com/trinodb/trino-python-client)

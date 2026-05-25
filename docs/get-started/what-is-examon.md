@@ -82,5 +82,5 @@ ExaMon is developed at the [DEI Department of Electrical, Electronic, and Inform
 
 - The ExaMon source repository: [ExamonHPC/examon](https://github.com/ExamonHPC/examon) (release/v0.5.0).
 - About: [community/about.md](../community/about.md).
-- Trino-KairosDB connector: [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector) (v3.0.0-rc1, Apache-2.0, May 2026).
+- Trino-KairosDB connector: [ExamonHPC/trino-kairosdb-connector](https://github.com/ExamonHPC/trino-kairosdb-connector).
 - Reference dataset: [Borghesi, A., Di Santi, C., Molan, M. et al. M100 ExaData: a data collection campaign on the CINECA’s Marconi100 Tier-0 supercomputer. Sci Data 10, 288 (2023)](https://doi.org/10.1038/s41597-023-02174-3).
