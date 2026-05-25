@@ -83,7 +83,7 @@ kubectl port-forward svc/examon-kairosdb 8083:8083 -n examon
 curl http://localhost:8083/api/v1/metricnames | jq '.results | length'
 ```
 
-The Trino SQL path is a separately-installed component, kept outside the ExaMon chart so its lifecycle (upgrades, scaling, JVM tuning, authentication) stays independent. To add it to your local stack, follow [Users → Analyze → Trino Quickstart](../users/analyze/local-trino-quickstart.md), which ships tested values overlays for the upstream Trino Helm chart (one for a fresh laptop install, one for an existing release) and walks you through your first SQL query. See [Users → Analyze](../users/analyze/index.md) for the full SQL surface.
+The Trino SQL path is a separately-installed component, kept outside the ExaMon chart so its lifecycle (upgrades, scaling, JVM tuning, authentication) stays independent. To add it to your local stack, follow [Users → Analyze → Trino Quickstart](../users/analyze/local-trino-quickstart.md), which ships a tested values overlay for the upstream Trino Helm chart, pairs it with a laptop sizing snippet, and walks you through your first SQL query. See [Users → Analyze](../users/analyze/index.md) for the full SQL surface.
 
 ## Step 5. Tear down
 
