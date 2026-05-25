@@ -2,8 +2,7 @@
 
 ExaMon does not bundle [Trino](https://trino.io/). The umbrella Helm
 chart stops at the KairosDB / Cassandra storage layer; the SQL surface
-described in [Users -> Analyze](../../docs/users/analyze/index.md) is
-provided by a separately-installed Trino release plus the
+is provided by a separately-installed Trino release plus the
 [`trino-kairosdb-connector`](https://github.com/ExamonHPC/trino-kairosdb-connector).
 Keeping Trino outside the umbrella means its lifecycle (upgrades,
 scaling, auth, JVM tuning) stays with the operator, not with ExaMon.
@@ -22,8 +21,10 @@ sizing values your deployment needs.
 | [`values-examon.yaml`](values-examon.yaml) | Init-container that fetches the connector JAR on coordinator and worker, plugin volume + mount on both pods, and the `examon_ts_timestamps` catalog pointing at the ExaMon KairosDB Service. Nothing else. |
 
 That's it. Sizing, image tag, worker count, auth, networking, and
-persistence all stay in your own values file (or `--set` flags). For
-the most common deployment shapes, see the [Trino Quickstart](../../docs/users/analyze/local-trino-quickstart.md).
+persistence all stay in your own values file (or `--set` flags). The
+end-to-end install walkthrough and the first SQL query live in the
+published ExaMon documentation (Administrators -> Add-ons -> Trino,
+Users -> Analyze -> Query with Trino).
 
 ## Usage
 
