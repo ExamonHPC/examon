@@ -36,20 +36,22 @@ The connector exposes each KairosDB metric as a virtual table. The columns are:
 
 | Column type | Example | Source |
 |---|---|---|
-| Mandatory timestamp | `time` (`TIMESTAMP(3) WITH TIME ZONE`) | KairosDB sample timestamp. Also available as `BIGINT` epoch milliseconds. |
-| Mandatory value | `value` (`DOUBLE`) | The numeric sample. |
+| Mandatory timestamp | `timestamp` | Sample timestamp. The SQL type is configurable in the connector catalog via `kairosdb.timestamp.format`: `BIGINT` (epoch milliseconds, connector default), `TIMESTAMP(3)` (UTC), or `TIMESTAMP(3) WITH TIME ZONE`. The examples below assume `TIMESTAMP(3) WITH TIME ZONE`; rewrite the `WHERE` literals as epoch milliseconds if your catalog uses `BIGINT`. |
+| Mandatory value | `value` (`VARCHAR`) | The raw KairosDB sample as a string. KairosDB allows per-metric value types (numeric, string, complex); the connector echoes whatever the storage layer returns rather than guessing a type per metric. For numeric metrics, cast at query time with `CAST(value AS DOUBLE)`. |
 | One column per tag | `org`, `cluster`, `node`, `plugin`, ... | Lifted from the metric's KairosDB tags. The full tag set varies per metric. |
 | Hidden `sampling_aggregator` | n/a | Pushdown of KairosDB aggregators via `WHERE` clause. See below. |
+
+The `value` column is `VARCHAR` so that string, numeric, and complex (histogram, percentile) metrics share one schema. For metrics you know are numeric, wrap each read in `CAST(value AS DOUBLE)`; if you query the same metric repeatedly, a SQL view over the cast hides the boilerplate from downstream consumers without changing the connector.
 
 A metric like `power.draw` published from `nvml_pub` with tags `(org=examon, cluster=e4red, node=cn01, plugin=nvml_pub, gpu=0)` is queryable as:
 
 ```sql
-SELECT time, value
+SELECT timestamp, CAST(value AS DOUBLE) AS power_w
 FROM examon_ts_timestamps.kairosdb."power.draw"
 WHERE node = 'cn01'
   AND gpu = '0'
-  AND time > current_timestamp - INTERVAL '1' HOUR
-ORDER BY time;
+  AND timestamp > current_timestamp - INTERVAL '1' HOUR
+ORDER BY timestamp;
 ```
 
 The tag-as-column mapping is what makes WHERE-clause filtering against ExaMon's data idiomatic SQL rather than a custom DSL.
@@ -59,13 +61,13 @@ The tag-as-column mapping is what makes WHERE-clause filtering against ExaMon's 
 KairosDB's native aggregators (`avg`, `sum`, `min`, `max`, `count`, `first`, `last`, `dev`, `percentile`, `rate`, `sampler`, `scale`, `trim`, `gaps`, `histogram`, `least_squares`) are pushed down to KairosDB via the hidden `sampling_aggregator` column in `WHERE`:
 
 ```sql
-SELECT time, value
+SELECT timestamp, CAST(value AS DOUBLE) AS temp_c
 FROM examon_ts_timestamps.kairosdb."CPU1_Temp"
 WHERE node = 'acnode03'
-  AND time BETWEEN TIMESTAMP '2026-05-23 00:00:00 UTC'
-              AND TIMESTAMP '2026-05-23 23:59:59 UTC'
+  AND timestamp BETWEEN TIMESTAMP '2026-05-23 00:00:00 UTC'
+                    AND TIMESTAMP '2026-05-23 23:59:59 UTC'
   AND sampling_aggregator = 'avg;1m;start_time'
-ORDER BY time;
+ORDER BY timestamp;
 ```
 
 This avoids transferring raw sample points to Trino for aggregation: KairosDB performs the bucketing, only the aggregated points cross the wire. For long time ranges (weeks or months), pushdown is the difference between a query that returns in seconds and a query that exhausts memory.
@@ -101,10 +103,10 @@ WITH failed_jobs AS (
   WHERE state = 'FAILED'
     AND start_time > current_timestamp - INTERVAL '30' DAY
 )
-SELECT j.job_id, j.user, AVG(g.value) AS avg_gpu_temp
+SELECT j.job_id, j.user, AVG(CAST(g.value AS DOUBLE)) AS avg_gpu_temp
 FROM failed_jobs j
 JOIN examon_ts_timestamps.kairosdb."temperature.gpu" g
-  ON g.time BETWEEN j.start_time AND j.end_time
+  ON g.timestamp BETWEEN j.start_time AND j.end_time
 WHERE g.sampling_aggregator = 'avg;1m;start_time'
 GROUP BY j.job_id, j.user
 ORDER BY avg_gpu_temp DESC;

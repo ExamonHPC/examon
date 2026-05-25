@@ -3,7 +3,7 @@
 !!! info "Status: Live (reproduced 2026-05-23)"
     Verified against examon-core v0.5.0 using the scripts shipped in the repository.
 
-> This page takes a reader from zero to a running ExaMon stack on a local Kubernetes cluster in about 15 minutes. By the end, Grafana is open in a browser with a live dashboard, the data pipeline is publishing simulated sensor data through MQTT into KairosDB, and the SQL query path is reachable. The path uses K3d, so a developer laptop is sufficient.
+> This page takes a reader from zero to a running ExaMon stack on a local Kubernetes cluster in about 15 minutes. By the end, Grafana is open in a browser with a live dashboard, the data pipeline is publishing simulated sensor data through MQTT into KairosDB, and the KairosDB REST API plus the Grafana KairosDB datasource are ready for ad-hoc exploration. The Trino SQL path is a separate install; Step 4 explains. The path uses K3d, so a developer laptop is sufficient.
 
 ## Before you start
 

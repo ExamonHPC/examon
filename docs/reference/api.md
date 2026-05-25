@@ -129,20 +129,20 @@ Column shape:
 
 | Column | Type | Source |
 |---|---|---|
-| `time` | `TIMESTAMP(3) WITH TIME ZONE` | KairosDB sample timestamp. Also available as `BIGINT` epoch milliseconds and `TIMESTAMP(3)` (no zone). |
-| `value` | `DOUBLE` | The numeric sample. |
+| `timestamp` | Configurable via `kairosdb.timestamp.format`: `BIGINT` (epoch milliseconds, connector default), `TIMESTAMP(3)` (UTC), or `TIMESTAMP(3) WITH TIME ZONE` | KairosDB sample timestamp. Examples below assume `TIMESTAMP(3) WITH TIME ZONE`; rewrite `WHERE` literals as epoch milliseconds if your catalog uses `BIGINT`. |
+| `value` | `VARCHAR` | The raw KairosDB sample as a string. KairosDB allows per-metric value types (numeric, string, complex); the connector echoes whatever the storage layer returns. For numeric metrics, cast at query time with `CAST(value AS DOUBLE)`. |
 | (one per tag) | `VARCHAR` | Lifted from the metric's KairosDB tags. The column set varies per metric. |
 | `sampling_aggregator` | `VARCHAR` (hidden) | Pushdown mechanism for KairosDB aggregators. Hidden by default; usable only in `WHERE`. |
 
 A query against one metric:
 
 ```sql
-SELECT time, value
+SELECT timestamp, CAST(value AS DOUBLE) AS power_w
 FROM examon_ts_timestamps.kairosdb."power.draw"
 WHERE node = 'cn01'
   AND gpu = '0'
-  AND time > current_timestamp - INTERVAL '1' HOUR
-ORDER BY time;
+  AND timestamp > current_timestamp - INTERVAL '1' HOUR
+ORDER BY timestamp;
 ```
 
 ### Aggregation pushdown (the `sampling_aggregator` column)
@@ -150,11 +150,11 @@ ORDER BY time;
 The hidden `sampling_aggregator` column is the connector's pushdown mechanism. KairosDB's native aggregators (`avg`, `sum`, `min`, `max`, `count`, `first`, `last`, `dev`, `percentile`, `rate`, `sampler`, `scale`, `trim`, `gaps`, `histogram`, `least_squares`) are pushed down to KairosDB and only the aggregated points cross the wire:
 
 ```sql
-SELECT time, value
+SELECT timestamp, CAST(value AS DOUBLE) AS temp_c
 FROM examon_ts_timestamps.kairosdb."CPU1_Temp"
 WHERE node = 'acnode03'
-  AND time BETWEEN TIMESTAMP '2026-05-23 00:00:00 UTC'
-              AND TIMESTAMP '2026-05-23 23:59:59 UTC'
+  AND timestamp BETWEEN TIMESTAMP '2026-05-23 00:00:00 UTC'
+                    AND TIMESTAMP '2026-05-23 23:59:59 UTC'
   AND sampling_aggregator = 'avg;1m;start_time';
 ```
 
