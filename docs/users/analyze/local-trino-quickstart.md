@@ -50,16 +50,16 @@ kubectl get pods -n examon -l 'app.kubernetes.io/name=trino'
 
 You should see one coordinator pod and one worker pod, both `Running` with the `install-kairosdb-connector` init-container `Completed`.
 
-Confirm the catalog is live. The examples below port-forward Trino to host port `18080` rather than `8080`; this is deliberate. Another Trino on the same host (a Docker Compose dev stack, a different K3d cluster, anything else listening on `0.0.0.0:8080`) silently steals the connection: `kubectl port-forward` exits without binding, and the `trino` client happily talks to the wrong server. Picking a free port avoids the collision; any free port works.
+Confirm the catalog is live:
 
 ```bash
-kubectl port-forward -n examon svc/trino 18080:8080 &
+kubectl port-forward -n examon svc/trino 8080:8080 &
 docker run --rm -it --network host trinodb/trino:476 \
-  trino --server http://localhost:18080 \
+  trino --server http://localhost:8080 \
   --execute 'SHOW CATALOGS'
 ```
 
-The output lists `examon_ts_timestamps` alongside the upstream defaults `system`, `tpch`, and `tpcds`. If you see other catalogs (e.g. `examon_meta`, `examon_ts`), the port-forward did not bind and you are talking to a different Trino: confirm with `curl http://localhost:18080/v1/info` (the K3d coordinator reports `"uptime"` in minutes for a fresh install).
+The output lists `examon_ts_timestamps` alongside the upstream defaults `system`, `tpch`, and `tpcds`.
 
 ## Step 4. Run your first query
 
@@ -74,11 +74,11 @@ ORDER BY timestamp DESC
 LIMIT 20;
 ```
 
-Run it through the same CLI (still on the `18080` port-forward from Step 3):
+Run it through the same CLI (still using the port-forward from Step 3):
 
 ```bash
 docker run --rm -it --network host trinodb/trino:476 \
-  trino --server http://localhost:18080 \
+  trino --server http://localhost:8080 \
         --catalog examon_ts_timestamps \
         --schema kairosdb
 ```
@@ -93,7 +93,7 @@ from trino.dbapi import connect
 
 with connect(
     host="localhost",
-    port=18080,   # match the kubectl port-forward host port from Step 3
+    port=8080,
     user="examon",
     catalog="examon_ts_timestamps",
     schema="kairosdb",
