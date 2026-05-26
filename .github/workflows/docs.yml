@@ -3,8 +3,9 @@ name: Docs
 # Publishes the MkDocs site to GitHub Pages via `mike` (versioned docs).
 #
 # Aliases on gh-pages:
-#   - release/*  push   -> mike deploy dev                          (in-development tip)
-#   - v*         tag    -> mike deploy <version> latest             (stable release)
+#   - release/*       push   -> mike deploy dev                      (in-development tip)
+#   - v<semver>       tag    -> mike deploy v<semver> latest         (stable release)
+#   - v<semver>-...   tag    -> skipped                              (pre-release: -rc, -beta, etc.)
 #
 # Local doc work happens on disposable `doc` branches and is previewed with
 # `mkdocs serve` only; nothing publishes from those branches. To promote, merge
@@ -50,9 +51,9 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/release/')
         run: mike deploy --push dev
 
-      - name: Deploy versioned + latest (v* tags)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Deploy versioned + latest (GA tags only)
+        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-')
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${GITHUB_REF_NAME}"
           mike deploy --push --update-aliases "$VERSION" latest
           mike set-default --push latest
