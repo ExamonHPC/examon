@@ -28,7 +28,7 @@ The high-level path families:
 
 | Path family | Returns | Typical consumer |
 |---|---|---|
-| `/api/health` | Service health and status. | Smoke tests, liveness probes. |
+| `/api/health` | Platform health and release version. **Unauthenticated** — see [below](#health-and-platform-version). | `examonctl` preflight and qualification, smoke tests, liveness probes. |
 | `/api/...metrics...` | Metric listings and metadata. | `examon-client` for tab-completion and discovery. |
 | `/api/...query...` | Time-series queries with caching. | `examon-client` and legacy dashboards that pre-dated the Trino federation. |
 | `/api/...jobs...` | Slurm job listing and per-job query helpers. | `examon-client` and HPC operators using the legacy interface. |
@@ -39,9 +39,27 @@ The `examon-server` REST API is the right surface when the consumer already spea
 
 A practical heuristic: if a query touches only one store (just time-series, or just job records) and the consumer already exists, the legacy API may be acceptable. If the query crosses stores, or if the consumer is new, use Trino.
 
+### Health and platform version
+
+The one exception to the delegated authentication above: the core host owns a single unauthenticated probe route (interim contract, see the addon-contract §4.8):
+
+```
+GET /api/health
+```
+
+```json
+{"status": "ok", "platform_version": "0.5.0"}
+```
+
+`platform_version` is the ExaMon platform release, read from the root `VERSION` file baked into the server image (bare semver, no `v` prefix; `"unknown"` if the file is missing). Any non-200 answer means unhealthy — no degraded states are defined. The intended consumer is `examonctl`: `plan` checks the value against the installation's `expectedVersion`, and `qualify` records it in the platform handshake.
+
+```bash
+curl http://examon-examon-server:5000/api/health
+```
+
 ### Readiness and liveness probes
 
-The Kubernetes Deployment uses TCP socket probes rather than HTTP probes against `/` (the root endpoint requires Grafana authentication and returns HTTP 401, which Kubernetes interprets as unhealthy):
+The Kubernetes Deployment uses TCP socket probes rather than HTTP probes against `/` (the root endpoint requires Grafana authentication and returns HTTP 401, which Kubernetes interprets as unhealthy). As of v0.5.0 an HTTP probe target exists (`/api/health` above), though the chart still ships TCP probes:
 
 ```yaml
 readinessProbe:
