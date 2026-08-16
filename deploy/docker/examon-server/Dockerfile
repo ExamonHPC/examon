@@ -10,6 +10,7 @@ COPY web/examon-server/requirements.txt .
 RUN CASS_DRIVER_BUILD_CONCURRENCY=8 pip install --no-cache-dir -r requirements.txt
 
 COPY web/examon-server/ .
+COPY VERSION .
 
 EXPOSE 5000
 

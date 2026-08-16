@@ -250,6 +250,32 @@ def localize_timestamps(df, tz):
                 df[col] = df[col].dt.tz_convert(tz)
     return df
 
+def _read_platform_version():
+    """Read the platform release version from the root VERSION file.
+
+    Looks next to this file first (standalone image bakes it in /app),
+    then two levels up (repo root / legacy image EXAMON_HOME).
+    """
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    for candidate in (os.path.join(base_dir, 'VERSION'),
+                      os.path.abspath(os.path.join(base_dir, '..', '..', 'VERSION'))):
+        try:
+            with open(candidate) as f:
+                version = f.read().strip()
+                return version[1:] if version.startswith('v') else version
+        except (IOError, OSError):
+            continue
+    return 'unknown'
+
+
+PLATFORM_VERSION = _read_platform_version()
+
+
+@app.route('/api/health')
+def health():
+    return jsonify({'status': 'ok', 'platform_version': PLATFORM_VERSION}), 200
+
+
 @app.route('/')
 @auth.login_required
 def index():

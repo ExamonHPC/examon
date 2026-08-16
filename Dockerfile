@@ -7,6 +7,9 @@ ADD ./publishers/random_pub ${EXAMON_HOME}/publishers/random_pub
 ADD ./docker/examon/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
 ADD ./scripts/examon.conf $EXAMON_HOME/scripts/examon.conf
 ADD ./web $EXAMON_HOME/web
+# Platform release version served by /api/health; kept at EXAMON_HOME so the
+# compose bind-mount of web/examon-server does not hide it
+ADD ./VERSION $EXAMON_HOME/VERSION
 
 # Venvs
 WORKDIR $EXAMON_HOME/scripts
